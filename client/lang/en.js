@@ -1,0 +1,3 @@
+var englishPack = {
+	Apply:'Apply'
+};

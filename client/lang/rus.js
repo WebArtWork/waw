@@ -1,0 +1,3 @@
+var russianPack = {
+	 Apply:'Применить',
+};

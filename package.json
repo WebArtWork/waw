@@ -1,0 +1,51 @@
+{
+	"name": "waw",
+	"version": "0.0.1",
+	"description": "Framework which provide layer over Mongodb, Node.js and Angular.js. Give availability as structure layouts, code parts, ready setup code and others.",
+	"license": "MIT",
+	"repository": "WebArtWork/waw",
+	"authors": [{
+		"name": "Honchar Denys",
+		"email": "crackeraki@gmail.com"
+	}],
+	"engines": {
+		"node": ">=4.4.7"
+	},
+	"main": "./index.js",
+	"keywords": [
+		"framework",
+		"waw"
+	],
+	"dependencies": {
+		"node-sass-middleware": "*",
+		"js-minify": "*",
+
+		"serve-favicon": "*",
+		"bcrypt-nodejs": "*",
+		"body-parser": "*",
+		"connect-mongo": "*",
+		"cookie-parser": "*",
+		"express": "*",
+		"express-paginate": "*",
+		"express-session": "*",
+		"method-override": "*",
+		"mongoose": "*",
+		"mongoose-paginate": "*",
+		"npmi": "*",
+		"morgan": "*",
+
+		"passport": "*",
+		"passport-local": "*",
+		"passport-twitter": "*",
+		"passport-facebook": "*",
+		"passport-instagram": "*",
+		"passport-vkontakte": "*",
+
+		"socket.io": "*",
+		"passport.socketio": "*",
+		"socket.io-emitter": "*",
+		"socket.io-adapter-mongo": "*"
+	}
+}
+
+
