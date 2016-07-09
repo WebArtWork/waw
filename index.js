@@ -27,7 +27,7 @@ module.exports = function(config) {
 		app.use(methodOverride('X-HTTP-Method-Override'));
 		app.set('view cache', true);
 	// Selections
-		createFolder(config.server);
+		io.createFolder(config.server);
 		if(config.database){
 			var mongoose = require('mongoose');
 			mongoose.connect(config.database.url);
@@ -35,7 +35,7 @@ module.exports = function(config) {
 				var paginate = require('express-paginate');
 				app.use(paginate.middleware(10, 50));
 			}
-			if(config.database.schemas||config.passport||config.socket.passport) createFolder(config.server+'/databases');
+			if(config.database.schemas||config.passport||config.socket.passport) io.createFolder(config.server+'/databases');
 			if(config.database.public&&config.database.public.length>0){
 				var npmi = require('npmi');
 				var addPublicPackage = function(name){
@@ -64,7 +64,7 @@ module.exports = function(config) {
 			if(config.database.schemas){
 				for (var i = 0; i < config.database.schemas.length; i++) {
 					clientRequireCounter++;
-					createSchema(config.database.schemas[i], function(schema){
+					io.createSchema(config.database.schemas[i], function(schema){
 						routesToRequire.push(config.server+'/'+ulfirst(schema.name));
 						readyForClient();
 					});
@@ -80,7 +80,7 @@ module.exports = function(config) {
 				if(config.passport.local){
 					clientRequireCounter++;
 					localCounter++;
-					createSchema({
+					io.createSchema({
 						name: "User",
 						fields: [{
 							name: "username",
@@ -102,7 +102,7 @@ module.exports = function(config) {
 				if(config.passport.twitter){
 					clientRequireCounter++;
 					localCounter++;
-					createSchema({
+					io.createSchema({
 						name: "User",
 						fields: [{
 							name: "twitter",
@@ -155,7 +155,7 @@ module.exports = function(config) {
 		}else var store;
 		if(config.socket){
 			var io = require('socket.io').listen(server);
-			createFile(__dirname+'/templates/socket.js', config.server+'/socket.js',{
+			io.createFile(__dirname+'/templates/socket.js', config.server+'/socket.js',{
 
 			}, function(){
 				require(config.server+'/socket.js')(io);
@@ -188,7 +188,7 @@ module.exports = function(config) {
 		if(config.session){
 			var sessionMiddleware = session({
 				key: 'express.sid',
-				secret: 'anAwesomeSecretForMyRoomsApp',
+				secret: 'anAwesomeSecretForMyApp',
 				resave: false,
 				saveUninitialized: true,
 				cookie: {
@@ -211,13 +211,11 @@ module.exports = function(config) {
 					functionsToRequire[i]();
 				}
 
-
-				var app = config.app;
 				var pages = config.pages;
 				var production = config.production;
 				var root = config.root;
-				createFolder(root + '/client');
-				createFolder(root + '/client/scss');
+				io.createFolder(root + '/client');
+				io.createFolder(root + '/client/scss');
 				app.use(require('node-sass-middleware')({
 					src: root + '/client/scss',
 					dest: root + '/client',
