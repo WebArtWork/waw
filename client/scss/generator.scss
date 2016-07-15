@@ -1,0 +1,39 @@
+html,
+body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    display: table;
+}
+/*    box style*/
+
+.box {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+/*    row style*/
+
+.row {
+    display: table-row;
+    width: 100%;
+}
+
+.row-in {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+/*	column style*/
+
+.col {
+    display: table-cell;
+    vertical-align: top;
+}
+
+.col-in {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
