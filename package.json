@@ -1,6 +1,6 @@
 {
 	"name": "waw",
-	"version": "0.1.11",
+	"version": "0.2.0",
 	"description": "Framework which provide layer over Mongodb, Node.js and Angular.js. Give availability as structure layouts, code parts, ready setup code and others.",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
@@ -20,6 +20,7 @@
 		"node-sass-middleware": "*",
 		"js-minify": "*",
 
+		"nodemon": "*",
 		"serve-favicon": "*",
 		"bcrypt-nodejs": "*",
 		"body-parser": "*",
@@ -34,13 +35,13 @@
 		"npmi": "*",
 		"morgan": "*",
 
+
 		"passport": "*",
 		"passport-local": "*",
 		"passport-twitter": "*",
 		"passport-facebook": "*",
 		"passport-instagram": "*",
 		"passport-vkontakte": "*",
-
 		"socket.io": "*",
 		"passport.socketio": "*",
 		"socket.io-emitter": "*",

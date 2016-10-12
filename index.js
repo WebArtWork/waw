@@ -1,24 +1,33 @@
-var funcs = require(__dirname+'/lib/functionalities.js');
-var readme = require(__dirname+'/lib/readme.js');
-var gu = require(__dirname+'/lib/gu.js');
-module.exports = function(config) {
-	// Defines
-		var express = require('express');
-		var app = express();
-		config.express = express;
-		config.app = app;
-		config.clientRequireCounter = 0;
-		config.routesToRequire = [];
-		config.functionsToRequire = [];
-		require(__dirname+"/lib/defines.js")(config);
-		funcs.setConfig(config);
-		gu.createFolder(config.server);
-		if(config.database) require(__dirname+"/lib/database.js")(config);
-	// Client side
-		config.serverApp.listen(config.port||8080);
-		console.log("App listening on port " + config.port||8080);
-		config.readyForClient = function(){
-			if(--config.clientRequireCounter===0) require(__dirname+"/lib/client.js")(config);
-		}
-	// End of
-};
+/*
+waw build
+waw run
+waw
+waw add part NAME
+
+waw need to add
+waw create NAME
+*/
+var nodemon = require('nodemon');
+var run = function(){
+	nodemon({
+		script: __dirname+'/run/index.js',
+		ext: 'js json'
+	});
+}
+if(process.argv[2]){
+	switch(process.argv[2].toLowerCase()){
+		case 'build':
+			require(__dirname+'/build').build();
+			return;
+		case 'run':
+			run();
+			return;
+		case 'add':
+			require(__dirname+'/build').add();
+			return;
+		default:
+			return console.log('Wrong Command.');
+	}	
+}else{
+	console.log('INFO ABOUT YOUR PROJECT');
+}
