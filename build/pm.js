@@ -13,7 +13,10 @@ module.exports.create = function(name){
 			from: 'NAME',
 			to: name.capitalize()
 		}];
-		doRenames(dest + '/route.js', renames, function() {
+		doRenames(dest + '/router.js', [{
+			from: 'NAME',
+			to: name
+		}], function() {
 			if (--counter === 0) console.log('Your Part "'+name+'" is successfully created');
 		});
 		doRenames(dest + '/schema.js', renames, function() {

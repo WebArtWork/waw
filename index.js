@@ -1,17 +1,22 @@
 /*
+waw
 waw build
 waw run
-waw
 waw add part NAME
 
-waw need to add
-waw create NAME
+npm i -g waw
+[
+	waw create NAME
+	waw create auth NAME
+]
+waw run
 */
 var nodemon = require('nodemon');
 var run = function(){
 	nodemon({
 		script: __dirname+'/run/index.js',
-		ext: 'js json'
+		ext: 'js json',
+		watch: process.cwd()+'/server'
 	});
 }
 if(process.argv[2]){
@@ -27,7 +32,7 @@ if(process.argv[2]){
 			return;
 		default:
 			return console.log('Wrong Command.');
-	}	
+	}
 }else{
 	console.log('INFO ABOUT YOUR PROJECT');
 }

@@ -4,15 +4,14 @@ var sd = {
 };
 sd.config = JSON.parse(sd.fs.readFileSync(process.cwd()+'/config.json','utf8'));
 sd.app = sd.express();
-require(__dirname+'/readAllParts')(sd, function(){
-	require(__dirname+'/readAllSchemas')(sd, function(){
-		require(__dirname+'/readAllControllers')(sd, function(){
-			require(__dirname+'/readAllRoutes')(sd, function(){
-				require(__dirname+'/readClientRoutes')(sd);
-			});
-		});
-	});
-});
+
+require(__dirname + '/scripts')(sd);
+require(__dirname + '/readAllParts')(sd);
+require(__dirname + '/readAllSchemas')(sd);
+require(__dirname + '/readAllControllers')(sd);
+require(__dirname + '/readAllRoutes')(sd);
+require(__dirname + '/readClientRoutes')(sd);
+
 var server = require('http').Server(sd.app);
 var mongoose = require('mongoose');
 var passport = require('passport');
