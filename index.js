@@ -4,6 +4,12 @@ waw build
 waw run
 waw add part NAME
 
+waw git init user git@github.com:WebArtWork/part-user.git
+waw git update user "Message"
+
+(waw git init user waw:NAME)
+
+
 npm i -g waw
 [
 	waw create NAME
@@ -23,6 +29,9 @@ if(process.argv[2]){
 	switch(process.argv[2].toLowerCase()){
 		case 'build':
 			require(__dirname+'/build').build();
+			return;
+		case 'git':
+			require(__dirname+'/build').git();
 			return;
 		case 'run':
 			run();

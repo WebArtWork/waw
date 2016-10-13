@@ -1,0 +1,19 @@
+{
+	"name": "NAME",
+	"schema": [{
+		"src": "/schema.js",
+		"name": "schema"
+	}],
+	"controller": [{
+		"src": "/controller.js",
+		"name": "controller"
+	}],
+	"router": [{
+		"src": "/router.js",
+		"name": "router"
+	}],
+	"socket": [{
+		"src": "/socket.js",
+		"name": "socket"
+	}]
+}

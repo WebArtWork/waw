@@ -8,6 +8,20 @@ module.exports.add = function(){
 		}
 	}else return console.log('Wrong Command.');
 };
+module.exports.git = function(){
+	if(process.argv[3]){
+		switch(process.argv[3].toLowerCase()){
+			case 'init':
+				return require(__dirname+'/git').init(process.argv[4],process.argv[5]);
+			case 'update':
+				return require(__dirname+'/git').pushAll(process.argv[4],process.argv[5], function(){
+					console.log('Successfully updated');
+				});
+			default: 
+				return console.log('Wrong Command.');
+		}
+	}else return console.log('Wrong Command.');
+};
 
 module.exports.build = function(){
 	console.log('BUILD THE APP NOW');

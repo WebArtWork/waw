@@ -1,6 +1,6 @@
 {
 	"name": "waw",
-	"version": "0.2.0",
+	"version": "0.2.2",
 	"description": "Framework which provide layer over Mongodb, Node.js and Angular.js. Give availability as structure layouts, code parts, ready setup code and others.",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
@@ -16,10 +16,14 @@
 		"framework",
 		"waw"
 	],
+	"bin": {
+		"waw": "./"
+	},
 	"dependencies": {
 		"node-sass-middleware": "*",
 		"js-minify": "*",
 
+		"gitty": "*",
 		"nodemon": "*",
 		"serve-favicon": "*",
 		"bcrypt-nodejs": "*",
