@@ -22,6 +22,13 @@ module.exports.git = function(){
 		}
 	}else return console.log('Wrong Command.');
 };
+module.exports.create = function(){
+	if(process.argv[4]){
+		
+	}else require(__dirname+'/git').create(process.argv[3], function(){
+		console.log('Successfully updated');
+	});
+};
 
 module.exports.build = function(){
 	console.log('BUILD THE APP NOW');

@@ -29,10 +29,20 @@ var pushAll = function(part, message, callback){
 		});
 	});
 }
+module.exports.pushAll = pushAll;
 var pull = function(part, callback){
 	var myRepo = git(process.cwd() + '/server/' + part);
 	myRepo.pull('origin','master', function(err){
 		if(typeof callback == 'function') callback();
 	});
 }
-module.exports.pushAll = pushAll;
+module.exports.create = function(name, callback){
+	console.log(name);
+	name = name.replace(/\s+/g, '');
+	var dest = process.cwd() + '/' + name;
+	if(fs.existsSync(dest)) return console.log('Project exists.');
+	fse.mkdirs(dest);
+	git.clone(dest,'git@github.com:WebArtWork/waw-sample-auth.git', function(){
+		// add npm i here
+	});
+}

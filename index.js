@@ -33,6 +33,9 @@ if(process.argv[2]){
 		case 'git':
 			require(__dirname+'/build').git();
 			return;
+		case 'create':
+			require(__dirname+'/build').create();
+			return;
 		case 'run':
 			run();
 			return;
