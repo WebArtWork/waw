@@ -1,6 +1,4 @@
 var minifier = require('js-minify');
-var fs = require('fs');
-var path = require('path');
 var sd;
 module.exports = function(sdGlobal){
 	console.log('READING CLIENT SIDE');
@@ -20,21 +18,21 @@ module.exports = function(sdGlobal){
 		serveFiles(pageUrl, pages[i], pages[i]==sd.config.root);
 	}
 }
-var getListOfComponents = function(path){
-	var libs = sd.getFiles(path);
+var getListOfComponents = function(dest){
+	var libs = sd.getFiles(dest);
 	libs.sort(function(a,b){
 		if(a>b) return 1;
 		else return -1;
 	});
 	for (var i = 0; i < libs.length; i++) {
-		libs[i]=path+'/'+libs[i];
+		libs[i]=dest+'/'+libs[i];
 	}
 	return libs;
 }
-var generateLibs = function(path){
+var generateLibs = function(dest){
 	minifier({
-		files: getListOfComponents(path+'/components'),
-		way: path + '/gen/',
+		files: getListOfComponents(dest+'/components'),
+		way: dest + '/gen/',
 		prefix: sd.config.prefix,
 		production: false
 	});

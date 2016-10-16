@@ -1,13 +1,13 @@
 {
 	"name": "waw",
-	"version": "0.2.3",
+	"version": "0.2.13",
 	"description": "Framework which provide layer over Mongodb, Node.js and Angular.js. Give availability as structure layouts, code parts, ready setup code and others.",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
-	"authors": [{
+	"author": {
 		"name": "Honchar Denys",
 		"email": "crackeraki@gmail.com"
-	}],
+	},
 	"engines": {
 		"node": ">=4.4.7"
 	},
@@ -17,40 +17,31 @@
 		"waw"
 	],
 	"bin": {
-		"waw": "./"
+		"waw": "index.js"
 	},
+	"preferGlobal": "true",
 	"dependencies": {
-		"node-sass-middleware": "*",
-		"js-minify": "*",
-
+		"npmi": "*",
 		"gitty": "*",
+		"morgan": "*",
 		"nodemon": "*",
-		"serve-favicon": "*",
-		"bcrypt-nodejs": "*",
+		"express": "*",
+		"fs-extra": "*",
+		"passport": "*",
+		"mongoose": "*",
+		"js-minify": "*",
 		"body-parser": "*",
 		"connect-mongo": "*",
+		"serve-favicon": "*",
 		"cookie-parser": "*",
-		"express": "*",
-		"express-paginate": "*",
 		"express-session": "*",
 		"method-override": "*",
-		"mongoose": "*",
+		"express-paginate": "*",
 		"mongoose-paginate": "*",
-		"npmi": "*",
-		"morgan": "*",
-
-
-		"passport": "*",
-		"passport-local": "*",
-		"passport-twitter": "*",
-		"passport-facebook": "*",
-		"passport-instagram": "*",
-		"passport-vkontakte": "*",
+		"node-sass-middleware": "*",
 		"socket.io": "*",
 		"passport.socketio": "*",
 		"socket.io-emitter": "*",
 		"socket.io-adapter-mongo": "*"
 	}
 }
-
-

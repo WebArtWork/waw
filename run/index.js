@@ -1,23 +1,17 @@
 var sd = {
 	express: require('express'),
-	fs: require('fs')
+	passport: require('passport'),
+	mongoose: require('mongoose'),
+	fs: require('fs'),
+	path: require('path'),
+	fse: require('fs-extra')
 };
 sd.config = JSON.parse(sd.fs.readFileSync(process.cwd()+'/config.json','utf8'));
 sd.app = sd.express();
 
-require(__dirname + '/scripts')(sd);
-require(__dirname + '/readAllParts')(sd);
-require(__dirname + '/readAllSchemas')(sd);
-require(__dirname + '/readAllControllers')(sd);
-require(__dirname + '/readAllRoutes')(sd);
-require(__dirname + '/readClientRoutes')(sd);
-
 var server = require('http').Server(sd.app);
-var mongoose = require('mongoose');
-var passport = require('passport');
 var session = require('express-session');
-var mongoUrl = 'mongodb://'+(sd.config.mongo.host||'localhost')+':'+(sd.config.mongo.port||'27017')+'/'+(sd.config.mongo.db||'test');
-mongoose.connect(mongoUrl);
+sd.mongoUrl = 'mongodb://'+(sd.config.mongo.host||'localhost')+':'+(sd.config.mongo.port||'27017')+'/'+(sd.config.mongo.db||'test');
 var favicon = require('serve-favicon');
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
@@ -35,7 +29,7 @@ sd.app.use(bodyParser.urlencoded({
 sd.app.use(bodyParser.json());
 sd.app.use(methodOverride('X-HTTP-Method-Override'));
 var store = new(require("connect-mongo")(session))({
-	url: mongoUrl
+	url: sd.mongoUrl
 });
 var sessionMiddleware = session({
 	secret: 'thisIsCoolSecretFromWaWFramework'+sd.config.prefix,
@@ -48,10 +42,16 @@ var sessionMiddleware = session({
 	store: store
 });
 sd.app.use(sessionMiddleware);
-sd.app.use(passport.initialize());
-sd.app.use(passport.session());
+sd.app.use(sd.passport.initialize());
+sd.app.use(sd.passport.session());
 sd.app.set('view cache', true);
 
 sd.app.use(favicon(process.cwd() + sd.config.icon));
+
+require(__dirname + '/scripts')(sd);
+require(__dirname + '/readAllParts')(sd);
+require(__dirname + '/readAllRoutes')(sd);
+require(__dirname + '/readClientRoutes')(sd);
+
 server.listen(sd.config.port||8080);
 console.log("App listening on port " + (sd.config.port||8080) );

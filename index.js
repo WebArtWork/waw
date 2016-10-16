@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
 waw
 waw build

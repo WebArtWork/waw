@@ -37,12 +37,21 @@ var pull = function(part, callback){
 	});
 }
 module.exports.create = function(name, callback){
-	console.log(name);
 	name = name.replace(/\s+/g, '');
 	var dest = process.cwd() + '/' + name;
 	if(fs.existsSync(dest)) return console.log('Project exists.');
 	fse.mkdirs(dest);
 	git.clone(dest,'git@github.com:WebArtWork/waw-sample-auth.git', function(){
-		// add npm i here
+		var npmi = require('npmi');
+		npmi({
+			path: dest,
+			npmLoad: {
+				loglevel: 'silent'
+			}
+		}, function(err, result) {
+			console.log('Project created Successfully.');
+		});
+		fse.remove(dest+'/.git', function(err) {});
+		fse.remove(dest+'/.gitignore', function(err) {});
 	});
 }

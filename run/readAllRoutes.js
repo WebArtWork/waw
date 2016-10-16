@@ -1,6 +1,8 @@
 module.exports = function(sd){
 	console.log('READING Routes');
 	for (var i = 0; i < sd.parts.length; i++) {
-		sd.parts[i].routes = require(sd.parts[i].src+'/router.js')(sd.app, sd.express, sd.parts[i].controllers);
+		for (var j = 0; j < sd.parts[i].info.router.length; j++) {
+			sd.parts[i][sd.parts[i].info.router[j].name] = require(sd.parts[i].src+sd.parts[i].info.router[j].src)(sd.app, sd.express, sd);
+		}
 	}
 }
