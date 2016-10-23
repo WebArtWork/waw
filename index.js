@@ -1,24 +1,4 @@
 #!/usr/bin/env node
-
-/*
-waw
-waw build
-waw run
-waw add part NAME
-
-waw git init user git@github.com:WebArtWork/part-user.git
-waw git update user "Message"
-
-(waw git init user waw:NAME)
-
-
-npm i -g waw
-[
-	waw create NAME
-	waw create auth NAME
-]
-waw run
-*/
 var nodemon = require('nodemon');
 var run = function(){
 	nodemon({
@@ -29,9 +9,6 @@ var run = function(){
 }
 if(process.argv[2]){
 	switch(process.argv[2].toLowerCase()){
-		case 'build':
-			require(__dirname+'/build').build();
-			return;
 		case 'git':
 			require(__dirname+'/build').git();
 			return;
@@ -39,7 +16,9 @@ if(process.argv[2]){
 			require(__dirname+'/build').create();
 			return;
 		case 'run':
-			run();
+			return run();
+		case 'fetch':
+			require(__dirname+'/build').fetch();
 			return;
 		case 'add':
 			require(__dirname+'/build').add();

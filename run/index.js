@@ -50,8 +50,10 @@ sd.app.use(favicon(process.cwd() + sd.config.icon));
 
 require(__dirname + '/scripts')(sd);
 require(__dirname + '/readAllParts')(sd);
-require(__dirname + '/readAllRoutes')(sd);
-require(__dirname + '/readClientRoutes')(sd);
+require(__dirname + '/readAllModules')(sd, function(){
+	require(__dirname + '/readAllRoutes')(sd);
+	require(__dirname + '/readClientRoutes')(sd);
 
-server.listen(sd.config.port||8080);
-console.log("App listening on port " + (sd.config.port||8080) );
+	server.listen(sd.config.port || 8080);
+	console.log("App listening on port " + (sd.config.port || 8080));
+});

@@ -1,7 +1,11 @@
 var fs = require('fs');
 var fse = require('fs-extra');
 var git = require('gitty');
+var wawParts = {
+	auth: 'git@github.com:WebArtWork/part-user.git'
+}
 module.exports.init = function(part, url){
+	if(url.indexOf('waw@')>-1) url = wawParts[url.split('@')[1]];
 	part = part.replace(/\s+/g, '');
 	var dest = process.cwd() + '/server/' + part;
 	if(!fs.existsSync(dest)) fse.mkdirs(dest);
@@ -53,5 +57,16 @@ module.exports.create = function(name, callback){
 		});
 		fse.remove(dest+'/.git', function(err) {});
 		fse.remove(dest+'/.gitignore', function(err) {});
+	});
+}
+module.exports.fetchPart = function(name){
+	name = name.replace(/\s+/g, '');
+	var dest = process.cwd() + '/server/' + name;
+	if(!fs.existsSync(dest)) return console.log('Parts dosnt exists.');
+	var myRepo = git(dest);
+	myRepo.fetch('--all',function(err){
+		myRepo.reset('origin/master',function(err){
+			console.log('Part has been fetched.');
+		});
 	});
 }

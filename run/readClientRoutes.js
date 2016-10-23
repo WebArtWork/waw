@@ -1,4 +1,5 @@
 var minifier = require('js-minify');
+var fontifier = require('svg-fontify');
 var sd;
 module.exports = function(sdGlobal){
 	console.log('READING CLIENT SIDE');
@@ -15,6 +16,7 @@ module.exports = function(sdGlobal){
 		if(pages[i]=='scss') continue;
 		var pageUrl = process.cwd()+'/client/'+pages[i];
 		generateLibs(pageUrl);
+		generateFonts(pageUrl, pages[i]);
 		serveFiles(pageUrl, pages[i], pages[i]==sd.config.root);
 	}
 }
@@ -28,6 +30,26 @@ var getListOfComponents = function(dest){
 		libs[i]=dest+'/'+libs[i];
 	}
 	return libs;
+}
+var getListOfSvgs = function(dest){
+	var svgs = sd.getFiles(dest);
+	for (var i = svgs.length - 1; i >= 0; i--) {
+		if(svgs[i].indexOf('.svg')==-1){
+			svgs.splice(i,1);
+		};
+	}
+	for (var i = 0; i < svgs.length; i++) {
+		svgs[i]=dest+'/'+svgs[i];
+	}
+	return svgs;
+}
+var generateFonts = function(dest, name){
+	fontifier({
+		name: name,
+		files: getListOfSvgs(dest+'/svgs'),
+		way: dest + '/fonts/',
+		prefix: sd.config.prefix
+	});
 }
 var generateLibs = function(dest){
 	minifier({
