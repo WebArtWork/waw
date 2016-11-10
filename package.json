@@ -1,6 +1,6 @@
 {
 	"name": "waw",
-	"version": "0.2.14",
+	"version": "0.2.16",
 	"description": "Framework which provide layer over Mongodb, Node.js and Angular.js. Give availability as structure layouts, code parts, ready setup code and others.",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
@@ -29,6 +29,7 @@
 		"fs-extra": "*",
 		"passport": "*",
 		"mongoose": "*",
+		"socket.io": "*",
 		"js-minify": "*",
 		"svg-fontify": "*",
 		"body-parser": "*",
@@ -38,11 +39,10 @@
 		"express-session": "*",
 		"method-override": "*",
 		"express-paginate": "*",
-		"mongoose-paginate": "*",
-		"node-sass-middleware": "*",
-		"socket.io": "*",
 		"passport.socketio": "*",
 		"socket.io-emitter": "*",
+		"mongoose-paginate": "*",
+		"node-sass-middleware": "*",
 		"socket.io-adapter-mongo": "*"
 	}
 }

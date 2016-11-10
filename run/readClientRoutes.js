@@ -21,6 +21,7 @@ module.exports = function(sdGlobal){
 	}
 }
 var getListOfComponents = function(dest){
+	sd.fse.mkdirs(dest);
 	var libs = sd.getFiles(dest);
 	libs.sort(function(a,b){
 		if(a>b) return 1;
@@ -32,6 +33,7 @@ var getListOfComponents = function(dest){
 	return libs;
 }
 var getListOfSvgs = function(dest){
+	sd.fse.mkdirs(dest);
 	var svgs = sd.getFiles(dest);
 	for (var i = svgs.length - 1; i >= 0; i--) {
 		if(svgs[i].indexOf('.svg')==-1){

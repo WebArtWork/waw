@@ -8,10 +8,10 @@ module.exports = function(sd, next){
 		if(!fs.existsSync(module)) needToInstall.push(sd.dependencies[i]);
 	}
 	var counter = needToInstall.length;
-	return next();
+	if(counter == 0) return next();
 	for (var i = 0; i < needToInstall.length; i++) {
 		npmi({
-			name: needToInstall[i].names,
+			name: needToInstall[i].name,
 			version: needToInstall[i].version,
 			path: process.cwd(),
 			forceInstall: false,
@@ -20,7 +20,6 @@ module.exports = function(sd, next){
 			console.log(result);
 			console.log('err');
 			console.log(err);
-			if(--counter === 0) console.log('you can call nEXT');
 			if(--counter === 0) next();
 		});
 	}

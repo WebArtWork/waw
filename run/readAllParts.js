@@ -23,13 +23,18 @@ module.exports = function(sd){
 				}
 			}
 			if(info.dependencies){
-				for (var k = 0; k < info.dependencies.length; k++) {
+				for (var prop in info.dependencies) {
+					var needToAdd = true;
 					for (var j = 0; j < sd.dependencies.length; j++) {
-						if(sd.dependencies[j]==info.dependencies[k].name){
+						if(sd.dependencies[j]==prop){
+							needToAdd = false;
 							break;
 						}
 					}
-					sd.dependencies.push(info.dependencies[k]);
+					if(needToAdd) sd.dependencies.push({
+						name: prop,
+						version: info.dependencies[prop]
+					});
 				}
 			}
 			sd.parts.push({

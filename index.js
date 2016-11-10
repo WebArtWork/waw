@@ -23,6 +23,9 @@ if(process.argv[2]){
 		case 'add':
 			require(__dirname+'/build').add();
 			return;
+		case 'remove':
+			require(__dirname+'/build').remove();
+			return;
 		default:
 			return console.log('Wrong Command.');
 	}
