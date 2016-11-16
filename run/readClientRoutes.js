@@ -5,7 +5,7 @@ module.exports = function(sdGlobal){
 	console.log('READING CLIENT SIDE');
 	sd = sdGlobal;
 	sd.app.use(require('node-sass-middleware')({
-		src: process.cwd() + '/client/scss',
+		src: process.cwd() + '/client',
 		dest: process.cwd() + '/client',
 		debug: !sd.config.production,
 		outputStyle: 'compressed',
@@ -64,7 +64,7 @@ var generateLibs = function(dest){
 var serveFiles = function(folder, name, isRoot){
 	sd.app.get('/' + name + '/:folder/:file', function(req, res) {
 		for (var i = 0; i < sd.folders.length; i++) {
-			if (sd.folders[i] == req.params.folder) return res.sendFile(process.cwd() + '/client/' + name + '/' + req.params.folder + '/' + req.params.file.replace('.map', ''));
+			if (sd.folders[i] == req.params.folder) return res.sendFile(process.cwd() + '/client/' + name + '/' + req.params.folder + '/' + req.params.file.replace('.map', '').replace('.scss', ''));
 		}
 		if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
 		else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');

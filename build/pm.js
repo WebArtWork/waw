@@ -14,16 +14,16 @@ var fse = require('fs-extra');
 				from: 'NAME',
 				to: name.capitalize()
 			}];
-			writeFile(dest + '/router.js', [{
+			gu.writeFile(dest + '/router.js', [{
 				from: 'NAME',
 				to: name
 			}], dest + '/router.js', function() {
 				if (--counter === 0) console.log('Your Part "'+name+'" is successfully created');
 			});
-			writeFile(dest + '/schema.js', renames, dest + '/schema.js', function() {
+			gu.writeFile(dest + '/schema.js', renames, dest + '/schema.js', function() {
 				if (--counter === 0) console.log('Your Part "'+name+'" is successfully created');
 			});
-			writeFile(dest + '/part.json', renames, dest + '/part.json', function() {
+			gu.writeFile(dest + '/part.json', renames, dest + '/part.json', function() {
 				if (--counter === 0) console.log('Your Part "'+name+'" is successfully created');
 			});
 		})
@@ -50,15 +50,17 @@ var fse = require('fs-extra');
 			name: service,
 		});
 		fse.writeJsonSync(part+'/part.json', partInfo, {throws: false});
-		fse.mkdirs(part+'/client');
-		writeFile(__dirname + '/templates/service.js', [{
+		fse.mkdirs(part+'/client/services');
+		gu.writeFile(__dirname + '/templates/service.js', [{
 			from: 'NAME',
 			to: service
-		}], part+'/client/'+service+'.js', function() {
-			if(page) fetchService(partName, service, page);
+		}], part+'/client/services/'+service+'.js', function() {
+			console.log('Service was created successfully.');
+			if(page) fetchService(partName, service, page, true);
+			else process.exit(0);
 		});
 	}
-	var fetchService = function(part, service, page){
+	var fetchService = function(part, service, page, ignoreMessage){
 		part = process.cwd() + '/server/' + part;
 		if(!part) return console.log('Please select part to add service.');
 		if(!service) return console.log('Please select service name.');
@@ -77,7 +79,9 @@ var fse = require('fs-extra');
 		}
 		if(!found) return console.log("Part you have selected doesn't exists.");
 		gu.removeCodeByTag(page + '/js/services.js', partInfo.services[i].id);
-		gu.addCodeByTag(part + '/client/'+service+'.js', page + '/js/services.js', partInfo.services[i].id);
+		gu.addCodeByTag(part + '/client/services/'+service+'.js', page + '/js/services.js', partInfo.services[i].id);
+		if(!ignoreMessage) console.log('Service fetched successfully.');
+		process.exit(0);
 	}
 	module.exports.fetchService = fetchService;
 	var fetchServerService = function(part, service, page){
@@ -99,7 +103,9 @@ var fse = require('fs-extra');
 		}
 		if(!found) return console.log("Part you have selected doesn't exists.");
 		var code = gu.getCodeByTag(page + '/js/services.js', partInfo.services[i].id);
-		fs.writeFileSync(part + '/client/'+service+'.js', code, 'utf8');
+		fs.writeFileSync(part + '/client/services/'+service+'.js', code, 'utf8');
+		console.log('Server service fetched successfully.');
+		process.exit(0);
 	}
 	module.exports.fetchServerService = fetchServerService;
 	module.exports.removeServerService = function(part, service){
@@ -114,7 +120,7 @@ var fse = require('fs-extra');
 			}
 		}
 		fse.writeJsonSync(part+'/part.json', partInfo, {throws: false});
-		fse.removeSync(part + '/client/'+service+'.js');
+		fse.removeSync(part + '/client/services/'+service+'.js');
 	}
 	module.exports.removeService = function(part, service, page){
 		part = process.cwd() + '/server/' + part;
@@ -155,15 +161,17 @@ var fse = require('fs-extra');
 			name: filter,
 		});
 		fse.writeJsonSync(part+'/part.json', partInfo, {throws: false});
-		fse.mkdirs(part+'/client');
-		writeFile(__dirname + '/templates/filter.js', [{
+		fse.mkdirs(part+'/client/filters');
+		gu.writeFile(__dirname + '/templates/filter.js', [{
 			from: 'NAME',
 			to: filter
-		}], part+'/client/'+filter+'.js', function() {
-			if(page) fetchFilter(partName, filter, page);
+		}], part+'/client/filters/'+filter+'.js', function() {
+			console.log('Filter was created successfully.');
+			if(page) fetchFilter(partName, filter, page, true);
+			else process.exit(0);
 		});
 	}
-	var fetchFilter = function(part, filter, page){
+	var fetchFilter = function(part, filter, page, ignoreMessage){
 		part = process.cwd() + '/server/' + part;
 		if(!part) return console.log('Please select part to add filter.');
 		if(!filter) return console.log('Please select filter name.');
@@ -182,14 +190,16 @@ var fse = require('fs-extra');
 		}
 		if(!found) return console.log("Part you have selected doesn't exists.");
 		gu.removeCodeByTag(page + '/js/filters.js', partInfo.filters[i].id);
-		gu.addCodeByTag(part + '/client/'+filter+'.js', page + '/js/filters.js', partInfo.filters[i].id);
+		gu.addCodeByTag(part + '/client/filters/'+filter+'.js', page + '/js/filters.js', partInfo.filters[i].id);
+		if(!ignoreMessage) console.log('Filter fetched successfully.');
+		process.exit(0);
 	}
 	module.exports.fetchFilter = fetchFilter;
 	var fetchServerFilter = function(part, filter, page){
 		part = process.cwd() + '/server/' + part;
-		if(!part) return console.log('Please select part to add filter.');
-		if(!filter) return console.log('Please select filter name.');
-		if(!page) return console.log("You don't have selected the page.");
+		if(!part) return gu.close('Please select part to add filter.');
+		if(!filter) return gu.close('Please select filter name.');
+		if(!page) return gu.close("You don't have selected the page.");
 		page = process.cwd() + '/client/' + page;
 		if(!fs.existsSync(page)) return console.log("Page you have selected doesn't exists.");
 		if(!fs.existsSync(part)||!fs.existsSync(part+'/part.json'))
@@ -204,7 +214,8 @@ var fse = require('fs-extra');
 		}
 		if(!found) return console.log("Part you have selected doesn't exists.");
 		var code = gu.getCodeByTag(page + '/js/filters.js', partInfo.filters[i].id);
-		fs.writeFileSync(part + '/client/'+filter+'.js', code, 'utf8');
+		fs.writeFileSync(part + '/client/filters/'+filter+'.js', code, 'utf8');
+		gu.close('Server service fetched successfully.');
 	}
 	module.exports.fetchServerFilter = fetchServerFilter;
 	module.exports.removeServerFilter = function(part, filter){
@@ -219,7 +230,7 @@ var fse = require('fs-extra');
 			}
 		}
 		fse.writeJsonSync(part+'/part.json', partInfo, {throws: false});
-		fse.removeSync(part + '/client/'+filter+'.js');
+		fse.removeSync(part + '/client/filters/'+filter+'.js');
 	}
 	module.exports.removeFilter = function(part, filter, page){
 		part = process.cwd() + '/server/' + part;
@@ -238,6 +249,289 @@ var fse = require('fs-extra');
 		if(!found) return console.log("Part you have selected doesn't exists.");
 		gu.removeCodeByTag(page + '/js/filters.js', partInfo.filters[i].id);
 	}
+/*
+*	Parts Manager - Directives
+*/
+	module.exports.addDirective = function(partName, directive, page){
+		if(!partName) return console.log('Please select part to add directive.');
+		if(!directive) return console.log('Please select directive name.');
+		part = process.cwd() + '/server/' + partName;
+		if(!fs.existsSync(part)||!fs.existsSync(part+'/part.json'))
+			return console.log("Part you have selected doesn't exists.");
+		if(fs.existsSync(part+'/'+directive+'.js'))
+			return console.log("This directive already exists.");
+		var partInfo = fse.readJsonSync(part+'/part.json', {throws: false});
+		if(!Array.isArray(partInfo.directives)) partInfo.directives = [];
+		for (var i = 0; i < partInfo.directives.length; i++) {
+			if(partInfo.directives[i].name == directive)
+				return console.log('This directive already exists.');
+		}
+		partInfo.directives.push({
+			id: 'directive_'+Date.now(),
+			name: directive,
+			themes: [{
+				id: 'theme_'+Date.now(),
+				name: 'default'
+			}]
+		});
+		fse.writeJsonSync(part+'/part.json', partInfo, {throws: false});
+		fse.mkdirs(part+'/client/directives/'+directive+'/themes');
+		var counter = 3;
+		gu.writeFile(__dirname + '/templates/directive.js', [{
+			from: 'NAME',
+			to: directive
+		}], part+'/client/directives/'+directive+'/script.js', function() {
+			if(--counter===0){
+				console.log('Directive successfully created.');
+				if(page) fetchDirective(partName, directive, 'default', page, true);
+				else process.exit(0);
+			}
+		});
+		gu.writeFile(__dirname + '/templates/template.html', [{
+			from: 'NAME',
+			to: directive
+		}], part+'/client/directives/'+directive+'/template.html', function() {
+			if(--counter===0){
+				console.log('Directive successfully created.');
+				if(page) fetchDirective(partName, directive, 'default', page, true);
+				else process.exit(0);
+			}
+		});
+		// Theme
+		gu.writeFile(__dirname + '/templates/default.scss', [{
+			from: 'DNAME',
+			to: directive
+		},{
+			from: 'NAME',
+			to: 'default'
+		}], part+'/client/directives/'+directive+'/themes/default.scss', function() {
+			if(--counter===0){
+				console.log('Directive successfully created.');
+				if(page) fetchDirective(partName, directive, 'default', page, true);
+				else process.exit(0);
+			}
+		});
+	}
+	var fetchDirective = function(part, directive, theme, page, ignoreMessage){
+		var partLoc = process.cwd() + '/server/' + part;
+		if(!part) return console.log('Please select part to add directive.');
+		if(!directive) return console.log('Please select directive name.');
+		if(!page) return console.log("You don't have selected the page.");
+		var pageLoc = process.cwd() + '/client/' + page;
+		if(!fs.existsSync(pageLoc)) return console.log("Page you have selected doesn't exists.");
+		if(!fs.existsSync(partLoc)||!fs.existsSync(partLoc+'/part.json'))
+			return console.log("Part you have selected doesn't exists.");
+		var partInfo = fse.readJsonSync(partLoc+'/part.json', {throws: false});
+		var found = false;
+		for (var i = 0; i < partInfo.directives.length; i++) {
+			if(partInfo.directives[i].name==directive){
+				found = true;
+				break;
+			}
+		}
+		if(!found) return console.log("Part you have selected doesn't exists.");
+		var name = part.toLowerCase() + '_' + directive.toLowerCase() + '_' + theme.toLowerCase();
+		var htmlName = pageLoc + '/html/' + name + '.html';
+		var dir = partLoc + '/client/directives/' + directive;
+		gu.writeFile(dir+'/template.html', [], htmlName);
+		gu.removeCodeByTag(pageLoc + '/js/directives.js', partInfo.directives[i].id);
+		gu.addPieceCodeByTag(gu.getFile(partLoc+'/client/directives/'+directive+'/script.js', [{
+			from: 'DIRECTORY',
+			to: part.toLowerCase() + directive.toLowerCase() + theme.toLowerCase()
+		},{
+			from: 'URL',
+			to: '/' + page + '/html/' + name + '.html'
+		}]), pageLoc + '/js/directives.js', partInfo.directives[i].id);
+		// Themes management
+		fse.mkdirs(pageLoc + '/css/directives');
+		gu.writeFile(partLoc+'/client/directives/'+directive+'/themes/'+theme+'.scss',
+		 [], pageLoc + '/css/directives/' + name + '.scss');
+		var indexFile = process.cwd() + '/client/'+ page + '/css/index.scss';
+		gu.removeCodeByTag(indexFile, partInfo.directives[i].id);
+		gu.addPieceCodeByTag("@import 'directives/" + name + ".scss'",
+		 indexFile, partInfo.directives[i].id);
+		if(!ignoreMessage) console.log('Directive successfully fetched.');
+		process.exit(0);
+	}
+	module.exports.fetchDirective = fetchDirective;
+	var fetchServerDirective = function(part, directive, theme, page){
+		var partLoc = process.cwd() + '/server/' + part;
+		if(!part) return console.log('Please select part to add directive.');
+		if(!directive) return console.log('Please select directive name.');
+		if(!page) return console.log("You don't have selected the page.");
+		var pageLoc = process.cwd() + '/client/' + page;
+		if(!fs.existsSync(pageLoc)) return console.log("Page you have selected doesn't exists.");
+		if(!fs.existsSync(partLoc)||!fs.existsSync(partLoc+'/part.json'))
+			return console.log("Part you have selected doesn't exists.");
+		var partInfo = fse.readJsonSync(partLoc+'/part.json', {throws: false});
+		var found = false;
+		for (var i = 0; i < partInfo.directives.length; i++) {
+			if(partInfo.directives[i].name==directive){
+				found = true;
+				break;
+			}
+		}
+		if(!found) return console.log("Part you have selected doesn't exists.");
+		var name = part.toLowerCase() + '_' + directive.toLowerCase() + '_' + theme.toLowerCase();
+		var htmlName = pageLoc + '/html/' + name + '.html';
+		var dir = partLoc + '/client/directives/' + directive;
+		gu.writeFile(htmlName, [], dir+'/template.html');
+		gu.writeFileFromData(gu.getCodeByTag(pageLoc + '/js/directives.js', partInfo.directives[i].id), [{
+			from: part.toLowerCase() + directive.toLowerCase() + theme.toLowerCase(),
+			to: 'DIRECTORY'
+		},{
+			from: '/' + page + '/html/' + name + '.html',
+			to: 'URL'
+		}], partLoc+'/client/directives/'+directive+'/script.js');
+		// Themes management
+		gu.writeFile(pageLoc + '/css/directives/' + name + '.scss',
+		 [], partLoc+'/client/directives/'+directive+'/themes/'+theme+'.scss');
+		gu.close('Server directive successfully fetched.');
+	}
+	module.exports.fetchServerDirective = fetchServerDirective;
+	module.exports.removeServerDirective = function(part, filter){
+		part = process.cwd() + '/server/' + part;
+		if(!part) return console.log('Please select part to add filter.');
+		if(!filter) return console.log('Please select filter name.');
+		var partInfo = fse.readJsonSync(part+'/part.json', {throws: false});
+		for (var i = 0; i < partInfo.filters.length; i++) {
+			if(partInfo.filters[i].name==filter){
+				partInfo.filters.splice(i,1);
+				break;
+			}
+		}
+		fse.writeJsonSync(part+'/part.json', partInfo, {throws: false});
+		fse.removeSync(part + '/client/filters/'+filter+'.js');
+	}
+	module.exports.removeDirective = function(part, filter, page){
+		part = process.cwd() + '/server/' + part;
+		if(!part) return console.log('Please select part to add filter.');
+		if(!filter) return console.log('Please select filter name.');
+		if(!page) return console.log("You don't have selected the page.");
+		page = process.cwd() + '/client/' + page;
+		var partInfo = fse.readJsonSync(part+'/part.json', {throws: false});
+		var found = false;
+		for (var i = 0; i < partInfo.filters.length; i++) {
+			if(partInfo.filters[i].name==filter){
+				found = true;
+				break;
+			}
+		}
+		if(!found) return console.log("Part you have selected doesn't exists.");
+		gu.removeCodeByTag(page + '/js/filters.js', partInfo.filters[i].id);
+	}
+/*
+*	Parts Manager - Themes
+*/
+	module.exports.addTheme = function(partName, directive, theme, page){
+		if(!partName) return console.log('Please select part to add directive.');
+		if(!directive) return console.log('Please select directive name.');
+		part = process.cwd() + '/server/' + partName;
+		if(!fs.existsSync(part)||!fs.existsSync(part+'/part.json'))
+			return console.log("Part you have selected doesn't exists.");
+		if(fs.existsSync(part+'/'+directive+'.js'))
+			return console.log("This directive already exists.");
+		var partInfo = fse.readJsonSync(part+'/part.json', {throws: false});
+		if(!Array.isArray(partInfo.directives)) partInfo.directives = [];
+		var found = false;
+		for (var i = 0; i < partInfo.directives.length; i++) {
+			if(partInfo.directives[i].name == directive){
+				for (var j = 0; j < partInfo.directives[i].themes.length; j++) {
+					if(partInfo.directives[i].themes[j].name == theme)
+						return console.log('This theme already exists.');
+				}
+				partInfo.directives[i].themes.push({
+					id: 'theme_'+Date.now(),
+					name: theme,
+				});				
+				found = true;
+				break;
+			}
+		}
+		if(!found){
+			return console.log('This directive do not exists.');
+		}
+		fse.writeJsonSync(part+'/part.json', partInfo, {throws: false});
+		fse.mkdirs(part+'/client/directives/'+directive+'/themes');
+
+		gu.writeFile(__dirname + '/templates/default.scss', [{
+			from: 'DNAME',
+			to: directive
+		},{
+			from: 'NAME',
+			to: theme
+		}], part+'/client/directives/'+directive+'/themes/'+theme+'.scss', function() {
+			if(page) fetchDirective(partName, directive, theme, page);
+		});
+	}
+	var fetchTheme = function(part, directive, theme, page){
+		var partLoc = process.cwd() + '/server/' + part;
+		if(!part) return console.log('Please select part to add directive.');
+		if(!directive) return console.log('Please select directive name.');
+		if(!page) return console.log("You don't have selected the page.");
+		var pageLoc = process.cwd() + '/client/' + page;
+		if(!fs.existsSync(pageLoc)) return console.log("Page you have selected doesn't exists.");
+		if(!fs.existsSync(partLoc)||!fs.existsSync(partLoc+'/part.json'))
+			return console.log("Part you have selected doesn't exists.");
+		var partInfo = fse.readJsonSync(partLoc+'/part.json', {throws: false});
+		var found = false;
+		for (var i = 0; i < partInfo.directives.length; i++) {
+			if(partInfo.directives[i].name==directive){
+				found = true;
+				break;
+			}
+		}
+		if(!found) return console.log("Part you have selected doesn't exists.");
+		var name = part.toLowerCase() + '_' + directive.toLowerCase() + '_' + theme.toLowerCase();
+		fse.mkdirs(pageLoc + '/css/directives');
+		gu.writeFile(partLoc+'/client/directives/'+directive+'/themes/'+theme+'.scss',
+		 [], pageLoc + '/css/directives/' + name + '.scss', function() {});
+		var indexFile = process.cwd() + '/client/'+ page + '/css/index.scss';
+		gu.removeCodeByTag(indexFile, partInfo.directives[i].id);
+		gu.addPieceCodeByTag("@import 'directives/" + name + ".scss'",
+		 indexFile, partInfo.directives[i].id);
+		console.log('Theme successfully fetched.');
+		process.exit(0);
+	}
+	module.exports.fetchTheme = fetchTheme;
+	var fetchServerTheme = function(part, directive, theme, page){
+		var partLoc = process.cwd() + '/server/' + part;
+		if(!part) return console.log('Please select part to add directive.');
+		if(!directive) return console.log('Please select directive name.');
+		if(!page) return console.log("You don't have selected the page.");
+		var pageLoc = process.cwd() + '/client/' + page;
+		if(!fs.existsSync(pageLoc)) return console.log("Page you have selected doesn't exists.");
+		if(!fs.existsSync(partLoc)||!fs.existsSync(partLoc+'/part.json'))
+			return console.log("Part you have selected doesn't exists.");
+		var partInfo = fse.readJsonSync(partLoc+'/part.json', {throws: false});
+		var found = false;
+		for (var i = 0; i < partInfo.directives.length; i++) {
+			if(partInfo.directives[i].name==directive){
+				found = true;
+				break;
+			}
+		}
+		if(!found) return console.log("Part you have selected doesn't exists.");
+		var name = part.toLowerCase()+'_'+directive.toLowerCase()+'_'+theme.toLowerCase();
+		gu.writeFile(pageLoc + '/css/directives/' + name + '.scss',
+		 [], partLoc+'/client/directives/'+directive+'/themes/'+theme+'.scss');
+		gu.close('Server theme successfully fetched.');
+	}
+	module.exports.fetchServerTheme = fetchServerTheme;
+	module.exports.removeServerTheme = function(part, filter){
+		part = process.cwd() + '/server/' + part;
+		if(!part) return console.log('Please select part to add filter.');
+		if(!filter) return console.log('Please select filter name.');
+		var partInfo = fse.readJsonSync(part+'/part.json', {throws: false});
+		for (var i = 0; i < partInfo.filters.length; i++) {
+			if(partInfo.filters[i].name==filter){
+				partInfo.filters.splice(i,1);
+				break;
+			}
+		}
+		fse.writeJsonSync(part+'/part.json', partInfo, {throws: false});
+		fse.removeSync(part + '/client/filters/'+filter+'.js');
+	}
 // General prototypes
 	String.prototype.capitalize = function(all) {
 		if (all) {
@@ -245,15 +539,5 @@ var fse = require('fs-extra');
 		} else {
 			return this.charAt(0).toUpperCase() + this.slice(1);
 		}
-	}
-	var writeFile = function(src, renames, dest, callback){
-		fs.readFile(src, 'utf8', function(err, data) {
-			for (var i = 0; i < renames.length; i++) {
-				data=data.replace(new RegExp(renames[i].from, 'g'), renames[i].to);
-			}
-			fs.writeFile(dest, data, function(err) {
-				if (typeof callback == 'function') callback(err);
-			});
-		});
 	}
 // end of file
