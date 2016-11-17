@@ -53,6 +53,9 @@ module.exports.writeFile = function(src, renames, dest, callback) {
 	fs.writeFileSync(dest, data);
 	if (typeof callback == 'function') callback();
 }
+module.exports.removeFile = function(src) {
+	fs.unlinkSync(src);
+}
 module.exports.writeFileFromData = function(data, renames, dest, callback) {
 	for (var i = 0; i < renames.length; i++) {
 		data=data.replace(new RegExp(renames[i].from, 'g'), renames[i].to);

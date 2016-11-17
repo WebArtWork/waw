@@ -229,12 +229,12 @@ var rl = readline.createInterface({
 				createTheme(obj);
 			});
 		}else if(!obj.directive){
-			getNewDirective(obj.part, function(name){
+			getDirective(obj.part, function(name){
 				obj.directive = name;
 				createTheme(obj);
 			});
 		}else if(!obj.theme){
-			getNewTheme(obj.part, function(name){
+			getNewTheme(obj.part, obj.directive, function(name){
 				obj.theme = name;
 				createTheme(obj);
 			});
@@ -363,7 +363,7 @@ var rl = readline.createInterface({
 			var pages = gu.getDirectories(process.cwd() + '/client');
 			if(pages.length == 0) return console.log("You don't have any page.");
 			else if(pages.length == 1) return require(__dirname + '/pm')
-				.fetchService(obj.part, obj.service, pages[i]);
+				.fetchService(obj.part, obj.service, pages[0]);
 			var question = 'Give page you want to fetch service:\n';
 			for (var i = 1; i < pages.length+1; i++) {
 				question += i + ') ' + pages[i-1] + '\n';
@@ -373,8 +373,7 @@ var rl = readline.createInterface({
 				name = name.toLowerCase();
 				for (var i = 0; i < pages.length; i++) {
 					if(name == pages[i] || name == (i+1).toString()){
-						if(name == (i+1).toString()) name = pages[i];
-						return require(__dirname + '/pm').fetchService(obj.part, obj.service, name);
+						return require(__dirname + '/pm').fetchService(obj.part, obj.service, pages[i]);
 					}
 				}
 				fetchService(obj);
@@ -421,7 +420,7 @@ var rl = readline.createInterface({
 			var pages = gu.getDirectories(process.cwd() + '/client');
 			if(pages.length == 0) return console.log("You don't have any page.");
 			else if(pages.length == 1) return require(__dirname + '/pm')
-				.fetchFilter(obj.part, obj.filter, pages[i]);
+				.fetchFilter(obj.part, obj.filter, pages[0]);
 			var question = 'Give page you want to fetch filter:\n';
 			for (var i = 1; i < pages.length+1; i++) {
 				question += i + ') ' + pages[i-1] + '\n';
@@ -431,8 +430,7 @@ var rl = readline.createInterface({
 				name = name.toLowerCase();
 				for (var i = 0; i < pages.length; i++) {
 					if(name == pages[i] || name == (i+1).toString()){
-						if(name == (i+1).toString()) name = pages[i];
-						return require(__dirname + '/pm').fetchFilter(obj.part, obj.filter, name);
+						return require(__dirname + '/pm').fetchFilter(obj.part, obj.filter, pages[i]);
 					}
 				}
 				console.log('Pick correct page.');
@@ -445,6 +443,9 @@ var rl = readline.createInterface({
 		if(directives.length==0){
 			console.log("You don't have any directives");
 			return process.exit(0);
+		}else if(directives.length==1){
+			console.log("Directive '"+directives[0].name+"' selected.");
+			return callback(directives[0].name);
 		}
 		var question = 'Pick directive:\n';
 		for (var i = 1; i < directives.length+1; i++) {
@@ -466,10 +467,6 @@ var rl = readline.createInterface({
 		});
 	}
 	var getTheme = function(part, directive, callback){
-		console.log('part');
-		console.log(part);
-		console.log('directive');
-		console.log(directive);
 		var directives = gu.getPartInfo(part).directives||[];
 		if(directives.length==0){
 			console.log("You don't have any directives");
@@ -537,9 +534,8 @@ var rl = readline.createInterface({
 				name = name.toLowerCase();
 				for (var i = 0; i < pages.length; i++) {
 					if(name == pages[i] || name == (i+1).toString()){
-						if(name == (i+1).toString()) name = pages[i];
 						return require(__dirname + '/pm')
-						.fetchDirective(obj.part, obj.directive, obj.theme, name);
+						.fetchDirective(obj.part, obj.directive, obj.theme, pages[i]);
 					}
 				}
 				fetchDirective(obj);
@@ -811,6 +807,227 @@ var rl = readline.createInterface({
 /*
 	waw remove
 */
+	var removeService = function(obj){
+		if(!obj.part){
+			getPart(function(name){
+				obj.part = name;
+				removeService(obj);
+			});
+		}else if(!obj.service){
+			getService(obj.part, function(name){
+				obj.service = name;
+				removeService(obj);
+			});
+		}else{
+			var pages = gu.getDirectories(process.cwd() + '/client');
+			console.log('pages');
+			console.log(pages);
+			if(pages.length == 0) return console.log("You don't have any page.");
+			else if(pages.length == 1) return require(__dirname + '/pm')
+				.removeService(obj.part, obj.service, pages[0]);
+			var question = 'Give page you want to fetch service:\n';
+			for (var i = 1; i < pages.length+1; i++) {
+				question += i + ') ' + pages[i-1] + '\n';
+			}
+			question += 'Choose: ';
+			rl.question(question, function(name) {
+				name = name.toLowerCase();
+				for (var i = 0; i < pages.length; i++) {
+					if(name == pages[i] || name == (i+1).toString()){
+						return require(__dirname + '/pm').removeService(obj.part, obj.service, pages[i]);
+					}
+				}
+				removeService(obj);
+			});
+		}
+	}
+	var removeFilter = function(obj){
+		if(!obj.part){
+			getPart(function(name){
+				obj.part = name;
+				removeFilter(obj);
+			});
+		}else if(!obj.filter){
+			getFilter(obj.part, function(name){
+				obj.filter = name;
+				removeFilter(obj);
+			});
+		}else{
+			var pages = gu.getDirectories(process.cwd() + '/client');
+			if(pages.length == 0) return console.log("You don't have any page.");
+			else if(pages.length == 1) return require(__dirname + '/pm')
+				.removeFilter(obj.part, obj.filter, pages[0]);
+			var question = 'Give page you want to remove filter:\n';
+			for (var i = 1; i < pages.length+1; i++) {
+				question += i + ') ' + pages[i-1] + '\n';
+			}
+			question += 'Choose: ';
+			rl.question(question, function(name) {
+				name = name.toLowerCase();
+				for (var i = 0; i < pages.length; i++) {
+					if(name == pages[i] || name == (i+1).toString()){
+						return require(__dirname + '/pm')
+						.removeFilter(obj.part, obj.filter, pages[i]);
+					}
+				}
+				console.log('Pick correct page.');
+				removeFilter(obj);
+			});
+		}
+	}
+	var removeDirective = function(obj){
+		if (!obj.part) {
+			getPart(function(name) {
+				obj.part = name;
+				removeDirective(obj);
+			});
+		} else if (!obj.directive) {
+			getDirective(obj.part, function(name) {
+				obj.directive = name;
+				removeDirective(obj);
+			});
+		} else if (!obj.theme){
+			getTheme(obj.part, obj.directive, function(name){
+				obj.theme = name;
+				removeDirective(obj);
+			});
+		} else {
+			var pages = gu.getDirectories(process.cwd() + '/client');
+			if(pages.length == 0) return console.log("You don't have any page.");
+			else if(pages.length == 1) return require(__dirname + '/pm')
+				.removeDirective(obj.part, obj.directive, obj.theme, pages[0]);
+			var question = 'Give page you want to remove directive:\n';
+			for (var i = 1; i < pages.length+1; i++) {
+				question += i + ') ' + pages[i-1] + '\n';
+			}
+			question += 'Choose: ';
+			rl.question(question, function(name) {
+				name = name.toLowerCase();
+				for (var i = 0; i < pages.length; i++) {
+					if(name == pages[i] || name == (i+1).toString()){
+						return require(__dirname + '/pm')
+						.removeDirective(obj.part, obj.directive, obj.theme, pages[i]);
+					}
+				}
+				removeDirective(obj);
+			});
+		}
+	}
+	var removeTheme = function(obj){
+		if (!obj.part) {
+			getPart(function(name) {
+				obj.part = name;
+				removeDirective(obj);
+			});
+		} else if (!obj.directive) {
+			getDirective(obj.part, function(name) {
+				obj.directive = name;
+				removeDirective(obj);
+			});
+		} else if (!obj.theme) {
+			getTheme(obj.part, obj.directive, function(name) {
+				obj.theme = name;
+				removeDirective(obj);
+			});
+		} else {
+			var pages = gu.getDirectories(process.cwd() + '/client');
+			if(pages.length == 0) return console.log("You don't have any page.");
+			else if(pages.length == 1) return require(__dirname + '/pm')
+				.removeDirective(obj.part, obj.directive, obj.theme, pages[0]);
+			var question = 'Give page you want to remove directive:\n';
+			for (var i = 1; i < pages.length+1; i++) {
+				question += i + ') ' + pages[i-1] + '\n';
+			}
+			question += 'Choose: ';
+			rl.question(question, function(name) {
+				name = name.toLowerCase();
+				for (var i = 0; i < pages.length; i++) {
+					if(name == pages[i] || name == (i+1).toString()){
+						return require(__dirname + '/pm')
+						.removeDirective(obj.part, obj.directive, obj.theme, pages[i]);
+					}
+				}
+				removeDirective(obj);
+			});
+		}
+	}
+	var removeServer = function(){
+		getFetchServerOption({
+			msg: 'What do you like to remove from server?',
+		}, function(answer) {
+			switch (answer.toLowerCase()) {
+				case '1':
+				case 'service':
+					return removeServerService({});
+				case '2':
+				case 'filter':
+					return removeServerFilter({});
+				case '3':
+				case 'directive':
+					return removeServerDirective({});
+				case '4':
+				case 'theme':
+					return removeServerTheme({});
+			}
+		});
+	}
+	var removeServerService = function(obj){
+		if (!obj.part) {
+			getPart(function(name) {
+				obj.part = name;
+				removeServerService(obj);
+			});
+		} else {
+			getService(obj.part, function(name) {
+				return require(__dirname + '/pm')
+				.removeServerService(obj.part, name);
+			});
+		}
+	}
+	var removeServerFilter = function(obj){
+		if(!obj.part){
+			getPart(function(name){
+				obj.part = name;
+				removeServerFilter(obj);
+			});
+		}else{
+			getFilter(obj.part, function(name){
+				return require(__dirname + '/pm')
+						.removeServerFilter(obj.part, name);
+			});
+		}
+	}
+	var removeServerDirective = function(obj){
+		if (!obj.part) {
+			getPart(function(name) {
+				obj.part = name;
+				removeServerDirective(obj);
+			});
+		} else {
+			getDirective(obj.part, function(name) {
+				return require(__dirname + '/pm')
+				.removeServerDirective(obj.part, name);
+			});
+		}
+	}
+	var removeServerTheme = function(obj){
+		if (!obj.part) {
+			getPart(function(name) {
+				obj.part = name;
+				removeServerTheme(obj);
+			});
+		} else if (!obj.directive) {
+			getDirective(obj.part, function(name) {
+				obj.directive = name;
+				removeServerTheme(obj);
+			});
+		} else {
+			getTheme(obj.part, obj.directive, function(name) {
+				return require(__dirname + '/pm')
+				.removeServerTheme(obj.part, obj.directive, name);
+			});
+		}
+	}
 	module.exports.remove = function(){
 		if(process.argv[3]){
 			switch(process.argv[3].toLowerCase()){
@@ -822,6 +1039,12 @@ var rl = readline.createInterface({
 						case 'filter':
 							return require(__dirname+'/pm')
 							.removeServerFilter(process.argv[5], process.argv[6]);
+						case 'directive':
+							return require(__dirname+'/pm')
+							.removeServerDirective(process.argv[5], process.argv[6]);
+						case 'theme':
+							return require(__dirname+'/pm')
+							.removeServerTheme(process.argv[5], process.argv[6], process.argv[7]);
 					};
 					return console.log('Please select something to fetch in server side.');
 				case 'service':
@@ -830,10 +1053,38 @@ var rl = readline.createInterface({
 				case 'filter':
 					return require(__dirname+'/pm')
 					.removeFilter(process.argv[4], process.argv[5], process.argv[6]);
+				case 'directive':
+					return require(__dirname+'/pm')
+					.removeDirective(process.argv[4], process.argv[5], process.argv[6], process.argv[7]);
+				case 'theme':
+					return require(__dirname+'/pm')
+					.removeTheme(process.argv[4], process.argv[5], process.argv[6], process.argv[7]);
 				default: 
 					return console.log('Wrong Command.');
 			}
-		}else return console.log('Wrong Command.');
+		}else{
+			getAddFetchOption({
+				msg: 'What do you like to remove?',
+				"1": 'Server'
+			}, function(answer){
+				switch (answer.toLowerCase()) {
+					case '1':
+					case 'server':
+						return removeServer();
+					case '2':
+					case 'service':
+						return removeService({});
+					case '3':
+					case 'filter':
+						return removeFilter({});
+					case '4':
+					case 'directive':
+					case '5':
+					case 'theme':
+						return removeDirective({});
+				}
+			});
+		}
 	};
 /*
 	waw git
