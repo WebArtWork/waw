@@ -2,14 +2,15 @@ var fs = require('fs');
 var fse = require('fs-extra');
 var git = require('gitty');
 var wawParts = {
-	auth: 'git@github.com:WebArtWork/part-user.git'
+	auth: 'git@github.com:WebArtWork/part-user.git',
+	seo: 'git@github.com:WebArtWork/part-seo.git'
 }
 module.exports.init = function(part, url){
 	if(url.indexOf('waw@')>-1) url = wawParts[url.split('@')[1]];
+	else url = url.replace(/\s+/g, '');
 	part = part.replace(/\s+/g, '');
 	var dest = process.cwd() + '/server/' + part;
 	if(!fs.existsSync(dest)) fse.mkdirs(dest);
-	url = url.replace(/\s+/g, '');
 	var myRepo = git(dest);
 	myRepo.init(function(err){
 		myRepo.addRemote('origin', url, function(err){

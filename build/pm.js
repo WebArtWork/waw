@@ -17,15 +17,10 @@ var fse = require('fs-extra');
 			gu.writeFile(dest + '/router.js', [{
 				from: 'NAME',
 				to: name
-			}], dest + '/router.js', function() {
-				if (--counter === 0) gu.close('Your Part "'+name+'" is successfully created');
-			});
-			gu.writeFile(dest + '/schema.js', renames, dest + '/schema.js', function() {
-				if (--counter === 0) gu.close('Your Part "'+name+'" is successfully created');
-			});
-			gu.writeFile(dest + '/part.json', renames, dest + '/part.json', function() {
-				if (--counter === 0) gu.close('Your Part "'+name+'" is successfully created');
-			});
+			}], dest + '/router.js');
+			gu.writeFile(dest + '/schema.js', renames, dest + '/schema.js');
+			gu.writeFile(dest + '/part.json', renames, dest + '/part.json');
+			gu.close('Your Part "'+name+'" is successfully created');
 		})
 	}
 /*
@@ -333,7 +328,7 @@ var fse = require('fs-extra');
 		 [], pageLoc + '/css/directives/' + name + '.scss');
 		var indexFile = process.cwd() + '/client/'+ page + '/css/index.scss';
 		gu.removeCodeByTag(indexFile, partInfo.directives[i].id);
-		gu.addPieceCodeByTag("@import 'directives/" + name + ".scss'",
+		gu.addPieceCodeByTag("@import 'directives/" + name + "';",
 		 indexFile, partInfo.directives[i].id);
 		if(!ignoreMessage) console.log('Directive successfully fetched.');
 		process.exit(0);
@@ -484,7 +479,7 @@ var fse = require('fs-extra');
 		 [], pageLoc + '/css/directives/' + name + '.scss', function() {});
 		var indexFile = process.cwd() + '/client/'+ page + '/css/index.scss';
 		gu.removeCodeByTag(indexFile, partInfo.directives[i].id);
-		gu.addPieceCodeByTag("@import 'directives/" + name + ".scss'",
+		gu.addPieceCodeByTag("@import 'directives/" + name + "';",
 		 indexFile, partInfo.directives[i].id);
 		gu.close('Theme successfully fetched.');
 	}
