@@ -57,7 +57,6 @@ module.exports.create = function(name, callback){
 			console.log('Project created Successfully.');
 		});
 		fse.remove(dest+'/.git', function(err) {});
-		fse.remove(dest+'/.gitignore', function(err) {});
 	});
 }
 module.exports.fetchPart = function(name){

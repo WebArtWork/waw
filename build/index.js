@@ -1109,6 +1109,7 @@ var rl = readline.createInterface({
 	waw create
 */
 	module.exports.create = function(){
+		console.log('called');
 		if(process.argv[4]){
 			
 		}else require(__dirname+'/git').create(process.argv[3], function(){
