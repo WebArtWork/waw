@@ -1,0 +1,17 @@
+<h1>Hey</h1>
+<p>Here we will give you clear explanation about how we code with the framework.</p>
+
+<h1>Project Structure</h1>
+<p>We decided to devide code into two folders, Client and server. Clinet will host all files which will be served for the use in client browser and server will have all files which will work on the server side.</p>
+
+<h3>Client Folder</h3>
+<p>We devide this into pages folders, which can be served in different roles. For example we have admin user and public user which can see different pages. Each folder have two folders for html files, first is html which will host all templates, static fields etc, second is page which will host only files for pages. We have one folder css which will have css and scss files. Folder gen contain all generated files. Components is plugins which we gonna use for our page, each time we start the webpage framework generate file lab-min.js and place it into gen folder. Folder svgs contain svg files which generate font with icons and place it into gen folder. Folder font contain all fonts which will be used for this page. Folder img will host images. Finally javascript is hosting under js folder and also translations in lang folder.</p>
+
+<h3>Server Folder</h3>
+<p>We devide our server code into parts. Each part have it's own client side pieces, routes, schema etc. For example we have user part, which have everything about authorization, have directives for log forms, service to provide info for other services and directives.</p>
+
+<h3>package.json</h3>
+<p>Nothing special about this, just what we had before for node.js. Something new, is that we can add dependencies inside each part, in part.json file.</p>
+
+<h3>config.json</h3>
+<p>All info we need to our webpage to work, such as mongo config, port etc.</p>

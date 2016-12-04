@@ -24,6 +24,32 @@ var fse = require('fs-extra');
 		})
 	}
 /*
+*	Page Management
+*/
+	module.exports.addPage = function(page){
+		var pages = gu.getDirectories(process.cwd() + '/client');
+		for (var i = 0; i < pages.length; i++) {
+			if (page.toLowerCase() == pages[i]) {
+				return gu.close('This page already exists');
+			}
+		}
+		var dest = process.cwd() + '/client/' + page;
+		fse.copySync(__dirname+'/page', dest);
+		gu.writeFile(dest + '/html/index.html', [{
+			from: 'PAGENAME',
+			to: page
+		}], dest + '/html/index.html');
+		gu.writeFile(dest + '/js/initialize.js', [{
+			from: 'PAGENAME',
+			to: page
+		}], dest + '/js/initialize.js');
+		gu.writeFile(dest + '/js/directives.js', [{
+			from: 'PAGENAME',
+			to: page
+		}], dest + '/js/directives.js');
+		gu.close("Page has been successfully created.");
+	}
+/*
 *	Parts Manager - Services
 */
 	module.exports.addService = function(partName, service, page){

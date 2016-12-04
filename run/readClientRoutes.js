@@ -17,7 +17,14 @@ module.exports = function(sdGlobal){
 		var pageUrl = process.cwd()+'/client/'+pages[i];
 		generateLibs(pageUrl);
 		generateFonts(pageUrl, pages[i]);
-		serveFiles(pageUrl, pages[i], pages[i]==sd.config.root);
+		if(pages[i]!=sd.config.root) serveFiles(pageUrl, pages[i], false);
+		else{
+			var rootPageUrl = pageUrl;
+			var page = pages[i];
+		}
+	}
+	if(rootPageUrl){
+		serveFiles(rootPageUrl, page, true);
 	}
 }
 var getListOfComponents = function(dest){
@@ -33,7 +40,7 @@ var getListOfComponents = function(dest){
 	return libs;
 }
 var getListOfSvgs = function(dest){
-	sd.fse.mkdirs(dest);
+	sd.fse.mkdirsSync(dest);
 	var svgs = sd.getFiles(dest);
 	for (var i = svgs.length - 1; i >= 0; i--) {
 		if(svgs[i].indexOf('.svg')==-1){
@@ -62,6 +69,7 @@ var generateLibs = function(dest){
 	});
 }
 var serveFiles = function(folder, name, isRoot){
+	console.log('SERVING FILES FOR PAGE: '+name);
 	sd.app.get('/' + name + '/:folder/:file', function(req, res) {
 		for (var i = 0; i < sd.folders.length; i++) {
 			if (sd.folders[i] == req.params.folder) return res.sendFile(process.cwd() + '/client/' + name + '/' + req.params.folder + '/' + req.params.file.replace('.map', '').replace('.scss', ''));
@@ -69,7 +77,7 @@ var serveFiles = function(folder, name, isRoot){
 		if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
 		else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');
 	});
-	if (isRoot) { // make this last
+	if (isRoot) {
 		sd.app.get('/', function(req, res) {
 			if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
 			else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');

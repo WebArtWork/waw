@@ -10,10 +10,12 @@ var rl = readline.createInterface({
 	var getAddFetchOption = function(obj, callback){
 		var firstParam = 'Part';
 		if(obj['1']) firstParam = obj['1'];
-		rl.question(obj.msg+'\n1) ' + firstParam + '\n2) Service\n3) Filter\n4) Directive\n5) Theme\nChoose: ', function(answer){
+		rl.question(obj.msg+'\n1) ' + firstParam + '\n2) Service\n3) Filter\n4) Directive\n5) Theme' + (!obj['1']&&'\n6) Page') + '\nChoose: ', function(answer){
 			answer = answer.toLowerCase();
-			if(answer=='1'||answer=='2'||answer=='3'||answer=='4'||answer=='5'||
-				answer=='part'||answer=='service'||answer=='theme'||
+			if(answer=='1'||answer=='2'||answer=='3'||
+				answer=='4'||answer=='5'||answer=='6'||
+				answer=='part'||answer=='service'||
+				answer=='theme'||answer=='page'||
 				answer=='filter'||answer=='directive') callback(answer);
 			else{
 				console.log('Please select one of the options');
@@ -260,6 +262,18 @@ var rl = readline.createInterface({
 			});
 		}
 	}
+	var createPage = function(){
+		var pages = gu.getDirectories(process.cwd() + '/client');
+		rl.question('Give page you want to create: ', function(name) {
+			for (var i = 0; i < pages.length; i++) {
+				if(name.toLowerCase() == pages[i]){
+					console.log('This page already exists');
+					return createPage();
+				}
+			}
+			require(__dirname + '/pm').addPage(name);
+		});
+	}
 	module.exports.add = function(){
 		if(process.argv[3]){
 			switch(process.argv[3].toLowerCase()){
@@ -281,6 +295,9 @@ var rl = readline.createInterface({
 				case 'theme':
 					return require(__dirname+'/pm')
 					.addTheme(process.argv[4], process.argv[5], process.argv[6], process.argv[7]);
+				case 'page':
+					return require(__dirname+'/pm')
+					.addPage(process.argv[4]);
 				default: 
 					return console.log('Wrong Command.');
 			}
@@ -304,6 +321,9 @@ var rl = readline.createInterface({
 					case '5':
 					case 'theme':
 						return createTheme({});
+					case '6':
+					case 'page':
+						return createPage({});
 				}
 			});
 		}

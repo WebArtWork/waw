@@ -1,0 +1,32 @@
+<!-- Template for friend directive. -->
+
+<h1 ng-if="!MyUser.isAdmin">Hello my dear friend.</h1>
+<h1 ng-if="MyUser.isAdmin">Hello my dear admin.</h1>
+
+<useravatardefault></useravatardefault>
+
+<a href="/api/user/logout" target="_self">log out</a>
+
+<form ng-if="!MyUser.email" ng-submit="MyUser.addLocalAccount(email, pass)">
+	<h2>Add local account</h2>
+	<input type="text" ng-model="email" placeholder="email">
+	<input type="password" ng-model="pass" placeholder="password">
+	<button type="submit">Add</button>
+</form>
+
+<div>
+	<h2>Socials connected</h2>
+	<span ng-if="MyUser.twitter">twitter</span>
+</div>
+
+<form ng-submit="MyUser.update()">
+	<h2>Change Name</h2>
+	<input type="text" placeholder="Your Name" ng-model="MyUser.name" ng-change="MyUser.updateAfterWhile()">
+</form>
+
+<form ng-submit="MyUser.changePassword(oldPass, newPass)">
+	<h2>Change Password</h2>
+	<input type="password" placeholder="Old Password" ng-model="oldPass">
+	<input type="password" placeholder="New Password" ng-model="newPass">
+	<button type="submit">Change</button>
+</form>

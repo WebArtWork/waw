@@ -9,6 +9,7 @@ module.exports = function(sd){
 			dirs.splice(i,1);
 		}else{
 			var info = sd.fse.readJsonSync(dest+'/part.json', {throws: false});
+			if(!info) continue;
 			var names = [];
 			if(info.router){
 				console.log('LOAD ROUTING');
