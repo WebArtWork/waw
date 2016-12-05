@@ -3,6 +3,7 @@ var nodemon = require('nodemon');
 var pm2 = require('pm2');
 var fse = require('fs-extra');
 var run = function(){
+	// add check if this is waw project
 	nodemon({
 		script: __dirname+'/run/index.js',
 		ext: 'js json',
@@ -23,6 +24,22 @@ var serve = function(){
 			instances: 1,
 			max_memory_restart: '200M'
 		}, function(err, apps) {
+			pm2.disconnect();
+			process.exit(2);
+		});
+	});
+}
+var list = function(){
+	var config = fse.readJsonSync(process.cwd()+'/config.json', {throws: false});
+	pm2.connect(function(err) {
+		if (err) {
+			console.error(err);
+			process.exit(2);
+		}
+		pm2.list(function(err, list) {
+			for (var i = 0; i < list.length; i++) {
+				console.log(list[i].name + ' : ' + list[i].monit.memory + ' : ' + list[i].monit.cpu);
+			}
 			pm2.disconnect();
 			process.exit(2);
 		});
@@ -56,6 +73,9 @@ if(process.argv[2]){
 		case 's':
 		case 'start':
 			return serve();
+		case 'l':
+		case 'list':
+			return list();
 		case 'stop':
 			return stopServe();
 		case 'f':
@@ -79,6 +99,4 @@ if(process.argv[2]){
 		default:
 			return console.log('Wrong Command.');
 	}
-}else{
-	console.log('INFO ABOUT YOUR PROJECT');
-}
+}else return run();
