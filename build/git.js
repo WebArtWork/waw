@@ -22,13 +22,13 @@ module.exports.init = function(part, url){
 		});
 	});
 }
-var pushAll = function(part, message, callback){
+var pushAll = function(part, message, branch, callback){
 	part = part.replace(/\s+/g, '');
 	var myRepo = git(process.cwd() + '/server/' + part);
 	myRepo.addSync(['.']);
 	myRepo.commit(message, function(){
-		myRepo.pull('origin','master', function(){
-			myRepo.push('origin','master', function(){
+		myRepo.pull('origin', branch||'master', function(){
+			myRepo.push('origin', branch||'master', function(){
 				if(typeof callback == 'function') callback();
 			});
 		});
@@ -67,6 +67,15 @@ module.exports.fetchPart = function(name){
 	myRepo.fetch('--all',function(err){
 		myRepo.reset('origin/master',function(err){
 			console.log('Part has been fetched.');
+		});
+	});
+}
+module.exports.fetch = function(branch){
+	var myRepo = git(process.cwd());
+	myRepo.fetch('--all',function(err){
+		myRepo.reset('origin/'+(branch||'master'),function(err){
+			console.log('Project has been fetched.');
+			process.exit(0);
 		});
 	});
 }

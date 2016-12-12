@@ -1109,21 +1109,62 @@ var rl = readline.createInterface({
 /*
 	waw git
 */
+	// var getFetchServerOption = function(obj, callback){
+	// 	rl.question(obj.msg+'\n1) Service\n2) Filter\n3) Directive\n4) Theme\nChoose: ', function(answer){
+	// 		answer = answer.toLowerCase();
+	// 		if(answer=='1'||answer=='2'||answer=='3'||answer=='4'||
+	// 			answer=='service'||answer=='theme'||
+	// 			answer=='filter'||answer=='directive') callback(answer);
+	// 		else{
+	// 			console.log('Please select one of the options');
+	// 			getFetchServerOption(obj, callback);
+	// 		}
+	// 	});
+	// }
 	module.exports.git = function(){
 		if(process.argv[3]){
 			switch(process.argv[3].toLowerCase()){
-				case 'init':
-					return require(__dirname+'/git')
-					.init(process.argv[4],process.argv[5]);
+				case 'add':
+				case 'commit':
+				case 'pull':
+				case 'push':
+				case 'fetch':
+					return require(__dirname+'/git').fetch();
 				case 'update':
 					return require(__dirname+'/git')
-					.pushAll(process.argv[4],process.argv[5], function(){
+					.pushAll(process.argv[4], process.argv[5], process.argv[6], function(){
 						console.log('Successfully updated');
 					});
+				case 'init':
+					return require(__dirname+'/git')
+					.init(process.argv[4]);
 				default: 
 					return console.log('Wrong Command.');
 			}
-		}else return console.log('Wrong Command.');
+		}else{
+
+			// getAddFetchOption({
+			// 	msg: 'What do you like to remove?',
+			// 	"1": 'Server'
+			// }, function(answer){
+			// 	switch (answer.toLowerCase()) {
+			// 		case '1':
+			// 		case 'server':
+			// 			return removeServer();
+			// 		case '2':
+			// 		case 'service':
+			// 			return removeService({});
+			// 		case '3':
+			// 		case 'filter':
+			// 			return removeFilter({});
+			// 		case '4':
+			// 		case 'directive':
+			// 		case '5':
+			// 		case 'theme':
+			// 			return removeDirective({});
+			// 	}
+			// });
+		}
 	};
 /*
 	waw create

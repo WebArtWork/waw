@@ -56,7 +56,7 @@ var generateFonts = function(dest, name){
 	fontifier({
 		name: name,
 		files: getListOfSvgs(dest+'/svgs'),
-		way: dest + '/fonts/',
+		way: dest + '/gen/',
 		prefix: sd.config.prefix
 	});
 }

@@ -58,6 +58,27 @@ var stopServe = function(){
 		});
 	});
 }
+var restart = function(){
+	var config = fse.readJsonSync(process.cwd()+'/config.json', {throws: false});
+	pm2.connect(function(err) {
+		if (err) {
+			console.error(err);
+			process.exit(2);
+		}
+		pm2.delete(config.name, function(err, apps) {
+			pm2.start({
+				name: config.name,
+				script: __dirname+'/run/index.js',
+				exec_mode: 'cluster',
+				instances: 1,
+				max_memory_restart: '200M'
+			}, function(err, apps) {
+				pm2.disconnect();
+				process.exit(2);
+			});
+		});
+	});
+}
 if(process.argv[2]){
 	switch(process.argv[2].toLowerCase()){
 		case 'git':
@@ -73,6 +94,9 @@ if(process.argv[2]){
 		case 's':
 		case 'start':
 			return serve();
+		case 'r':
+		case 'restart':
+			return restart();
 		case 'l':
 		case 'list':
 			return list();
