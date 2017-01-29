@@ -8,7 +8,6 @@ var sd = {
 };
 sd.config = JSON.parse(sd.fs.readFileSync(process.cwd()+'/config.json','utf8'));
 sd.app = sd.express();
-
 var server = require('http').Server(sd.app);
 var session = require('express-session');
 sd.mongoUrl = 'mongodb://'+(sd.config.mongo.host||'localhost')+':'+(sd.config.mongo.port||'27017')+'/'+(sd.config.mongo.db||'test');
@@ -32,6 +31,7 @@ var store = new(require("connect-mongo")(session))({
 	url: sd.mongoUrl
 });
 var sessionMiddleware = session({
+	key: 'express.sid',
 	secret: 'thisIsCoolSecretFromWaWFramework'+sd.config.prefix,
 	resave: false,
 	saveUninitialized: true,
@@ -48,11 +48,37 @@ sd.app.set('view cache', true);
 
 sd.app.use(favicon(process.cwd() + sd.config.icon));
 
+// Socket Management
+sd.io = require('socket.io').listen(server);
+var mongo = require('socket.io-adapter-mongo');
+sd.io.adapter(mongo({ host: sd.config.mongo.host||'localhost', port: sd.config.mongo.port||'27017', db: sd.config.mongo.db||'test' }));
+var passportSocketIo = require("passport.socketio");
+
+sd.io.use(passportSocketIo.authorize({
+	passport: sd.passport,
+	cookieParser: cookieParser,
+	key: 'express.sid',
+	secret: 'thisIsCoolSecretFromWaWFramework'+sd.config.prefix,
+	store: store,
+	success: function(data, accept) {
+		console.log('successful connection to socket.io');
+		accept();
+	},
+	fail: function(data, message, error, accept) {
+		console.log(error);
+		console.log('failed connection to socket.io:', message);
+		accept();
+	}
+}));
+
 require(__dirname + '/scripts')(sd);
 require(__dirname + '/readAllParts')(sd);
 require(__dirname + '/readAllModules')(sd, function(){
 	require(__dirname + '/readAllRoutes')(sd);
 	require(__dirname + '/readClientRoutes')(sd);
+
+
+
 
 	server.listen(sd.config.port || 8080);
 	console.log("App listening on port " + (sd.config.port || 8080));

@@ -8,18 +8,19 @@ var fse = require('fs-extra');
 		name = name.replace(/\s+/g, '');
 		var dest = process.cwd() + '/server/' + name;
 		if(fs.existsSync(dest)) return gu.close('Part Exists');
-		fse.mkdirsSync(dest);
 		fse.copy(__dirname+'/part', dest, function() {
-			var counter = 3, renames = [{
+			var renames = [{
+				from: 'CNAME',
+				to: name.toLowerCase().capitalize()
+			},{
 				from: 'NAME',
-				to: name.capitalize()
+				to: name.toLowerCase()				
 			}];
-			gu.writeFile(dest + '/router.js', [{
-				from: 'NAME',
-				to: name
-			}], dest + '/router.js');
-			gu.writeFile(dest + '/schema.js', renames, dest + '/schema.js');
-			gu.writeFile(dest + '/part.json', renames, dest + '/part.json');
+			var files = gu.getFiles(__dirname+'/part');
+			files.push('client/crud.js');
+			for (var i = 0; i < files.length; i++) {
+				gu.writeFile(dest + '/' + files[i], renames, dest + '/' + files[i]);
+			}
 			gu.close('Your Part "'+name+'" is successfully created');
 		})
 	}
@@ -49,6 +50,22 @@ var fse = require('fs-extra');
 		}], dest + '/js/directives.js');
 		gu.close("Page has been successfully created.");
 	}
+/*
+*	Parts Manager - Crud
+*/
+	var fetchCrud = function(part, page){
+		partLoc = process.cwd() + '/server/' + part;
+		if(!partLoc) return gu.close('Please select part fetch crud.');
+		if(!page) return gu.close("You don't have selected the page.");
+		page = process.cwd() + '/client/' + page;
+		if(!fs.existsSync(page)) return gu.close("Page you have selected doesn't exists.");
+		if(!fs.existsSync(partLoc)||!fs.existsSync(partLoc+'/part.json'))
+			return gu.close("Part you have selected doesn't exists.");
+		gu.removeCodeByTag(page + '/gen/crud.js', part);
+		gu.addCodeByTag(partLoc + '/client/crud.js', page + '/gen/crud.js', part);
+		gu.close('Crud fetched successfully.');
+	}
+	module.exports.fetchCrud = fetchCrud;
 /*
 *	Parts Manager - Services
 */

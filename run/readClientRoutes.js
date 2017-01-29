@@ -69,7 +69,6 @@ var generateLibs = function(dest){
 	});
 }
 var serveFiles = function(folder, name, isRoot){
-	console.log('SERVING FILES FOR PAGE: '+name);
 	sd.app.get('/' + name + '/:folder/:file', function(req, res) {
 		for (var i = 0; i < sd.folders.length; i++) {
 			if (sd.folders[i] == req.params.folder) return res.sendFile(process.cwd() + '/client/' + name + '/' + req.params.folder + '/' + req.params.file.replace('.map', '').replace('.scss', ''));
@@ -78,6 +77,7 @@ var serveFiles = function(folder, name, isRoot){
 		else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');
 	});
 	if (isRoot) {
+		console.log('SERVING FILES FOR PAGE: '+name+' which is root page.');
 		sd.app.get('/', function(req, res) {
 			if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
 			else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');
@@ -87,6 +87,7 @@ var serveFiles = function(folder, name, isRoot){
 			else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');
 		});
 	} else {
+		console.log('SERVING FILES FOR PAGE: '+name);
 		sd.app.get('/' + name + '/*', function(req, res) {
 			if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
 			else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');

@@ -342,6 +342,48 @@ var rl = readline.createInterface({
 				getFetchServerOption(obj, callback);
 			}
 		});
+	}	
+	var getFetchOption = function(callback){
+		rl.question('What do you like to fetch?\n1) Server\n2) Service\n3) Filter\n4) Directive\n5) Theme\n6) Crud\nChoose: ', function(answer){
+			answer = answer.toLowerCase();
+			if(answer=='1'||answer=='2'||answer=='3'||
+				answer=='4'||answer=='5'||answer=='6'||
+				answer=='6'||answer=='crud'||
+				answer=='part'||answer=='service'||
+				answer=='theme'||answer=='page'||
+				answer=='filter'||answer=='directive') callback(answer);
+			else{
+				console.log('Please select one of the options');
+				getFetchOption(callback);
+			}
+		});
+	}
+	var fetchCrud = function(obj){
+		if(!obj.part){
+			getPart(function(name){
+				obj.part = name;
+				fetchCrud(obj);
+			});
+		}else{
+			var pages = gu.getDirectories(process.cwd() + '/client');
+			if(pages.length == 0) return console.log("You don't have any page.");
+			else if(pages.length == 1) return require(__dirname + '/pm')
+				.fetchCrud(obj.part, obj.service, pages[0]);
+			var question = 'Give page you want to fetch service:\n';
+			for (var i = 1; i < pages.length+1; i++) {
+				question += i + ') ' + pages[i-1] + '\n';
+			}
+			question += 'Choose: ';
+			rl.question(question, function(name) {
+				name = name.toLowerCase();
+				for (var i = 0; i < pages.length; i++) {
+					if(name == pages[i] || name == (i+1).toString()){
+						return require(__dirname + '/pm').fetchCrud(obj.part, pages[i]);
+					}
+				}
+				fetchCrud(obj);
+			});
+		}
 	}
 	var getService = function(part, callback){
 		var services = gu.getPartInfo(part).services||[];
@@ -796,14 +838,14 @@ var rl = readline.createInterface({
 				case 'theme':
 					return require(__dirname+'/pm')
 					.fetchTheme(process.argv[4], process.argv[5], process.argv[6], process.argv[7]);
+				case 'crud':
+					return require(__dirname+'/pm')
+					.fetchCrud(process.argv[4], process.argv[5]);
 				default: 
 					return console.log('Wrong Command.');
 			}
 		}else{
-			getAddFetchOption({
-				msg: 'What do you like to fetch?',
-				"1": 'Server'
-			}, function(answer){
+			getFetchOption(function(answer){
 				switch (answer.toLowerCase()) {
 					case '1':
 					case 'server':
@@ -820,6 +862,9 @@ var rl = readline.createInterface({
 					case '5':
 					case 'theme':
 						return fetchTheme({});
+					case '6':
+					case 'crud':
+						return fetchCrud({});
 				}
 			});
 		}
@@ -1104,66 +1149,6 @@ var rl = readline.createInterface({
 						return removeDirective({});
 				}
 			});
-		}
-	};
-/*
-	waw git
-*/
-	// var getFetchServerOption = function(obj, callback){
-	// 	rl.question(obj.msg+'\n1) Service\n2) Filter\n3) Directive\n4) Theme\nChoose: ', function(answer){
-	// 		answer = answer.toLowerCase();
-	// 		if(answer=='1'||answer=='2'||answer=='3'||answer=='4'||
-	// 			answer=='service'||answer=='theme'||
-	// 			answer=='filter'||answer=='directive') callback(answer);
-	// 		else{
-	// 			console.log('Please select one of the options');
-	// 			getFetchServerOption(obj, callback);
-	// 		}
-	// 	});
-	// }
-	module.exports.git = function(){
-		if(process.argv[3]){
-			switch(process.argv[3].toLowerCase()){
-				case 'add':
-				case 'commit':
-				case 'pull':
-				case 'push':
-				case 'fetch':
-					return require(__dirname+'/git').fetch();
-				case 'update':
-					return require(__dirname+'/git')
-					.pushAll(process.argv[4], process.argv[5], process.argv[6], function(){
-						console.log('Successfully updated');
-					});
-				case 'init':
-					return require(__dirname+'/git')
-					.init(process.argv[4]);
-				default: 
-					return console.log('Wrong Command.');
-			}
-		}else{
-
-			// getAddFetchOption({
-			// 	msg: 'What do you like to remove?',
-			// 	"1": 'Server'
-			// }, function(answer){
-			// 	switch (answer.toLowerCase()) {
-			// 		case '1':
-			// 		case 'server':
-			// 			return removeServer();
-			// 		case '2':
-			// 		case 'service':
-			// 			return removeService({});
-			// 		case '3':
-			// 		case 'filter':
-			// 			return removeFilter({});
-			// 		case '4':
-			// 		case 'directive':
-			// 		case '5':
-			// 		case 'theme':
-			// 			return removeDirective({});
-			// 	}
-			// });
 		}
 	};
 /*

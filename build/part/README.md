@@ -1,15 +1,15 @@
 ## REST API
 
 ### /create 
-Post for create new NAME for current user.
+Post for create new CNAME for current user.
 ``` Javascript
 {
 	name: 'Sample'
 }
 ```
 ### /update
-Update the NAME, post NAME object.
+Update the CNAME, post CNAME object.
 ### /adminUpdate
-Update the NAME, post NAME object, also update moderators.
+Update the CNAME, post CNAME object, also update moderators.
 ### /remove
-Remove the NAME if user is author
+Remove the CNAME if user is author

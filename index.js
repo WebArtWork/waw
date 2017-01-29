@@ -4,11 +4,14 @@ var pm2 = require('pm2');
 var fse = require('fs-extra');
 var run = function(){
 	// add check if this is waw project
-	nodemon({
+	var obj = {
 		script: __dirname+'/run/index.js',
-		ext: 'js json',
-		watch: process.cwd()+'/server'
-	});
+		ext: 'js json'
+	}
+	if(process.argv[3]) obj.watch = process.argv[3].toLowerCase().replace('ROOT', process.cwd());
+	else obj.watch = process.cwd()+'/server';
+	if(process.argv[4]) obj.ignore = process.argv[4].toLowerCase().replace('ROOT', process.cwd());
+	nodemon(obj);
 }
 var serve = function(){
 	var config = fse.readJsonSync(process.cwd()+'/config.json', {throws: false});
@@ -81,9 +84,6 @@ var restart = function(){
 }
 if(process.argv[2]){
 	switch(process.argv[2].toLowerCase()){
-		case 'git':
-			require(__dirname+'/build').git();
-			return;
 		case 'c':
 		case 'create':
 			require(__dirname+'/build').create();
@@ -99,6 +99,9 @@ if(process.argv[2]){
 			return restart();
 		case 'l':
 		case 'list':
+			return list();
+		case 'w':
+		case 'watch':
 			return list();
 		case 'stop':
 			return stopServe();
