@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 var nodemon = require('nodemon');
 var pm2 = require('pm2');
+var path = require('path');
+var fs = require('fs');
 var fse = require('fs-extra');
 var run = function(){
 	// add check if this is waw project
@@ -8,8 +10,27 @@ var run = function(){
 		script: __dirname+'/run/index.js',
 		ext: 'js json'
 	}
-	if(process.argv[3]) obj.watch = process.argv[3].toLowerCase().replace('ROOT', process.cwd());
-	else obj.watch = process.cwd()+'/server';
+	if(process.argv[3]) obj.watch = [process.argv[3].toLowerCase().replace('ROOT', process.cwd())];
+	else obj.watch = [process.cwd()+'/server'];
+
+
+	var pages = fs.readdirSync(process.cwd() + '/client').filter(function(file) {
+		return fs.statSync(path.join(process.cwd() + '/client', file)).isDirectory();
+	});
+	for (var i = 0; i < pages.length; i++) {
+		if (pages[i] == 'scss') continue; // remove this one day
+		var pageUrl = process.cwd() + '/client/' + pages[i];
+		if (fs.existsSync(pageUrl + '/config.json')) var info = fse
+			.readJsonSync(pageUrl + '/config.json', {
+				throws: false
+			});
+		else continue;
+		if (info.seo) {
+			for (var j = 0; j < info.router.length; j++) {
+				obj.watch.push(pageUrl + '/' + info.router[j].src);
+			}
+		}
+	}
 	if(process.argv[4]) obj.ignore = process.argv[4].toLowerCase().replace('ROOT', process.cwd());
 	nodemon(obj);
 }

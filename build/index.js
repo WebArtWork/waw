@@ -23,13 +23,34 @@ var rl = readline.createInterface({
 			}
 		});
 	}
+	var getAddOption = function(callback){
+		rl.question('What do you want to add into your waw project?\n1) Part\n2) Service\n3) Filter\n4) Directive\n5) Theme\n6) Local Page\n7) Public Page\nChoose: ', function(answer){
+			answer = answer.toLowerCase();
+			if(answer=='1'||answer=='2'||answer=='3'||
+				answer=='4'||answer=='5'||answer=='6'||
+				answer=='7'||answer=='public page'||
+				answer=='p'||answer=='pp'||answer=='lp'||
+				answer=='s'||answer=='f'||answer=='d'||answer=='t'||
+				answer=='part'||answer=='service'||
+				answer=='theme'||answer=='local page'||
+				answer=='filter'||answer=='directive') callback(answer);
+			else{
+				console.log('Please select one of the options');
+				getAddOption(obj, callback);
+			}
+		});
+	}
 	var createPart = function(){
 		rl.question('Give name for new part: ', function(name) {
 			if(!name){
 				console.log('Empty name is not allowed.');
 				createPart();
 			}
-			return require(__dirname + '/pm').create(name);
+			if(name.indexOf('@')>-1)
+				return require(__dirname+'/git')
+				.createPart(name);
+			else return require(__dirname+'/pm')
+				.create(name);
 		});
 	}
 	var getPart = function(callback){
@@ -262,68 +283,105 @@ var rl = readline.createInterface({
 			});
 		}
 	}
-	var createPage = function(){
+	var addPageLocal = function(){
 		var pages = gu.getDirectories(process.cwd() + '/client');
 		rl.question('Give page you want to create: ', function(name) {
 			for (var i = 0; i < pages.length; i++) {
 				if(name.toLowerCase() == pages[i]){
 					console.log('This page already exists');
-					return createPage();
+					return addPageLocal();
 				}
 			}
-			require(__dirname + '/pm').addPage(name);
+			require(__dirname + '/pm').addPageLocal(name);
+		});
+	}
+	var addPagePublic = function(){
+		var pages = gu.getDirectories(process.cwd() + '/client');
+		rl.question('Give page you want to create: ', function(name) {
+			for (var i = 0; i < pages.length; i++) {
+				if(name.toLowerCase() == pages[i]){
+					console.log('This page already exists');
+					return addPagePublic();
+				}
+			}
+			require(__dirname + '/pm').addPagePublic(name);
 		});
 	}
 	module.exports.add = function(){
 		if(process.argv[3]){
 			switch(process.argv[3].toLowerCase()){
+				case '1':
+				case 'p':
 				case 'part':
 					if(process.argv[4].indexOf('@')>-1)
 						return require(__dirname+'/git')
-						.createFromPublic(process.argv[4], process.argv[5]);
+						.createPart(process.argv[4]);
 					else return require(__dirname+'/pm')
 						.create(process.argv[4]);
+				case '2':
+				case 's':
 				case 'service':
 					return require(__dirname+'/pm')
 					.addService(process.argv[4], process.argv[5], process.argv[6]);
+				case '3':
+				case 'f':
 				case 'filter':
 					return require(__dirname+'/pm')
 					.addFilter(process.argv[4], process.argv[5], process.argv[6]);
+				case '4':
+				case 'd':
 				case 'directive':
 					return require(__dirname+'/pm')
 					.addDirective(process.argv[4], process.argv[5], process.argv[6]);
+				case '5':
+				case 't':
 				case 'theme':
 					return require(__dirname+'/pm')
 					.addTheme(process.argv[4], process.argv[5], process.argv[6], process.argv[7]);
-				case 'page':
+				case '6':
+				case 'pp':
+				case 'publicpage':
 					return require(__dirname+'/pm')
-					.addPage(process.argv[4]);
+					.addPageLocal(process.argv[4]);
+				case '7':
+				case 'lp':
+				case 'localpage':
+					return require(__dirname+'/pm')
+					.addPagePublic(process.argv[4]);
 				default: 
 					return console.log('Wrong Command.');
 			}
 		}else{
-			getAddFetchOption({
-				msg: 'What do you want to add into your waw project?'
-			}, function(answer){
+			getAddOption(function(answer){
 				switch (answer.toLowerCase()) {
 					case '1':
+					case 'p':
 					case 'part':
 						return createPart();
 					case '2':
+					case 's':
 					case 'service':
 						return createService({});
 					case '3':
+					case 'f':
 					case 'filter':
 						return createFilter({});
 					case '4':
+					case 'd':
 					case 'directive':
 						return createDirective({});
 					case '5':
+					case 't':
 					case 'theme':
 						return createTheme({});
 					case '6':
-					case 'page':
-						return createPage({});
+					case 'pp':
+					case 'public page':
+						return addPageLocal({});
+					case '7':
+					case 'lp':
+					case 'local page':
+						return addPagePublic({});
 				}
 			});
 		}
@@ -1155,7 +1213,6 @@ var rl = readline.createInterface({
 	waw create
 */
 	module.exports.create = function(){
-		console.log('called');
 		if(process.argv[4]){
 			
 		}else require(__dirname+'/git').create(process.argv[3], function(){

@@ -12,16 +12,45 @@ module.exports = function(sdGlobal){
 		force: !sd.config.production
 	}));
 	var pages = sd.getDirectories(process.cwd() + '/client');
+	var seoPages = [];
 	for (var i = 0; i < pages.length; i++) {
-		if(pages[i]=='scss') continue;
+		if(pages[i]=='scss') continue; // remove this one day
 		var pageUrl = process.cwd()+'/client/'+pages[i];
 		generateLibs(pageUrl);
 		generateFonts(pageUrl, pages[i]);
-		if(pages[i]!=sd.config.root) serveFiles(pageUrl, pages[i], false);
-		else{
-			var rootPageUrl = pageUrl;
-			var page = pages[i];
+		if(sd.fs.existsSync(pageUrl+'/config.json')) var info = sd.fse
+			.readJsonSync(pageUrl+'/config.json', {throws: false});
+		else var info = false;
+		if(info&&info.seo){
+			seoPages.push({
+				url: pageUrl,
+				router: info.router
+			});
+			simpleServeFiles(pageUrl, pages[i]);
+		}else{
+			if(pages[i]!=sd.config.root) serveFiles(pageUrl, pages[i], false);
+			else{
+				var rootPageUrl = pageUrl;
+				var page = pages[i];
+			}
 		}
+	}
+	if(seoPages.length>0){
+		var swig  = require('swig');
+		swig.setDefaults({
+			varControls: ['{{{', '}}}']
+		});
+		sd.app.engine('html', swig.renderFile);
+		sd.app.set('view engine', 'html');
+		sd.app.set('view cache', true);
+		var engines = [];
+		for (var i = 0; i < seoPages.length; i++) {
+			engines.push(seoPages[i].url+'/page');
+			for (var j = 0; j < seoPages[i].router.length; j++) {
+				require(seoPages[i].url+'/'+seoPages[i].router[j].src)(sd.app, sd);
+			}
+		}
+		sd.app.set('views', engines);
 	}
 	if(rootPageUrl){
 		serveFiles(rootPageUrl, page, true);
@@ -68,6 +97,14 @@ var generateLibs = function(dest){
 		production: false
 	});
 }
+var simpleServeFiles = function(folder, name){
+	sd.app.get('/' + name + '/:folder/:file', function(req, res) {
+		for (var i = 0; i < sd.folders.length; i++) {
+			if (sd.folders[i] == req.params.folder) return res.sendFile(process.cwd() + '/client/' + name + '/' + req.params.folder + '/' + req.params.file.replace('.map', '').replace('.scss', ''));
+		}
+		res.json(false);
+	});
+}
 var serveFiles = function(folder, name, isRoot){
 	sd.app.get('/' + name + '/:folder/:file', function(req, res) {
 		for (var i = 0; i < sd.folders.length; i++) {
@@ -75,13 +112,15 @@ var serveFiles = function(folder, name, isRoot){
 		}
 		if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
 		else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');
-	});
+	});	
 	if (isRoot) {
 		console.log('SERVING FILES FOR PAGE: '+name+' which is root page.');
-		sd.app.get('/', function(req, res) {
-			if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
-			else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');
-		});
+		if(!sd.config.customRootLink){
+			sd.app.get('/', function(req, res) {
+				if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
+				else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');
+			});
+		}
 		sd.app.get('/*', function(req, res) {
 			if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
 			else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');

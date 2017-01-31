@@ -1,6 +1,7 @@
 var gu = require(__dirname+'/gu.js');
 var fs = require('fs');
 var fse = require('fs-extra');
+var recursive = require('recursive-readdir');
 /*
 *	Parts Manager
 */
@@ -14,20 +15,22 @@ var fse = require('fs-extra');
 				to: name.toLowerCase().capitalize()
 			},{
 				from: 'NAME',
-				to: name.toLowerCase()				
+				to: name.toLowerCase()
 			}];
-			var files = gu.getFiles(__dirname+'/part');
-			files.push('client/crud.js');
-			for (var i = 0; i < files.length; i++) {
-				gu.writeFile(dest + '/' + files[i], renames, dest + '/' + files[i]);
-			}
-			gu.close('Your Part "'+name+'" is successfully created');
-		})
+			recursive(dest, function(err, files) {
+				if(files){
+					for (var i = 0; i < files.length; i++) {
+						gu.writeFile(files[i], renames, files[i]);
+					}
+				};
+				gu.close('Your Part "'+name+'" is successfully created');
+			});
+		});
 	}
 /*
 *	Page Management
 */
-	module.exports.addPage = function(page){
+	module.exports.addPageLocal = function(page){
 		var pages = gu.getDirectories(process.cwd() + '/client');
 		for (var i = 0; i < pages.length; i++) {
 			if (page.toLowerCase() == pages[i]) {
@@ -35,20 +38,41 @@ var fse = require('fs-extra');
 			}
 		}
 		var dest = process.cwd() + '/client/' + page;
-		fse.copySync(__dirname+'/page', dest);
-		gu.writeFile(dest + '/html/index.html', [{
+		fse.copySync(__dirname+'/PageLocal', dest);
+		var renames = [{
 			from: 'PAGENAME',
 			to: page
-		}], dest + '/html/index.html');
-		gu.writeFile(dest + '/js/initialize.js', [{
+		}];
+		recursive(dest, function(err, files) {
+			if(files){
+				for (var i = 0; i < files.length; i++) {
+					gu.writeFile(files[i], renames, files[i]);
+				}
+			};
+			gu.close("Local Page has been successfully created.");
+		});
+	}
+	module.exports.addPagePublic = function(page){
+		var pages = gu.getDirectories(process.cwd() + '/client');
+		for (var i = 0; i < pages.length; i++) {
+			if (page.toLowerCase() == pages[i]) {
+				return gu.close('This page already exists');
+			}
+		}
+		var dest = process.cwd() + '/client/' + page;
+		fse.copySync(__dirname+'/PagePublic', dest);
+		var renames = [{
 			from: 'PAGENAME',
 			to: page
-		}], dest + '/js/initialize.js');
-		gu.writeFile(dest + '/js/directives.js', [{
-			from: 'PAGENAME',
-			to: page
-		}], dest + '/js/directives.js');
-		gu.close("Page has been successfully created.");
+		}];
+		recursive(dest, function(err, files) {
+			if(files){
+				for (var i = 0; i < files.length; i++) {
+					gu.writeFile(files[i], renames, files[i]);
+				}
+			};
+			gu.close("Public Page has been successfully created.");
+		});
 	}
 /*
 *	Parts Manager - Crud

@@ -1,6 +1,6 @@
 {
 	"name": "waw",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"description": "Framework which provide layer over Mongodb, Node.js and Angular.js. Give availability as structure layouts, code parts, ready setup code and others.",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
@@ -23,6 +23,7 @@
 	"dependencies": {
 		"pm2": "*",
 		"npmi": "*",
+		"swig": "*",
 		"gitty": "*",
 		"morgan": "*",
 		"nodemon": "*",
@@ -39,6 +40,7 @@
 		"cookie-parser": "*",
 		"express-session": "*",
 		"method-override": "*",
+    	"recursive-readdir": "*",
 		"passport.socketio": "*",
 		"node-sass-middleware": "*",
 		"socket.io-adapter-mongo": "*"

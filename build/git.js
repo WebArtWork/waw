@@ -1,9 +1,9 @@
 var fs = require('fs');
 var fse = require('fs-extra');
+var gu = require(__dirname+'/gu.js');
 var git = require('gitty');
 var wawParts = {
-	auth: 'git@github.com:WebArtWork/part-user.git',
-	seo: 'git@github.com:WebArtWork/part-seo.git'
+	user: 'git@github.com:WebArtWork/part-user.git'
 }
 module.exports.init = function(part, url){
 	if(url.indexOf('waw@')>-1) url = wawParts[url.split('@')[1]];
@@ -57,6 +57,18 @@ module.exports.create = function(name, callback){
 			console.log('Project created Successfully.');
 		});
 		fse.remove(dest+'/.git', function(err) {});
+	});
+}
+module.exports.createPart = function(name){
+	name = name.replace(/\s+/g, '');
+	name = name.replace('waw@', '');
+	var dest = process.cwd() + '/server/' + name;
+	if(fs.existsSync(dest)) return gu.close('Part Exists');
+	fse.mkdirs(dest);
+	git.clone(dest,wawParts[name], function(){
+		fse.remove(dest+'/.git', function(err) {
+			gu.close('Your Part "'+name+'" is successfully pulled.');
+		});
 	});
 }
 module.exports.fetchPart = function(name){

@@ -14,7 +14,4 @@ module.exports = function(sd){
 		if (sd.fs.existsSync(src)) return true;
 		else return false;
 	}
-	sd.folderPreview = function(src){
-
-	}
 }

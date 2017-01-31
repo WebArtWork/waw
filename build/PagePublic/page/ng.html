@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html ng-app="PAGENAME">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="/public/css/index.css">
+</head>
+
+<body ng-controller="Landing">
+	<div>
+		<a href="/">Landing</a>
+		<a href="/AboutUs">AboutUs</a>
+		<a href="/AboutFramework">AboutFramework</a>
+		<a href="/Structure">Structure</a>
+	</div>
+
+	{% block body %}{% endblock %}
+
+	<!-- Script -->
+	<script src="/public/gen/lab-min.js"></script>
+	<script>
+		var app = angular.module('PAGENAME',[]);
+	</script>
+	<script src="/public/gen/crud.js"></script>
+	<script src="/public/js/services.js"></script>
+	<script src="/public/js/controllers.js"></script>
+</body>
+</html>

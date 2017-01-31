@@ -1,0 +1,61 @@
+{% extends 'ng.html' %}
+{% block body %}
+{% if !user %}
+	<h1>Hello Stranger :)</h1>
+
+	<form action="/api/user/login" method="POST">
+		<h2>Login</h2>
+		<input type="text" name="username" placeholder="email">
+		<input type="password" name="password" placeholder="password">
+		<button>Sign</button>
+	</form>
+
+	<form action="/api/user/signup" method="POST">
+		<h2>Register</h2>
+		<input type="text" name="username" placeholder="email">
+		<input type="password" name="password" placeholder="password">
+		<button>Sign</button>
+	</form>
+
+	<div>
+		<a href="/api/user/twitter" target="_self">Twitter</a>
+	</div>
+{% endif %}
+{% if user %}
+	{% if isAdmin %}<h1>Hello my dear admin.</h1>{% endif %}
+	{% if !isAdmin %}<h1>Hello my dear friend.</h1>{% endif %}
+
+	<label>
+		<img src="{{avatarUrl}}">
+		<input type="file" ng-hide="true" id="inputAvatarUserDirective">
+	</label>
+
+	<a href="/api/user/logout">log out</a>
+
+	{% if !email %}
+	<form ng-submit="MyUser.addLocalAccount(email, pass)">
+		<h2>Add local account</h2>
+		<input type="text" ng-model="email" placeholder="email">
+		<input type="password" ng-model="pass" placeholder="password">
+		<button type="submit">Add</button>
+	</form>
+	{% endif %}
+
+	<div>
+		<h2>Socials connected</h2>
+		{% if twitter %}<span>twitter</span>{% endif %}			
+	</div>
+
+	<form ng-submit="MyUser.update()">
+		<h2>Change Name</h2>
+		<input type="text" placeholder="Your Name" ng-model="MyUser.name" ng-change="MyUser.updateAfterWhile()">
+	</form>
+
+	<form ng-submit="MyUser.changePassword(oldPass, newPass)">
+		<h2>Change Password</h2>
+		<input type="password" placeholder="Old Password" ng-model="oldPass">
+		<input type="password" placeholder="New Password" ng-model="newPass">
+		<button type="submit">Change</button>
+	</form>
+{% endif %}
+{% endblock %}
