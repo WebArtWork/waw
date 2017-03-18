@@ -6,22 +6,14 @@ module.exports = function(app, express, sd) {
 		app.use(api, router);
 		sd.CNAME = CNAME;
 	// Routes
-		router.post("/create", ensure, function(req, res) {
+		router.post("/create", ensure, sd.CNAMEAuth||sd.next, function(req, res) {
 			CNAME.create({
-				author: req.user._id,
-				moderators: [req.user._id],
-				version: 0,
+				author: req.body.__author||req.user._id,
+				moderators: req.body.__moderators||[req.user._id],
 				name: req.body.name
 			}, function(err, NAME){
 				if(err) return res.json(false);
 				res.json(NAME);
-				if(sd.NAMEc){
-					for (var i = 0; i < sd.NAMEc.length; i++) {
-						if(typeof sd.NAMEc[i] == 'function'){
-							sd.NAMEc[i](NAME);
-						}
-					}
-				}
 			});
 		});
 		router.post("/update", ensure, function(req, res) {

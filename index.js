@@ -124,6 +124,22 @@ if(process.argv[2]){
 		case 'w':
 		case 'watch':
 			return list();
+		case 'u':
+		case 'update':
+			require(__dirname+'/build/git.js').fetch(process.argv[3], function(){
+				restart();
+			});
+			return;
+		case 'lu':
+		case 'lupdate':
+			require(__dirname+'/build/git.js').fetch(process.argv[3], function(){
+				run();
+			});
+			return;
+		case 'i':
+		case 'init':
+			require(__dirname+'/build/git.js').initialize(process.argv[3], process.argv[4]);
+			return;
 		case 'stop':
 			return stopServe();
 		case 'f':

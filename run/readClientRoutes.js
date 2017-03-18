@@ -11,6 +11,17 @@ module.exports = function(sdGlobal){
 		outputStyle: 'compressed',
 		force: !sd.config.production
 	}));
+	
+	sd.app.use(require('postcss-middleware')({
+		plugins: [
+			/* Plugins */
+			require('autoprefixer')({
+				/* Options */
+			})
+		]
+	}));
+
+
 	var pages = sd.getDirectories(process.cwd() + '/client');
 	var seoPages = [];
 	for (var i = 0; i < pages.length; i++) {
@@ -36,9 +47,10 @@ module.exports = function(sdGlobal){
 		}
 	}
 	if(seoPages.length>0){
-		var swig  = require('swig');
+		var swig  = require('derer');
 		swig.setDefaults({
-			varControls: ['{{{', '}}}']
+			varControls: ['{{{', '}}}'],
+			cache: sd.config.production
 		});
 		sd.app.engine('html', swig.renderFile);
 		sd.app.set('view engine', 'html');

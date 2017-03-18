@@ -425,8 +425,7 @@ var rl = readline.createInterface({
 		}else{
 			var pages = gu.getDirectories(process.cwd() + '/client');
 			if(pages.length == 0) return console.log("You don't have any page.");
-			else if(pages.length == 1) return require(__dirname + '/pm')
-				.fetchCrud(obj.part, obj.service, pages[0]);
+			else if(pages.length == 1) return require(__dirname + '/pm').fetchCrud(obj.part, pages[0]);
 			var question = 'Give page you want to fetch service:\n';
 			for (var i = 1; i < pages.length+1; i++) {
 				question += i + ') ' + pages[i-1] + '\n';

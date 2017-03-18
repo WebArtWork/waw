@@ -2,8 +2,11 @@ var fs = require('fs');
 var fse = require('fs-extra');
 var gu = require(__dirname+'/gu.js');
 var git = require('gitty');
+var recursive = require('recursive-readdir');
 var wawParts = {
-	user: 'git@github.com:WebArtWork/part-user.git'
+	user: 'git@github.com:WebArtWork/part-user.git',
+	db: 'git@github.com:WebArtWork/part-local-db.git',
+	dbo: 'git@github.com:WebArtWork/part-local-db-original.git',
 }
 module.exports.init = function(part, url){
 	if(url.indexOf('waw@')>-1) url = wawParts[url.split('@')[1]];
@@ -62,12 +65,29 @@ module.exports.create = function(name, callback){
 module.exports.createPart = function(name){
 	name = name.replace(/\s+/g, '');
 	name = name.replace('waw@', '');
+	name = name.split(':');
+	var wawPart = name[0];
+	name = name[1]||name[0];
 	var dest = process.cwd() + '/server/' + name;
 	if(fs.existsSync(dest)) return gu.close('Part Exists');
 	fse.mkdirs(dest);
-	git.clone(dest,wawParts[name], function(){
+	git.clone(dest,wawParts[wawPart], function(){
 		fse.remove(dest+'/.git', function(err) {
-			gu.close('Your Part "'+name+'" is successfully pulled.');
+			var renames = [{
+				from: 'CNAME',
+				to: name.toLowerCase().capitalize()
+			}, {
+				from: 'NAME',
+				to: name.toLowerCase()
+			}];
+			recursive(dest, function(err, files) {
+				if (files) {
+					for (var i = 0; i < files.length; i++) {
+						gu.writeFile(files[i], renames, files[i]);
+					}
+				};
+				gu.close('Your Part "'+name+'" is successfully pulled.');
+			});
 		});
 	});
 }
@@ -82,12 +102,34 @@ module.exports.fetchPart = function(name){
 		});
 	});
 }
-module.exports.fetch = function(branch){
+module.exports.fetch = function(branch, callback){
 	var myRepo = git(process.cwd());
 	myRepo.fetch('--all',function(err){
 		myRepo.reset('origin/'+(branch||'master'),function(err){
-			console.log('Project has been fetched.');
-			process.exit(0);
+			if(typeof callback == 'function') callback();
+			else process.exit(0);
 		});
 	});
 }
+module.exports.initialize = function(url, branch){
+	var myRepo = git(process.cwd());
+	myRepo.init(function(){
+		myRepo.addRemote('origin', url, function(err){
+			if(err) gu.close('Project exists.');
+			myRepo.checkout(branch ||'master', ['-b'], function(err) {
+				myRepo.pull('origin', branch || 'master', function() {
+					gu.close('Project successfully initialized.');
+				});
+			});
+		});
+	});
+}
+// General prototypes
+	String.prototype.capitalize = function(all) {
+		if (all) {
+			return this.split(' ').map(e => e.capitalize()).join(' ');
+		} else {
+			return this.charAt(0).toUpperCase() + this.slice(1);
+		}
+	}
+// end of file

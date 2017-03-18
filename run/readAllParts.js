@@ -4,10 +4,18 @@ module.exports = function(sd){
 	sd.parts = [];
 	sd.dependencies = [];
 	for (var i = dirs.length - 1; i >= 0; i--) {
+		var isIgnore = false;
+		if(sd.config.ignoreParts){
+			for (var j = 0; j < sd.config.ignoreParts.length; j++) {
+				if(sd.config.ignoreParts[j].toLowerCase()==dirs[i].toLowerCase()){
+					isIgnore = true;
+					break;
+				}
+			}
+		}
+		if(isIgnore) continue;
 		var dest = process.cwd() + '/server/'+dirs[i];
-		if(!sd.isPart(dest+'/part.json')){
-			dirs.splice(i,1);
-		}else{
+		if(sd.isPart(dest+'/part.json')){
 			var info = sd.fse.readJsonSync(dest+'/part.json', {throws: false});
 			if(!info) continue;
 			var names = [];

@@ -14,4 +14,7 @@ module.exports = function(sd){
 		if (sd.fs.existsSync(src)) return true;
 		else return false;
 	}
+	sd.next = function(req, res, next){
+		next();
+	}
 }
