@@ -1,21 +1,31 @@
 {
 	"name": "waw",
-	"version": "0.4.9",
-	"description": "Framework which provide layer over Mongodb, Node.js and Angular.js. Give availability as structure layouts, code parts, ready setup code and others.",
-	"license": "MIT",
-	"repository": "WebArtWork/waw",
-	"author": {
-		"name": "Honchar Denys",
-		"email": "crackeraki@gmail.com"
-	},
-	"engines": {
-		"node": ">=4.4.7"
-	},
-	"main": "./index.js",
+	"description": "Framework which provide layer over Mongodb, Node.js and Angular.js. Divide back-end into parts and provide awesome crud system.",
 	"keywords": [
 		"framework",
 		"waw"
 	],
+	"version": "0.5.1",
+	"license": "MIT",
+	"repository": "WebArtWork/waw",
+	"author": {
+		"name": "Honchar Denys",
+		"email": "crackeraki@gmail.com",
+		"url": "https://github.com/CrackerakiUA"
+	},
+	"contributors": [{
+		"name": "Sikora Serg",
+		"email": "sikorasergii@gmail.com",
+		"url": "https://github.com/SikoraSergii"
+	}, {
+		"name": "Andriy Momot",
+		"email": "Anrehecil@gmail.com",
+		"url": "https://github.com/Anrehecil"
+	}],
+	"engines": {
+		"node": ">=6.10.0"
+	},
+	"main": "./index.js",
 	"bin": {
 		"waw": "index.js"
 	},
@@ -35,7 +45,6 @@
 		"js-minify": "*",
 		"svg-fontify": "*",
 		"body-parser": "*",
-		"autoprefixer": "*",
 		"connect-mongo": "*",
 		"serve-favicon": "*",
 		"cookie-parser": "*",
@@ -43,8 +52,9 @@
 		"method-override": "*",
     	"recursive-readdir": "*",
 		"passport.socketio": "*",
-		"postcss-middleware": "*",
 		"node-sass-middleware": "*",
-		"socket.io-adapter-mongo": "*"
+		"socket.io-adapter-mongo": "*",
+		"autoprefixer": "*",
+		"postcss-middleware": "*"
 	}
 }

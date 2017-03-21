@@ -10,6 +10,7 @@ module.exports.removeCodeByTag = function(dest, tag){
 }
 module.exports.getCodeByTag = function(dest, tag){
 	var data = fs.readFileSync(dest, 'utf8');
+	if(data.indexOf('/*start_'+tag+'*/')==-1) return false;
 	return data.slice(data.indexOf('/*start_'+tag+'*/')+tag.length+11, data.indexOf('/*end_'+tag+'*/')-1);
 }
 module.exports.addCodeByTag = function(src, dest, tag){

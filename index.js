@@ -105,9 +105,9 @@ var restart = function(){
 }
 if(process.argv[2]){
 	switch(process.argv[2].toLowerCase()){
-		case 'c':
-		case 'create':
-			require(__dirname+'/build').create();
+		case 'n':
+		case 'new':
+			require(__dirname+'/build').new();
 			return;
 		case 'r':
 		case 'run':
@@ -142,16 +142,13 @@ if(process.argv[2]){
 			return;
 		case 'stop':
 			return stopServe();
-		case 'f':
-		case 'fetch':
-			require(__dirname+'/build').fetch();
+		case 'c':
+		case 'crud':
+			require(__dirname+'/build').crud();
 			return;
 		case 'a':
 		case 'add':
 			require(__dirname+'/build').add();
-			return;
-		case 'remove':
-			require(__dirname+'/build').remove();
 			return;
 		case '--version':
 		case '-version':
