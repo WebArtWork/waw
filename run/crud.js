@@ -8,15 +8,14 @@ module.exports = function(sd, partJson) {
 	// Routes
 		if(partJson.crud){
 			// Init
-			var router = sd._express.Router();
-			var api = '/api/'+name;
-			sd._app.use(api, router);
+			var router = sd._initRouter('/api/'+name);
 			// create
 			router.post("/create", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
 				var doc = new Schema();
 				if(typeof doc.create !== 'function'){
 					return res.json(false);
 				}
+				doc.create(req.body, req.user);
 				doc.save(function(err){
 					if(err) return res.json(false);
 					res.json(doc);
@@ -40,7 +39,7 @@ module.exports = function(sd, partJson) {
 			}
 			// delete
 			router.post("/delete", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
-				Schema.remove(sd['sp'+name+'r'+partJson.name]||{
+				Schema.remove(sd['sp'+name+'r']||{
 					_id: req.body._id,
 					author: req.user._id
 				}, function(err){
