@@ -8,9 +8,9 @@ module.exports = function(sd, next){
 		name: 'mongoose',
 		version: '*'
 	});
-	for (var i = 0; i < sd.dependencies.length; i++) {
-		var module = process.cwd() + '/node_modules/'+sd.dependencies[i].name;
-		if(!fs.existsSync(module)) needToInstall.push(sd.dependencies[i]);
+	for (var i = 0; i < sd._dependencies.length; i++) {
+		var module = process.cwd() + '/node_modules/'+sd._dependencies[i].name;
+		if(!fs.existsSync(module)) needToInstall.push(sd._dependencies[i]);
 	}
 	var counter = needToInstall.length;
 	if(counter == 0) return next();

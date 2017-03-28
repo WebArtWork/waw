@@ -19,7 +19,7 @@ crudServices.CNAME = function($http, $timeout, socket){
 		srv.update = function(obj, callback){
 			if(!obj) return;
 			$timeout.cancel(updateTimeout);
-			$http.post('/api/NAME/update', obj)
+			$http.post('/api/NAME/update'+obj.name, obj)
 			.then(function(){
 				if(typeof callback == 'function')
 					callback();
@@ -30,22 +30,6 @@ crudServices.CNAME = function($http, $timeout, socket){
 			$timeout.cancel(updateTimeout);
 			updateTimeout = $timeout(function(){
 				srv.update(obj);
-			}, 1000);
-		}
-		srv.adminUpdate = function(obj, callback){
-			if(!obj) return;
-			$timeout.cancel(admimnUpdateTimeout);
-			$http.post('/api/NAME/adminUpdate', obj)
-			.then(function(){
-				if(typeof callback == 'function')
-					callback();
-				socket.emit('MineCNAMEUpdated', obj);
-			});		
-		}
-		srv.adminUpdateAfterWhile = function(obj){
-			$timeout.cancel(admimnUpdateTimeout);
-			admimnUpdateTimeout = $timeout(function(){
-				srv.adminUpdate(obj);
 			}, 1000);
 		}
 		srv.delete = function(obj, callback){

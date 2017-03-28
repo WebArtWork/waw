@@ -111,6 +111,14 @@ module.exports.fetch = function(branch, callback){
 		});
 	});
 }
+module.exports.fetchOrigin = function(){
+	var myRepo = git(__dirname);
+	myRepo.fetch('--all',function(err){
+		myRepo.reset('origin/'+(branch||'master'),function(err){
+			gu.close('waw were successfully updated.');
+		});
+	});
+}
 module.exports.initialize = function(url, branch){
 	var myRepo = git(process.cwd());
 	myRepo.init(function(){

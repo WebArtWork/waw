@@ -1,42 +1,43 @@
 var sd = {
-	express: require('express'),
-	passport: require('passport'),
-	mongoose: require('mongoose'),
-	fs: require('fs'),
-	path: require('path'),
-	fse: require('fs-extra')
+	_express: require('express'),
+	_passport: require('passport'),
+	_mongoose: require('mongoose'),
+	_fs: require('fs'),
+	_fse: require('fs-extra'),
+	_path: require('path'),
 };
-sd.config = JSON.parse(sd.fs.readFileSync(process.cwd()+'/config.json','utf8'));
-sd.app = sd.express();
-var server = require('http').Server(sd.app);
+sd._config = JSON.parse(sd._fs.readFileSync(process.cwd()+'/config.json','utf8'));
+
+sd._app = sd._express();
+var server = require('http').Server(sd._app);
 var session = require('express-session');
-sd.mongoUrl = 'mongodb://'+(sd.config.mongo.host||'localhost')+':'+(sd.config.mongo.port||'27017')+'/'+(sd.config.mongo.db||'test');
+sd._mongoUrl = 'mongodb://'+(sd._config.mongo.host||'localhost')+':'+(sd._config.mongo.port||'27017')+'/'+(sd._config.mongo.db||'test');
 var favicon = require('serve-favicon');
 
 var cookieParser = require('cookie-parser');
-sd.app.use(cookieParser());
+sd._app.use(cookieParser());
 
 var methodOverride = require('method-override');
-sd.app.use(methodOverride('X-HTTP-Method-Override'));
+sd._app.use(methodOverride('X-HTTP-Method-Override'));
 
 var morgan = require('morgan');
-sd.app.use(morgan('dev'));
+sd._app.use(morgan('dev'));
 
 var bodyParser = require('body-parser');
-sd.app.use(bodyParser.urlencoded({
+sd._app.use(bodyParser.urlencoded({
 	'extended': 'true',
 	'limit': '50mb'
 }));
-sd.app.use(bodyParser.json({
+sd._app.use(bodyParser.json({
 	'limit': '50mb'
 }));
 
 var store = new(require("connect-mongo")(session))({
-	url: sd.mongoUrl
+	url: sd._mongoUrl
 });
 var sessionMiddleware = session({
-	key: 'express.sid.'+sd.config.prefix,
-	secret: 'thisIsCoolSecretFromWaWFramework'+sd.config.prefix,
+	key: 'express.sid.'+sd._config.prefix,
+	secret: 'thisIsCoolSecretFromWaWFramework'+sd._config.prefix,
 	resave: false,
 	saveUninitialized: true,
 	cookie: {
@@ -45,24 +46,24 @@ var sessionMiddleware = session({
 	rolling: true,
 	store: store
 });
-sd.app.use(sessionMiddleware);
-sd.app.use(sd.passport.initialize());
-sd.app.use(sd.passport.session());
-sd.app.set('view cache', true);
+sd._app.use(sessionMiddleware);
+sd._app.use(sd._passport.initialize());
+sd._app.use(sd._passport.session());
+sd._app.set('view cache', true);
 
-sd.app.use(favicon(process.cwd() + sd.config.icon));
+sd._app.use(favicon(process.cwd() + sd._config.icon));
 
 // Socket Management
-sd.io = require('socket.io').listen(server);
+sd._io = require('socket.io').listen(server);
 var mongo = require('socket.io-adapter-mongo');
-sd.io.adapter(mongo({ host: sd.config.mongo.host||'localhost', port: sd.config.mongo.port||'27017', db: sd.config.mongo.db||'test' }));
+sd._io.adapter(mongo({ host: sd._config.mongo.host||'localhost', port: sd._config.mongo.port||'27017', db: sd._config.mongo.db||'test' }));
 var passportSocketIo = require("passport.socketio");
 
-sd.io.use(passportSocketIo.authorize({
-	passport: sd.passport,
+sd._io.use(passportSocketIo.authorize({
+	passport: sd._passport,
 	cookieParser: cookieParser,
 	key: 'express.sid',
-	secret: 'thisIsCoolSecretFromWaWFramework'+sd.config.prefix,
+	secret: 'thisIsCoolSecretFromWaWFramework'+sd._config.prefix,
 	store: store,
 	success: function(data, accept) {
 		console.log('successful connection to socket.io');
@@ -81,6 +82,6 @@ require(__dirname + '/readAllModules')(sd, function(){
 	require(__dirname + '/readAllRoutes')(sd);
 	require(__dirname + '/readClientRoutes')(sd);
 
-	server.listen(sd.config.port || 8080);
-	console.log("App listening on port " + (sd.config.port || 8080));
+	server.listen(sd._config.port || 8080);
+	console.log("App listening on port " + (sd._config.port || 8080));
 });

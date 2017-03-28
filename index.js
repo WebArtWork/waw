@@ -10,10 +10,7 @@ var run = function(){
 		script: __dirname+'/run/index.js',
 		ext: 'js json'
 	}
-	if(process.argv[3]) obj.watch = [process.argv[3].toLowerCase().replace('ROOT', process.cwd())];
-	else obj.watch = [process.cwd()+'/server'];
-
-
+	obj.watch = [process.cwd()+'/server'];
 	var pages = fs.readdirSync(process.cwd() + '/client').filter(function(file) {
 		return fs.statSync(path.join(process.cwd() + '/client', file)).isDirectory();
 	});
@@ -25,13 +22,12 @@ var run = function(){
 				throws: false
 			});
 		else continue;
-		if (info.seo) {
+		if (info&&info.seo) {
 			for (var j = 0; j < info.router.length; j++) {
 				obj.watch.push(pageUrl + '/' + info.router[j].src);
 			}
 		}
 	}
-	if(process.argv[4]) obj.ignore = process.argv[4].toLowerCase().replace('ROOT', process.cwd());
 	nodemon(obj);
 }
 var serve = function(){
@@ -130,6 +126,9 @@ if(process.argv[2]){
 				restart();
 			});
 			return;
+		case 'uw':
+			require(__dirname+'/build/git.js').fetchOrigin();
+			return;
 		case 'lu':
 		case 'lupdate':
 			require(__dirname+'/build/git.js').fetch(process.argv[3], function(){
@@ -146,8 +145,35 @@ if(process.argv[2]){
 		case 'crud':
 			require(__dirname+'/build').crud();
 			return;
+		case 'cs':
+			process.argv[5]=process.argv[4];
+			process.argv[4]=process.argv[3];
+			process.argv[3]='server';
+			require(__dirname+'/build').crud();
+			return;
+		case 'cc':
+			process.argv[5]=process.argv[4];
+			process.argv[4]=process.argv[3];
+			process.argv[3]='client';
+			require(__dirname+'/build').crud();
+			return;
 		case 'a':
 		case 'add':
+			require(__dirname+'/build').add();
+			return;
+		case 'ap':
+			process.argv[4]=process.argv[3];
+			process.argv[3]='part';
+			require(__dirname+'/build').add();
+			return;
+		case 'app':
+			process.argv[4]=process.argv[3];
+			process.argv[3]='publicpage';
+			require(__dirname+'/build').add();
+			return;
+		case 'alp':
+			process.argv[4]=process.argv[3];
+			process.argv[3]='localpage';
 			require(__dirname+'/build').add();
 			return;
 		case '--version':

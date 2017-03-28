@@ -1,13 +1,13 @@
 module.exports = function(sd){
 	console.log('READING PARTS');
-	var dirs = sd.getDirectories(process.cwd() + '/server');
-	sd.parts = [];
-	sd.dependencies = [];
+	var dirs = sd._getDirectories(process.cwd() + '/server');
+	sd._parts = [];
+	sd._dependencies = [];
 	for (var i = dirs.length - 1; i >= 0; i--) {
 		var isIgnore = false;
-		if(sd.config.ignoreParts){
-			for (var j = 0; j < sd.config.ignoreParts.length; j++) {
-				if(sd.config.ignoreParts[j].toLowerCase()==dirs[i].toLowerCase()){
+		if(sd._config.ignoreParts){
+			for (var j = 0; j < sd._config.ignoreParts.length; j++) {
+				if(sd._config.ignoreParts[j].toLowerCase()==dirs[i].toLowerCase()){
 					isIgnore = true;
 					break;
 				}
@@ -15,8 +15,8 @@ module.exports = function(sd){
 		}
 		if(isIgnore) continue;
 		var dest = process.cwd() + '/server/'+dirs[i];
-		if(sd.isPart(dest+'/part.json')){
-			var info = sd.fse.readJsonSync(dest+'/part.json', {throws: false});
+		if(sd._isPart(dest+'/part.json')){
+			var info = sd._fse.readJsonSync(dest+'/part.json', {throws: false});
 			if(!info) continue;
 			var names = [];
 			if(info.router){
@@ -34,19 +34,19 @@ module.exports = function(sd){
 			if(info.dependencies){
 				for (var prop in info.dependencies) {
 					var needToAdd = true;
-					for (var j = 0; j < sd.dependencies.length; j++) {
-						if(sd.dependencies[j]==prop){
+					for (var j = 0; j < sd._dependencies.length; j++) {
+						if(sd._dependencies[j]==prop){
 							needToAdd = false;
 							break;
 						}
 					}
-					if(needToAdd) sd.dependencies.push({
+					if(needToAdd) sd._dependencies.push({
 						name: prop,
 						version: info.dependencies[prop]
 					});
 				}
 			}
-			sd.parts.push({
+			sd._parts.push({
 				src: dest,
 				name: dirs[i],
 				info: info

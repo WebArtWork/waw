@@ -4,15 +4,15 @@ var sd;
 module.exports = function(sdGlobal){
 	console.log('READING CLIENT SIDE');
 	sd = sdGlobal;
-	sd.app.use(require('node-sass-middleware')({
+	sd._app.use(require('node-sass-middleware')({
 		src: process.cwd() + '/client',
 		dest: process.cwd() + '/client',
-		debug: !sd.config.production,
+		debug: !sd._config.production,
 		outputStyle: 'compressed',
-		force: !sd.config.production
+		force: !sd._config.production
 	}));
 	
-	sd.app.use(require('postcss-middleware')({
+	sd._app.use(require('postcss-middleware')({
 		plugins: [
 			/* Plugins */
 			require('autoprefixer')({
@@ -21,15 +21,14 @@ module.exports = function(sdGlobal){
 		]
 	}));
 
-
-	var pages = sd.getDirectories(process.cwd() + '/client');
+	var pages = sd._getDirectories(process.cwd() + '/client');
 	var seoPages = [];
+	var folders = ['css','fonts','gen','html','img','js','lang','page'];
 	for (var i = 0; i < pages.length; i++) {
-		if(pages[i]=='scss') continue; // remove this one day
 		var pageUrl = process.cwd()+'/client/'+pages[i];
 		generateLibs(pageUrl);
 		generateFonts(pageUrl, pages[i]);
-		if(sd.fs.existsSync(pageUrl+'/config.json')) var info = sd.fse
+		if(sd._fs.existsSync(pageUrl+'/config.json')) var info = sd._fse
 			.readJsonSync(pageUrl+'/config.json', {throws: false});
 		else var info = false;
 		if(info&&info.seo){
@@ -37,12 +36,13 @@ module.exports = function(sdGlobal){
 				url: pageUrl,
 				router: info.router
 			});
-			simpleServeFiles(pageUrl, pages[i]);
+			simpleServeFiles(pageUrl, pages[i], info.folders||folders);
 		}else{
-			if(pages[i]!=sd.config.root) serveFiles(pageUrl, pages[i], false);
+			if(pages[i]!=sd._config.root) serveFiles(pageUrl, pages[i], false, info&&info.folders||folders);
 			else{
 				var rootPageUrl = pageUrl;
 				var page = pages[i];
+				var rootFolders = info&&info.folders||folders;
 			}
 		}
 	}
@@ -50,27 +50,27 @@ module.exports = function(sdGlobal){
 		var swig  = require('derer');
 		swig.setDefaults({
 			varControls: ['{{{', '}}}'],
-			cache: sd.config.production
+			cache: sd._config.production
 		});
-		sd.app.engine('html', swig.renderFile);
-		sd.app.set('view engine', 'html');
-		sd.app.set('view cache', true);
+		sd._app.engine('html', swig.renderFile);
+		sd._app.set('view engine', 'html');
+		sd._app.set('view cache', true);
 		var engines = [];
 		for (var i = 0; i < seoPages.length; i++) {
 			engines.push(seoPages[i].url+'/page');
 			for (var j = 0; j < seoPages[i].router.length; j++) {
-				require(seoPages[i].url+'/'+seoPages[i].router[j].src)(sd.app, sd);
+				require(seoPages[i].url+'/'+seoPages[i].router[j].src)(sd._app, sd);
 			}
 		}
-		sd.app.set('views', engines);
+		sd._app.set('views', engines);
 	}
 	if(rootPageUrl){
-		serveFiles(rootPageUrl, page, true);
+		serveFiles(rootPageUrl, page, true, rootFolders);
 	}
 }
 var getListOfComponents = function(dest){
-	sd.fse.mkdirs(dest);
-	var libs = sd.getFiles(dest);
+	sd._fse.mkdirs(dest);
+	var libs = sd._getFiles(dest);
 	libs.sort(function(a,b){
 		if(a>b) return 1;
 		else return -1;
@@ -81,8 +81,8 @@ var getListOfComponents = function(dest){
 	return libs;
 }
 var getListOfSvgs = function(dest){
-	sd.fse.mkdirsSync(dest);
-	var svgs = sd.getFiles(dest);
+	sd._fse.mkdirsSync(dest);
+	var svgs = sd._getFiles(dest);
 	for (var i = svgs.length - 1; i >= 0; i--) {
 		if(svgs[i].indexOf('.svg')==-1){
 			svgs.splice(i,1);
@@ -98,53 +98,53 @@ var generateFonts = function(dest, name){
 		name: name,
 		files: getListOfSvgs(dest+'/svgs'),
 		way: dest + '/gen/',
-		prefix: sd.config.prefix
+		prefix: sd._config.prefix
 	});
 }
 var generateLibs = function(dest){
 	minifier({
 		files: getListOfComponents(dest+'/components'),
 		way: dest + '/gen/',
-		prefix: sd.config.prefix,
+		prefix: sd._config.prefix,
 		production: false
 	});
 }
-var simpleServeFiles = function(folder, name){
-	sd.app.get('/' + name + '/:folder/:file', function(req, res) {
-		for (var i = 0; i < sd.folders.length; i++) {
-			if (sd.folders[i] == req.params.folder) return res.sendFile(process.cwd() + '/client/' + name + '/' + req.params.folder + '/' + req.params.file.replace('.map', '').replace('.scss', ''));
+var simpleServeFiles = function(folder, name, folders){
+	sd._app.get('/' + name + '/:folder/:file', sd['sf'+name]||sd._next, function(req, res) {
+		for (var i = 0; i < folders.length; i++) {
+			if (folders[i] == req.params.folder) return res.sendFile(process.cwd() + '/client/' + name + '/' + req.params.folder + '/' + req.params.file.replace('.map', '').replace('.scss', ''));
 		}
 		res.json(false);
 	});
 }
-var serveFiles = function(folder, name, isRoot){
-	sd.app.get('/' + name + '/:folder/:file', function(req, res) {
-		for (var i = 0; i < sd.folders.length; i++) {
-			if (sd.folders[i] == req.params.folder) return res.sendFile(process.cwd() + '/client/' + name + '/' + req.params.folder + '/' + req.params.file.replace('.map', '').replace('.scss', ''));
+var serveFiles = function(folder, name, isRoot, folders){
+	sd._app.get('/' + name + '/:folder/:file', sd['sf'+name]||sd._next, function(req, res) {
+		for (var i = 0; i < folders.length; i++) {
+			if (folders[i] == req.params.folder) return res.sendFile(process.cwd() + '/client/' + name + '/' + req.params.folder + '/' + req.params.file.replace('.map', '').replace('.scss', ''));
 		}
-		if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
+		if (sd._config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
 		else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');
 	});	
 	if (isRoot) {
 		console.log('SERVING FILES FOR PAGE: '+name+' which is root page.');
-		if(!sd.config.customRootLink){
-			sd.app.get('/', function(req, res) {
-				if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
+		if(!sd._config.customRootLink){
+			sd._app.get('/', sd['sf'+name]||sd._next, function(req, res) {
+				if (sd._config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
 				else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');
 			});
 		}
-		sd.app.get('/*', function(req, res) {
-			if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
+		sd._app.get('/*', sd['sf'+name]||sd._next, function(req, res) {
+			if (sd._config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
 			else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');
 		});
 	} else {
 		console.log('SERVING FILES FOR PAGE: '+name);
-		sd.app.get('/' + name + '/*', function(req, res) {
-			if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
+		sd._app.get('/' + name + '/*', sd['sf'+name]||sd._next, function(req, res) {
+			if (sd._config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
 			else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');
 		});
-		sd.app.get('/' + name, function(req, res) {
-			if (sd.config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
+		sd._app.get('/' + name, sd['sf'+name]||sd._next, function(req, res) {
+			if (sd._config.production) res.sendFile(process.cwd() + '/client/' + name + '/html/indexProduction.html');
 			else res.sendFile(process.cwd() + '/client/' + name + '/html/index.html');
 		});
 	}
