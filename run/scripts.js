@@ -39,19 +39,27 @@ module.exports = function(sd){
 			next();
 		}
 		sd._searchInObject = function(checkingObj, obj, inKeys) {
-			if (checkingObj._id == obj.loc) {
-				if(Array.isArray(checkingObj[obj.place]&&obj.push)){
+			if (obj.loc && checkingObj._id && checkingObj._id.toString() == obj.loc) {
+				if(Array.isArray(checkingObj[obj.place])&&obj.push){
 					return checkingObj[obj.place].push(obj.val);
-				}else if(Array.isArray(checkingObj[obj.place]&&obj.unshift)){
+				}else if(Array.isArray(checkingObj[obj.place])&&obj.unshift){
 					return checkingObj[obj.place].unshift(obj.val);
-				}else if(Array.isArray(checkingObj[obj.place]&&obj.remove)){
+				}else if(Array.isArray(checkingObj[obj.place])&&obj.remove){
 					return checkingObj[obj.place].splice(obj.val, 1);
-				}else if(Array.isArray(checkingObj[obj.place]&&obj.splice)){
+				}else if(Array.isArray(checkingObj[obj.place])&&obj.splice){
 					return checkingObj[obj.place].splice(obj.val, 1, obj.add);
 				}
 				return checkingObj[obj.place] = obj.val;
 			}
 			for (var key in checkingObj) {
+				if(key=='__parentArray') continue;
+				if(key=='__parent') continue;
+				if(key=='__v') continue;
+				if(key=='__index') continue;
+				if(key=='_id') continue;
+				if(key=='_doc') continue;
+				if(key=='schema') continue;
+				if(key=='$__') continue;
 				if(inKeys){
 					var check = false;
 					for (var i = 0; i < inKeys.length; i++) {

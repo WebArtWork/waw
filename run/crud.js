@@ -1,8 +1,7 @@
 module.exports = function(sd, partJson) {
 	// Initialize
 		var name = partJson.name.toLowerCase();
-		var cname = partJson.name.toLowerCase();
-		cname[0] = cname[0].toUpperCase();
+		var cname = partJson.name.toLowerCase().capitalize();
 		var Schema = require(process.cwd() + '/server/' + name + '/schema.js');
 		sd[cname] = Schema;
 	// Routes
@@ -23,19 +22,22 @@ module.exports = function(sd, partJson) {
 			});
 			// update
 			if(!partJson.crud.updates) partJson.crud.updates=[];
-			for (var i = 0; i < partJson.crud.updates.length; i++) {
-				router.post("/update"+partJson.crud.updates[i].name, sd['sp'+name+'ensure']||sd._ensure, sd._ensureUpdateObject, function(req, res) {
-					Schema.findOne(sd['sp'+name+'q'+partJson.crud.updates[i].name]||{
+			var updateRoute = function(update){
+				router.post("/update"+update.name, sd['sp'+name+'ensure']||sd._ensure, sd._ensureUpdateObject, function(req, res) {
+					Schema.findOne(sd['sp'+name+'q'+update.name]||{
 						_id: req.body._id,
 						moderators: req.user._id
 					}, function(err, doc){
 						if(err||!doc) return res.json(false);
-						sd._searchInObject(doc, req.body, partJson.crud.updates[i].keys);
+						sd._searchInObject(doc, req.body, update.keys);
 						doc.save(function(){
 							res.json(req.body);
 						});
 					});
 				});
+			}
+			for (var i = 0; i < partJson.crud.updates.length; i++) {
+				updateRoute(partJson.crud.updates[i]);
 			}
 			// delete
 			router.post("/delete", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
@@ -86,3 +88,12 @@ module.exports = function(sd, partJson) {
 		*/
 	// End of Crud
 };
+// General prototypes
+	String.prototype.capitalize = function(all) {
+		if (all) {
+			return this.split(' ').map(e => e.capitalize()).join(' ');
+		} else {
+			return this.charAt(0).toUpperCase() + this.slice(1);
+		}
+	}
+// end of file
