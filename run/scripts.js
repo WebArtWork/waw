@@ -51,15 +51,8 @@ module.exports = function(sd){
 				}
 				return checkingObj[obj.place] = obj.val;
 			}
-			for (var key in checkingObj) {
-				if(key=='__parentArray') continue;
-				if(key=='__parent') continue;
-				if(key=='__v') continue;
-				if(key=='__index') continue;
-				if(key=='_id') continue;
-				if(key=='_doc') continue;
-				if(key=='schema') continue;
-				if(key=='$__') continue;
+			var key = (checkingObj.schema)?Object.keys(checkingObj.schema.obj):Object.getOwnPropertyNames(checkingObj);
+			for (var i = 0; i < key.length; i++) {
 				if(inKeys){
 					var check = false;
 					for (var i = 0; i < inKeys.length; i++) {
@@ -69,10 +62,10 @@ module.exports = function(sd){
 					}
 					if(!check) continue;
 				}
-				if (Array.isArray(checkingObj[key]))
-					sd._searchInArray(checkingObj[key], obj);
-				else if (typeof checkingObj[key] == 'object')
-					sd._searchInObject(checkingObj[key], obj);
+				if (Array.isArray(checkingObj[key[i]]))
+					sd._searchInArray(checkingObj[key[i]], obj);
+				else if (typeof checkingObj[key[i]] == 'object')
+					sd._searchInObject(checkingObj[key[i]], obj);
 			}
 		}
 		sd._searchInArray = function(checkingArr, obj) {
