@@ -11,10 +11,10 @@ var Schema = mongoose.Schema({
 });
 
 Schema.methods.create = function(obj, user) {
-	this.author = user._id,
-	this.moderators = [user._id],
-	this.name = obj.name,
-	this.description = obj.description
+	this.author = user._id;
+	this.moderators = [user._id];
+	this.name = obj.name;
+	this.description = obj.description;
 }
 
 module.exports = mongoose.model('CNAME', Schema);

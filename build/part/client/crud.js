@@ -19,6 +19,7 @@ crudServices.CNAME = function($http, $timeout, socket){
 		srv.update = function(obj, callback){
 			if(!obj) return;
 			$timeout.cancel(updateTimeout);
+			if(!obj.name) obj.name='';
 			$http.post('/api/NAME/update'+obj.name, obj)
 			.then(function(){
 				if(typeof callback == 'function')

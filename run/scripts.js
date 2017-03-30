@@ -55,8 +55,8 @@ module.exports = function(sd){
 			for (var i = 0; i < key.length; i++) {
 				if(inKeys){
 					var check = false;
-					for (var i = 0; i < inKeys.length; i++) {
-						if(inKeys[i]==key){
+					for (var j = 0; j < inKeys.length; j++) {
+						if(inKeys[j]==key[i]){
 							check = true;
 						}
 					}
@@ -84,6 +84,39 @@ module.exports = function(sd){
 					if(--counter===0) callback();
 				});
 			}
+		}
+		sd._serial = function(arr, callback){
+			serial(0, arr, callback);
+		}
+		var serial = function(i, arr, callback){
+			if(i>=arr.length) callback();
+			arr[i](function(){
+				serial(++i, arr, callback);
+			});
+		}
+		sd._each = function(arr, func, callback){
+			var counter = arr.length;
+			if(counter===0) return callback();
+			for (var i = 0; i < arr.length; i++) {
+				func(arr[i], function(){
+					if(--counter===0) callback();
+				});
+			}
+		}
+		sd._isEndOfStr = function(str, strCheck){
+			var length = strCheck.length;
+			return str.slice(str.length-length)==strCheck;
+		}
+		sd._cmpId = function(objA, objB){
+			return objA._id.toString()==objB._id.toString();
+		}
+		sd._hasId = function(arr, obj) {
+			for (var i = arr.length - 1; i >= 0; i--) {
+				if (arr[i]._id === obj._id) {
+					return i;
+				}
+			}
+			return false;
 		}
 	/*
 	*	End of support Scritping
