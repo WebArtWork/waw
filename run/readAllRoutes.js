@@ -1,7 +1,10 @@
 module.exports = function(sd){
-	console.log('READING Routes');	
+	console.log('READING Routes');
 	sd._app.get("/waw/newId", sd._ensure, function(req, res) {
 		res.json(sd._mongoose.Types.ObjectId());
+	});
+	sd._app.get("/waw/dateNow", sd._ensure, function(req, res) {
+		res.json(new Date());
 	});
 	if(sd._parts){
 		for (var i = 0; i < sd._parts.length; i++) {

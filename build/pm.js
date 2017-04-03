@@ -85,8 +85,8 @@ var recursive = require('recursive-readdir');
 		if(!fs.existsSync(page)) return gu.close("Page you have selected doesn't exists.");
 		if(!fs.existsSync(partLoc)||!fs.existsSync(partLoc+'/part.json'))
 			return gu.close("Part you have selected doesn't exists.");
-		gu.removeCodeByTag(page + '/gen/crud.js', part);
-		gu.addCodeByTag(partLoc + '/client/crud.js', page + '/gen/crud.js', part);
+		gu.removeCodeByTag(page + '/js/crud.js', part);
+		gu.addCodeByTag(partLoc + '/client/crud.js', page + '/js/crud.js', part);
 		gu.close('Crud fetched successfully.');
 	}
 	var crudServer = function(part, page){
@@ -97,7 +97,7 @@ var recursive = require('recursive-readdir');
 		if(!fs.existsSync(page)) return gu.close("Page you have selected doesn't exists.");
 		if(!fs.existsSync(partLoc)||!fs.existsSync(partLoc+'/part.json'))
 			return gu.close("Part you have selected doesn't exists.");
-		var code = gu.getCodeByTag(page + '/gen/crud.js', part);
+		var code = gu.getCodeByTag(page + '/js/crud.js', part);
 		if(!code) gu.close('Server failed to fetch crud.');
 		fs.writeFileSync(partLoc + '/client/crud.js', code, 'utf8');
 		gu.close('Server crud fetched successfully.');

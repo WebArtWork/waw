@@ -4,6 +4,7 @@ var sd;
 module.exports = function(sdGlobal){
 	console.log('READING CLIENT SIDE');
 	sd = sdGlobal;
+	
 	sd._app.use(require('node-sass-middleware')({
 		src: process.cwd() + '/client',
 		dest: process.cwd() + '/client',

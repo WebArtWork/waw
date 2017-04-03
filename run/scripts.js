@@ -34,7 +34,7 @@ module.exports = function(sd){
 		sd._ensureUpdateObject = function(req, res, next){
 			if(Array.isArray(req.body)) return res.json(false);
 			if(typeof req.body != 'object')  return res.json(false);
-			if(!req.body._id||!req.body.val||!req.body.place||!req.body.loc)
+			if(!req.body._id||(!req.body.val&&typeof req.body.val!='number'&&typeof req.body.val!='boolean')||!req.body.place||!req.body.loc)
 				return res.json(false);
 			next();
 		}
