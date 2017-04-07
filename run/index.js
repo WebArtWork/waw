@@ -62,7 +62,7 @@ var passportSocketIo = require("passport.socketio");
 sd._io.use(passportSocketIo.authorize({
 	passport: sd._passport,
 	cookieParser: cookieParser,
-	key: 'express.sid',
+	key: 'express.sid.'+sd._config.prefix,
 	secret: 'thisIsCoolSecretFromWaWFramework'+sd._config.prefix,
 	store: store,
 	success: function(data, accept) {
@@ -70,6 +70,7 @@ sd._io.use(passportSocketIo.authorize({
 		accept();
 	},
 	fail: function(data, message, error, accept) {
+		console.log('error');
 		console.log(error);
 		console.log('failed connection to socket.io:', message);
 		accept();

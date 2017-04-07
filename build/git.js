@@ -123,18 +123,40 @@ module.exports.fetchOrigin = function(){
 		});
 	});
 }
+var initFolder = function(dest){
+	fse.mkdirs(dest+'/client');
+	fse.mkdirs(dest+'/server');
+	var ProjectName = dest.split('/');
+	ProjectName = ProjectName[ProjectName.length-1];
+	fse.copySync(__dirname + '/configSample.json', dest+'/config.json');
+	gu.writeFile(dest+'/config.json', [{
+		from: 'NAME',
+		to: ProjectName
+	},{
+		from: 'RAND',
+		to: Math.floor(Math.random() * 9999) + 1000
+	}], dest+'/config.json');
+	gu.close('Project successfully initialized.');
+}
 module.exports.initialize = function(url, branch){
-	var myRepo = git(process.cwd());
-	myRepo.init(function(){
-		myRepo.addRemote('origin', url, function(err){
-			if(err) gu.close('Project exists.');
-			myRepo.checkout(branch ||'master', ['-b'], function(err) {
-				myRepo.pull('origin', branch || 'master', function() {
-					gu.close('Project successfully initialized.');
+	if(url.indexOf('@')>-1){
+		var myRepo = git(process.cwd());
+		myRepo.init(function(){
+			myRepo.addRemote('origin', url, function(err){
+				if(err) gu.close('Project exists.');
+				myRepo.checkout(branch ||'master', ['-b'], function(err) {
+					myRepo.pull('origin', branch || 'master', function() {
+						gu.close('Project successfully initialized.');
+					});
 				});
 			});
 		});
-	});
+	}else if(url){
+		var dest = process.cwd()+'/'+url;
+		if(fs.existsSync(dest)) gu.close('Project already exists.');
+		fse.mkdirs(dest);
+		initFolder(dest);
+	}else initFolder(process.cwd());
 }
 // General prototypes
 	String.prototype.capitalize = function(all) {

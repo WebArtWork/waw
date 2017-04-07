@@ -14,7 +14,7 @@ module.exports = function(sd, partJson) {
 				if(typeof doc.create !== 'function'){
 					return res.json(false);
 				}
-				doc.create(req.body, req.user);
+				doc.create(req.body, req.user, sd);
 				doc.save(function(err){
 					if(err) return res.json(false);
 					res.json(doc);
@@ -31,6 +31,8 @@ module.exports = function(sd, partJson) {
 						if(err||!doc) return res.json(false);
 						sd._searchInObject(doc, req.body, update.keys);
 						doc.save(function(){
+							req.body.name = update.name;
+							sd._io.in(doc._id).emit(cname+"Update", req.body);
 							res.json(req.body);
 						});
 					});
@@ -46,46 +48,31 @@ module.exports = function(sd, partJson) {
 					author: req.user._id
 				}, function(err){
 					if(err) res.json(false);
-					else res.json(true);
+					else{
+						sd._io.in(req.body._id).emit(cname+"Delete", req.body);
+						res.json(true);
+					}
 				});
 			});
 		}
 	// Socket Management
-		/*
 		sd._io.on('connection', function(socket) {
-			// room for each place
-			Schema.find({
-				$or: [{
+			if (socket.request.user) {
+				Schema.find(sd['socket' + cname + 'q'] || {
 					moderators: socket.request.user._id
-				},{
-					viewers: socket.request.user._id
-				}]
-			},function(err, places){
-				if(err) res.json(false)
-				else {
-					places.forEach(function(place){
-						socket.join('room-' + place._id);
-					});
+				}, function(err, docs) {
+					if (!err&&docs){
+						docs.forEach(function(doc) {
+							socket.join(doc._id);
+						});
+					}
+				})
+				if(!sd.__userJoinedRoom){
+					sd.__userJoinedRoom=true;
+					socket.join(socket.request.user._id);
 				}
-			})
-			//room for user
-			if(socket.request.user._id) socket.join(socket.request.user._id);
-
-			socket.on('MinePlaceCreated', function(place){
-				socket.broadcast.to(socket.request.user._id).emit('MinePlaceCreated', place);
-				socket.join('room-' + place._id);
-			});
-			socket.on('MinePlaceUpdated', function(place){
-				socket.broadcast.to(socket.request.user._id).emit('MinePlaceUpdated', place);
-				socket.broadcast.to('room-' + place._id).emit('RoomPlaceUpdated', place);
-			});
-			socket.on('MinePlaceDeleted', function(place){
-				socket.broadcast.to(socket.request.user._id).emit('MinePlaceDeleted', place);
-			});
-			socket.on('MinePlaceLeaved', function(place){
-			});
+			}
 		});
-		*/
 	// End of Crud
 };
 // General prototypes

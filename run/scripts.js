@@ -103,6 +103,15 @@ module.exports = function(sd){
 				});
 			}
 		}
+		sd._arrsToArr = function(arrs){
+			var newArr = [];
+			for (var i = 0; i < arrs.length; i++) {
+				for (var j = 0; j < arrs[i].length; j++) {
+					newArr.push(arrs[i][j]);
+				}
+			}
+			return newArr;
+		}
 		sd._isEndOfStr = function(str, strCheck){
 			var length = strCheck.length;
 			return str.slice(str.length-length)==strCheck;

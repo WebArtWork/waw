@@ -1,5 +1,5 @@
 var minifier = require('js-minify');
-var fontifier = require('svg-fontify');
+//var fontifier = require('svg-fontify');
 var sd;
 module.exports = function(sdGlobal){
 	console.log('READING CLIENT SIDE');
@@ -28,7 +28,7 @@ module.exports = function(sdGlobal){
 	for (var i = 0; i < pages.length; i++) {
 		var pageUrl = process.cwd()+'/client/'+pages[i];
 		generateLibs(pageUrl);
-		generateFonts(pageUrl, pages[i]);
+		//generateFonts(pageUrl, pages[i]);
 		if(sd._fs.existsSync(pageUrl+'/config.json')) var info = sd._fse
 			.readJsonSync(pageUrl+'/config.json', {throws: false});
 		else var info = false;
@@ -94,14 +94,14 @@ var getListOfSvgs = function(dest){
 	}
 	return svgs;
 }
-var generateFonts = function(dest, name){
+/*var generateFonts = function(dest, name){
 	fontifier({
 		name: name,
 		files: getListOfSvgs(dest+'/svgs'),
 		way: dest + '/gen/',
 		prefix: sd._config.prefix
 	});
-}
+}*/
 var generateLibs = function(dest){
 	minifier({
 		files: getListOfComponents(dest+'/components'),
