@@ -1,6 +1,9 @@
 var fs = require('fs');
 var fse = require('fs-extra');
 var path = require('path');
+
+module.exports.fs = fs;
+module.exports.fse = fse;
 module.exports.removeCodeByTag = function(dest, tag){
 	var data = fs.readFileSync(dest, 'utf8');
 	if (data.indexOf(tag) > -1){
@@ -45,6 +48,10 @@ module.exports.getPartInfo = function(part) {
 	return fse.readJsonSync(process.cwd() + '/server/'+ part+'/part.json', {throws: false});
 }
 
+
+module.exports.replace = function(str, from, to) {
+	return str.replace(new RegExp(from, 'g'), to);
+}
 
 module.exports.writeFile = function(src, renames, dest, callback) {
 	var data = fs.readFileSync(src, 'utf8');

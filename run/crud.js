@@ -2,8 +2,11 @@ module.exports = function(sd, partJson) {
 	// Initialize
 		var name = partJson.name.toLowerCase();
 		var cname = partJson.name.toLowerCase().capitalize();
-		var Schema = require(process.cwd() + '/server/' + name + '/schema.js');
-		sd[cname] = Schema;
+		var schemaLoc = process.cwd() + '/server/' + name + '/schema.js';
+		if (sd._fs.existsSync(schemaLoc)) {
+			var Schema = require(schemaLoc);
+			sd[cname] = Schema;
+		}else return;
 	// Routes
 		if(partJson.crud){
 			// Init
@@ -56,23 +59,25 @@ module.exports = function(sd, partJson) {
 			});
 		}
 	// Socket Management
-		sd._io.on('connection', function(socket) {
-			if (socket.request.user) {
-				Schema.find(sd['socket' + cname + 'q'] || {
-					moderators: socket.request.user._id
-				}, function(err, docs) {
-					if (!err&&docs){
-						docs.forEach(function(doc) {
-							socket.join(doc._id);
-						});
+		if (sd._fs.existsSync(schemaLoc)) {
+			sd._io.on('connection', function(socket) {
+				if (socket.request.user) {
+					Schema.find(sd['socket' + cname + 'q'] || {
+						moderators: socket.request.user._id
+					}, function(err, docs) {
+						if (!err&&docs){
+							docs.forEach(function(doc) {
+								socket.join(doc._id);
+							});
+						}
+					})
+					if(!sd.__userJoinedRoom){
+						sd.__userJoinedRoom=true;
+						socket.join(socket.request.user._id);
 					}
-				})
-				if(!sd.__userJoinedRoom){
-					sd.__userJoinedRoom=true;
-					socket.join(socket.request.user._id);
 				}
-			}
-		});
+			});
+		}
 	// End of Crud
 };
 // General prototypes

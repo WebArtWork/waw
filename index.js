@@ -145,6 +145,13 @@ if(process.argv[2]){
 		case 'crud':
 			require(__dirname+'/build').crud();
 			return;
+		case 'd':
+		case 'domain':
+			require(__dirname+'/build').domain();
+			return;
+		case 'config':
+			require(__dirname+'/build').config(process.argv[3], process.argv[4]);
+			return;
 		case 'cs':
 			process.argv[5]=process.argv[4];
 			process.argv[4]=process.argv[3];

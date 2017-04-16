@@ -4,6 +4,14 @@ var rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout
 });
+var cmd = require('node-cmd');
+var info = {};
+var configPath = __dirname+'/../config.json';
+if (gu.fs.existsSync(configPath)) {
+	info = gu.fse.readJsonSync(configPath, {
+		throws: false
+	});
+}
 /*
 	waw add
 */
@@ -127,6 +135,202 @@ var rl = readline.createInterface({
 				}
 			});
 		}
+	};
+/*
+	waw domain management
+*/
+	var getDomainOption = function(callback){
+		rl.question('What would you like to do with domains?\n1) Add Domain\n2) Add Secure Domain\n3) Remove Domain\n4) List Domains\nChoose: ', function(answer){
+			answer = answer.toLowerCase();
+			if(answer=='1'||answer=='2'||answer=='3'||answer=='4'||
+				answer=='a'||answer=='as'||answer=='r'||answer=='l'||
+				answer=='add domain'||answer=='add secure domain'||
+				answer=='remove domain'||answer=='list domains') callback(answer);
+			else{
+				console.log('Please select one of the options');
+				getDomainOption(callback);
+			}
+		});
+	}
+	var startNginx = function(){
+		cmd.get('certbot renew --dry-run', function(err, data, stderr) {
+			cmd.get('service nginx start', function(err, data, stderr) {
+				gu.close('Domains Successfully updated.');
+			});
+		});
+	}
+	var makeCrts = function(servers){
+		var path = info.nginx || '/etc/nginc/sites-enabled/default';
+		var data = '';
+		var addCert = 'certbot certonly --standalone'
+		for (var i = 0; i < servers.length; i++) {
+			data += '\n' + servers[i].code + '\n';
+			if(servers[i].secure&&!gu.fs.existsSync('/etc/letsencrypt/live/'+servers[i].name)){
+				addCert += ' -d ' + servers[i].name;
+			}
+		}
+		gu.fs.writeFileSync(path, data, 'utf8');
+		cmd.get('service nginx stop', function(err, data, stderr) {
+			if(addCert != 'certbot certonly --standalone'){
+				cmd.get(addCert, function(err, data, stderr) {
+					startNginx();
+				});
+			}else startNginx();
+		});
+	}
+	var addDomainPort = function(servers, secure, domain){
+		rl.question('Please provide port you want to add: ', function(answer) {
+			answer = parseInt(answer);
+			if (!answer||answer<1000) {
+				gu.log('Please give correct port, greater then 1000.');
+				return addDomainPort(servers, secure, domain);
+			}
+			for (var i = 0; i < servers.length; i++) {
+				if (servers[i].name.toLowerCase() == domain) {
+					servers.splice(i, 1);
+				}
+			}
+			var code;
+			if (secure) code = gu.fs.readFileSync(__dirname + '/domain/secure', 'utf8');
+			else code = gu.fs.readFileSync(__dirname + '/domain/simple', 'utf8');
+			code = gu.replace(code, 'NAME', domain);
+			code = gu.replace(code, 'PORT', answer);
+			servers.push({
+				code: code,
+				name: domain,
+				secure: secure
+			});
+			makeCrts(servers);
+		});
+	}
+	var addDomain = function(servers, secure){
+		rl.question('Please provide domain you want to add: ', function(answer){
+			answer = answer.toLowerCase();
+			if (!answer || answer.indexOf('.') == -1) {
+				gu.log('Please give correct domain.');
+				return addDomain(servers, secure);
+			}
+			addDomainPort(servers, secure, answer);
+		});
+	}
+	var removeDomain = function(servers, secure){
+		rl.question('Please provide domain you want to add: ', function(answer){
+			answer = answer.toLowerCase();
+			if (!answer || answer.indexOf('.') == -1) {
+				gu.log('Please give correct domain.');
+				return removeDomain(servers, secure);
+			}
+			for (var i = servers.length - 1; i >= 0; i--) {
+				if(servers[i].name.toLowerCase() == answer){
+					servers.splice(i, 1);
+				}
+			}
+			makeCrts(servers);
+		});
+	}
+	// list support
+	var getServerName = function(code){
+		var name = code.split('server_name ')[1].split(';')[0];
+		return name;
+	}
+	var cleanStarts = function(code){
+		return code.substring(code.indexOf('server'), code.length);
+	}
+	var listDomains = function(servers){
+		console.log('\nSecure Domains');
+		console.log('========================================================');
+		var removeDomains = [];
+		var once = false;
+		for (var i = servers.length - 1; i >= 0; i--) {
+			if(servers[i].secure){
+				if(once) console.log('--------------------------------------------------------');
+				once = true;
+				var length = servers[i].name.length;
+				var spaces = '';
+				for (var j = length; j < 53; j++) {
+					spaces+=' ';
+				}
+				console.log('| '+servers[i].name+spaces+"|");
+				removeDomains.push(servers[i].name);
+				servers.splice(i, 1);
+			}
+		}
+		for (var i = servers.length - 1; i >= 0; i--) {
+			for (var j = 0; j < removeDomains.length; j++) {
+				if(removeDomains[j] == servers[i].name){
+					servers.splice(i, 1);
+					break;
+				}
+			}
+		}
+		console.log('========================================================');
+		if(servers.length==0) return gu.close();;
+		console.log('\nSimple Domains');
+		console.log('========================================================');
+		once = false;
+		for (var i = servers.length - 1; i >= 0; i--) {
+			if(once) console.log('--------------------------------------------------------');
+			once = true;
+			var length = servers[i].name.length;
+			var spaces = '';
+			for (var j = length; j < 53; j++) {
+				spaces+=' ';
+			}
+			console.log('| '+servers[i].name+spaces+"|");
+		}
+		console.log('========================================================');
+		gu.close('');
+	}
+	module.exports.config = function(field, value){
+		info[field] = value;
+		gu.fse.writeJsonSync(configPath, info, {
+			throws: false
+		});
+		gu.close('Config Successfully saved.');
+	}
+	module.exports.domain = function(){
+		var path = info.nginx || '/etc/nginc/sites-enabled/default';
+		if (gu.fs.existsSync(path)) {
+			var nginxConfig = gu.fs.readFileSync(path, 'utf8');
+			var servers = nginxConfig.split('}');
+			for (var i = servers.length - 1; i >= 0; i--) {
+				if(!servers[i]||servers[i].length<10){
+					servers.splice(i, 1);
+					continue;
+				}
+				if(servers[i].indexOf('https://$server_name$request_uri')>-1){
+					servers[i]+='}';
+				}else{
+					servers[i]+='}\n}';
+				}
+				servers[i] = cleanStarts(servers[i]);
+				servers[i] = {
+					code: servers[i],
+					name: getServerName(servers[i]),
+					secure: servers[i].indexOf('https://$server_name$request_uri')>-1
+				}
+			}
+		}
+		getDomainOption(function(answer){
+			switch (answer.toLowerCase()) {
+				case '1':
+				case 'a':
+				case 'add domain':
+					return addDomain(servers);
+				case '2':
+				case 'as':
+				case 'add secure domain':
+					return addDomain(servers, true);
+				case '3':
+				case 'r':
+				case 'remove domain':
+					return removeDomain(servers);
+				case '4':
+				case 'l':
+				case 'list domains':
+					return listDomains(servers);
+			}
+		});
 	};
 /*
 	waw crud

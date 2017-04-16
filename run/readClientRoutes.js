@@ -49,6 +49,7 @@ module.exports = function(sdGlobal){
 	}
 	if(seoPages.length>0){
 		var swig  = require('derer');
+		sd._swig = swig;
 		swig.setDefaults({
 			varControls: ['{{{', '}}}'],
 			cache: sd._config.production
