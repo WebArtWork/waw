@@ -160,7 +160,7 @@ if (gu.fs.existsSync(configPath)) {
 		});
 	}
 	var makeCrts = function(servers){
-		var path = info.nginx || '/etc/nginc/sites-enabled/default';
+		var path = info.nginx || '/etc/nginx/sites-enabled/default';
 		var data = '';
 		var addCert = 'certbot certonly --standalone'
 		for (var i = 0; i < servers.length; i++) {
@@ -289,7 +289,7 @@ if (gu.fs.existsSync(configPath)) {
 		gu.close('Config Successfully saved.');
 	}
 	module.exports.domain = function(){
-		var path = info.nginx || '/etc/nginc/sites-enabled/default';
+		var path = info.nginx || '/etc/nginx/sites-enabled/default';
 		if (gu.fs.existsSync(path)) {
 			var nginxConfig = gu.fs.readFileSync(path, 'utf8');
 			var servers = nginxConfig.split('}');
