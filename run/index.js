@@ -35,13 +35,17 @@ sd._app.use(bodyParser.json({
 var store = new(require("connect-mongo")(session))({
 	url: sd._mongoUrl
 });
+var sessionMaxAge = 365 * 24 * 60 * 60 * 1000;
+if(typeof sd._config.session == 'number'){
+	sessionMaxAge = sd._config.session;
+}
 var sessionMiddleware = session({
 	key: 'express.sid.'+sd._config.prefix,
 	secret: 'thisIsCoolSecretFromWaWFramework'+sd._config.prefix,
 	resave: false,
 	saveUninitialized: true,
 	cookie: {
-		maxAge: (365 * 24 * 60 * 60 * 1000)
+		maxAge: sessionMaxAge
 	},
 	rolling: true,
 	store: store

@@ -1,0 +1,3 @@
+var ukrainianPack = {
+	Apply:'Застосувати',
+};

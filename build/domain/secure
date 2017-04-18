@@ -2,7 +2,7 @@ server {
   server_name NAME;
   listen 443;
   ssl on;
-  ssl_certificate    /etc/letsencrypt/live/DOMAIN/cert.pem;
+  ssl_certificate    /etc/letsencrypt/live/NAME/cert.pem;
   ssl_certificate_key    /etc/letsencrypt/live/NAME/privkey.pem;
   location / {
     proxy_set_header X-Real-IP $remote_addr;
@@ -13,6 +13,7 @@ server {
     proxy_redirect off;
   }
 }
+
 server {
   server_name NAME;
   listen 80;
