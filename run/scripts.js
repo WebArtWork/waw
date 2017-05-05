@@ -85,14 +85,14 @@ module.exports = function(sd){
 				});
 			}
 		}
-		sd._serial = function(arr, callback){
-			serial(0, arr, callback);
+		sd._serial = function(arr, callback, opt){
+			serial(0, arr, callback, opt);
 		}
-		var serial = function(i, arr, callback){
-			if(i>=arr.length) callback();
+		var serial = function(i, arr, callback, opt){
+			if(i>=arr.length) return callback();
 			arr[i](function(){
-				serial(++i, arr, callback);
-			});
+				serial(++i, arr, callback, opt);
+			}, opt);
 		}
 		sd._each = function(arr, func, callback){
 			var counter = arr.length;

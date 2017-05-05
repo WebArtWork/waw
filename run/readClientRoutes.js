@@ -59,6 +59,7 @@ module.exports = function(sdGlobal){
 		sd._app.set('view cache', true);
 		var engines = [];
 		for (var i = 0; i < seoPages.length; i++) {
+			engines.push(seoPages[i].url+'/html');
 			engines.push(seoPages[i].url+'/page');
 			for (var j = 0; j < seoPages[i].router.length; j++) {
 				require(seoPages[i].url+'/'+seoPages[i].router[j].src)(sd._app, sd);

@@ -7,8 +7,22 @@ var sd = {
 	_path: require('path'),
 };
 sd._config = JSON.parse(sd._fs.readFileSync(process.cwd()+'/config.json','utf8'));
+require(__dirname + '/scripts')(sd);
 
 sd._app = sd._express();
+
+sd._middleware = [];
+sd._app.use(function(req, res, next){
+	if(Array.isArray(sd._middleware)&&sd._middleware.length>0){
+		sd._serial(sd._middleware, function(){
+			next();
+		},{
+			req: req,
+			res: res
+		});
+	}else next();
+});
+
 var server = require('http').Server(sd._app);
 var session = require('express-session');
 sd._mongoUrl = 'mongodb://'+(sd._config.mongo.host||'localhost')+':'+(sd._config.mongo.port||'27017')+'/'+(sd._config.mongo.db||'test');
@@ -81,7 +95,6 @@ sd._io.use(passportSocketIo.authorize({
 	}
 }));
 
-require(__dirname + '/scripts')(sd);
 require(__dirname + '/readAllParts')(sd);
 require(__dirname + '/readAllModules')(sd, function(){
 	require(__dirname + '/readAllRoutes')(sd);
