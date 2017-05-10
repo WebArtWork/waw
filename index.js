@@ -4,6 +4,7 @@ var pm2 = require('pm2');
 var path = require('path');
 var fs = require('fs');
 var fse = require('fs-extra');
+var gu = require(__dirname+'/build/gu.js');
 var run = function(){
 	// add check if this is waw project
 	var obj = {
@@ -99,8 +100,34 @@ var restart = function(){
 		});
 	});
 }
+
+
+if (fs.existsSync(__dirname+'/config.json')) {
+	var config = fse.readJsonSync(__dirname+'/config.json', {
+		throws: false
+	});
+}else var config = {};
+var adduser = function(){
+	var newUser = JSON.parse(process.argv[3]);
+	if(!newUser.name||!newUser.token) gu.close("Not correct user.");
+	if(!config.users) config.users=[];
+	config.users.unshift(newUser);
+	fse.writeJsonSync(__dirname+'/config.json', config);
+	gu.close("User successfully added.");
+}
+var listusers = function(){
+	if(!config.users) gu.close("You don't have any users");
+	gu.close(config.users);
+}
+
 if(process.argv[2]){
 	switch(process.argv[2].toLowerCase()){
+		// Waw User Management
+		case 'adduser':
+			return adduser();
+		case 'listusers':
+			return listusers();
+		// Project Build
 		case 'n':
 		case 'new':
 			require(__dirname+'/build').new();

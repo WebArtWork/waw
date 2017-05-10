@@ -11,18 +11,6 @@ require(__dirname + '/scripts')(sd);
 
 sd._app = sd._express();
 
-sd._middleware = [];
-sd._app.use(function(req, res, next){
-	if(Array.isArray(sd._middleware)&&sd._middleware.length>0){
-		sd._serial(sd._middleware, function(){
-			next();
-		},{
-			req: req,
-			res: res
-		});
-	}else next();
-});
-
 var server = require('http').Server(sd._app);
 var session = require('express-session');
 sd._mongoUrl = 'mongodb://'+(sd._config.mongo.host||'localhost')+':'+(sd._config.mongo.port||'27017')+'/'+(sd._config.mongo.db||'test');
@@ -65,9 +53,24 @@ var sessionMiddleware = session({
 	store: store
 });
 sd._app.use(sessionMiddleware);
+
+sd._middleware = [];
+sd._app.use(function(req, res, next){
+	if(Array.isArray(sd._middleware)&&sd._middleware.length>0){
+		sd._serial(sd._middleware, function(){
+			next();
+		},{
+			req: req,
+			res: res
+		});
+	}else next();
+});
+
 sd._app.use(sd._passport.initialize());
 sd._app.use(sd._passport.session());
 sd._app.set('view cache', true);
+
+
 
 sd._app.use(favicon(process.cwd() + sd._config.icon));
 
@@ -96,10 +99,12 @@ sd._io.use(passportSocketIo.authorize({
 }));
 
 require(__dirname + '/readAllParts')(sd);
-require(__dirname + '/readAllModules')(sd, function(){
-	require(__dirname + '/readAllRoutes')(sd);
-	require(__dirname + '/readClientRoutes')(sd);
+require(__dirname + '/readAllConfigs')(sd, function(){
+	require(__dirname + '/readAllModules')(sd, function(){
+		require(__dirname + '/readAllRoutes')(sd);
+		require(__dirname + '/readClientRoutes')(sd);
 
-	server.listen(sd._config.port || 8080);
-	console.log("App listening on port " + (sd._config.port || 8080));
+		server.listen(sd._config.port || 8080);
+		console.log("App listening on port " + (sd._config.port || 8080));
+	});
 });
