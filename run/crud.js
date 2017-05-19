@@ -17,10 +17,23 @@ module.exports = function(sd, partJson) {
 				if(typeof doc.create !== 'function'){
 					return res.json(false);
 				}
-				doc.create(req.body, req.user, sd);
+				doc.create(req.body, req.user, sd);	
 				doc.save(function(err){
 					if(err) return res.json(false);
 					res.json(doc);
+				});			
+			});
+			router.post("/createCb", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
+				var doc = new Schema();
+				if(typeof doc.create !== 'function'){
+					return res.json(false);
+				}
+				doc.create(req.body, req.user, sd, function(){
+					doc.save(function(err){
+						if(err) return res.json(false);
+						req.body._id = doc._id;
+						res.json(req.body);
+					});
 				});
 			});
 			// update

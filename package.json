@@ -5,7 +5,7 @@
 		"framework",
 		"waw"
 	],
-	"version": "0.6.0",
+	"version": "0.6.1",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
 	"author": {
@@ -44,7 +44,7 @@
 		"fs-extra": "*",
 		"passport": "*",
 		"mongoose": "*",
-		"socket.io": "*",
+		"socket.io": "1.7.4",
 		"js-minify": "*",
 		"svg-fontify": "*",
 		"body-parser": "*",
