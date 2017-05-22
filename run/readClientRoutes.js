@@ -32,7 +32,7 @@ module.exports = function(sdGlobal){
 		if(sd._fs.existsSync(pageUrl+'/config.json')) var info = sd._fse
 			.readJsonSync(pageUrl+'/config.json', {throws: false});
 		else var info = false;
-		if(info&&info.seo){
+		if(info&&(info.seo||info.swig)) {
 			seoPages.push({
 				url: pageUrl,
 				router: info.router
@@ -117,9 +117,10 @@ var simpleServeFiles = function(folder, name, folders){
 		for (var i = 0; i < folders.length; i++) {
 			if (folders[i] == req.params.folder) return res.sendFile(process.cwd() + '/client/' + name + '/' + req.params.folder + '/' + req.params.file.replace('.map', '').replace('.scss', ''));
 		}
-		res.json(false);
+		if(typeof sd['sf'+name] == 'function') sd['sf'+name+'serve'](req, res);
+		else res.json(false);
 	});
-}
+}  
 var serveFiles = function(folder, name, isRoot, folders){
 	sd._app.get('/' + name + '/:folder/:file', sd['sf'+name]||sd._next, function(req, res) {
 		for (var i = 0; i < folders.length; i++) {

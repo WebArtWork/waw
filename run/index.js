@@ -4,6 +4,7 @@ var sd = {
 	_mongoose: require('mongoose'),
 	_fs: require('fs'),
 	_fse: require('fs-extra'),
+	_git: require('gitty'),
 	_path: require('path'),
 };
 sd._config = JSON.parse(sd._fs.readFileSync(process.cwd()+'/config.json','utf8'));

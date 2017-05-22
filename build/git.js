@@ -129,6 +129,7 @@ var initFolder = function(dest){
 	var ProjectName = dest.split('/');
 	ProjectName = ProjectName[ProjectName.length-1];
 	fse.copySync(__dirname + '/configSample.json', dest+'/config.json');
+	fse.copySync(__dirname + '/ignore', dest+'/.gitignore');
 	gu.writeFile(dest+'/config.json', [{
 		from: 'NAME',
 		to: ProjectName
@@ -139,7 +140,7 @@ var initFolder = function(dest){
 	gu.close('Project successfully initialized.');
 }
 module.exports.initialize = function(url, branch){
-	if(url.indexOf('@')>-1){
+	if(url&&url.indexOf('@')>-1){
 		var myRepo = git(process.cwd());
 		myRepo.init(function(){
 			myRepo.addRemote('origin', url, function(err){

@@ -5,6 +5,11 @@ var path = require('path');
 var fs = require('fs');
 var fse = require('fs-extra');
 var gu = require(__dirname+'/build/gu.js');
+if (fs.existsSync(__dirname+'/config.json')) {
+	var config = fse.readJsonSync(__dirname+'/config.json', {
+		throws: false
+	});
+}else var config = {};
 var run = function(){
 	// add check if this is waw project
 	var obj = {
@@ -23,12 +28,16 @@ var run = function(){
 				throws: false
 			});
 		else continue;
-		if (info&&info.seo) {
+		if (info&&(info.seo||info.swig) ){
 			for (var j = 0; j < info.router.length; j++) {
 				obj.watch.push(pageUrl + '/' + info.router[j].src);
 			}
 		}
 	}
+	var config = fse.readJsonSync(process.cwd()+'/config.json', {
+		throws: false
+	});
+	if(config.swigIgnore) obj.ignore = config.swigIgnore;
 	nodemon(obj);
 }
 var serve = function(){
@@ -102,11 +111,6 @@ var restart = function(){
 }
 
 
-if (fs.existsSync(__dirname+'/config.json')) {
-	var config = fse.readJsonSync(__dirname+'/config.json', {
-		throws: false
-	});
-}else var config = {};
 var adduser = function(){
 	var newUser = JSON.parse(process.argv[3]);
 	if(!newUser.name||!newUser.token) gu.close("Not correct user.");
