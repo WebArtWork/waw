@@ -1,6 +1,5 @@
 var controllers = {};
 app.controller(controllers);
-controllers.Landing=function($scope, MyUser){
+controllers.Landing=function($scope){
 	"ngInject";
-	$scope.MyUser = MyUser;
 };

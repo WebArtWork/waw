@@ -1,5 +1,4 @@
 {
-	"seo": true,
 	"router": [{
 		"name": "Basic",
 		"src": "server.js"
