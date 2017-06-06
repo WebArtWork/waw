@@ -12,13 +12,13 @@ if (fs.existsSync(__dirname+'/config.json')) {
 }else var config = {};
 var projectConfig = {};
 if (fs.existsSync(process.cwd()+'/server.json')) {
-	projectConfig = fse.readJsonSync(__dirname+'/server.json', {
+	projectConfig = fse.readJsonSync(process.cwd()+'/server.json', {
 		throws: false
-	});
+	})||{};
 }else if (fs.existsSync(process.cwd()+'/config.json')) {
-	projectConfig = fse.readJsonSync(__dirname+'/config.json', {
+	projectConfig = fse.readJsonSync(process.cwd()+'/config.json', {
 		throws: false
-	});
+	})||{};
 }
 
 var run = function(){
@@ -37,7 +37,9 @@ var run = function(){
 			obj.watch.push(clientRoot + '/' + info.router[j].src);
 		}
 	} else {
-		var pages = sd._getDirectories(clientRoot);
+		var pages = fs.readdirSync(process.cwd() + '/client').filter(function(file) {
+			return fs.statSync(path.join(process.cwd() + '/client', file)).isDirectory();
+		});
 		for (var i = 0; i < pages.length; i++) {
 			var pageUrl = clientRoot + '/' + pages[i];
 			if (fs.existsSync(pageUrl + '/config.json')) var info = fse
