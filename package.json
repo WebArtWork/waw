@@ -5,7 +5,7 @@
 		"framework",
 		"waw"
 	],
-	"version": "0.6.7",
+	"version": "0.6.8",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
 	"author": {
@@ -45,6 +45,7 @@
 		"passport": "*",
 		"mongoose": "*",
 		"socket.io": "1.7.4",
+		"socket.io-adapter-mongo": "*",
 		"js-minify": "*",
 		"svg-fontify": "*",
 		"body-parser": "*",
@@ -56,7 +57,6 @@
     	"recursive-readdir": "*",
 		"passport.socketio": "*",
 		"node-sass-middleware": "*",
-		"socket.io-adapter-mongo": "*",
 		"autoprefixer": "*",
 		"postcss-middleware": "*"
 	}
