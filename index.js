@@ -10,6 +10,17 @@ if (fs.existsSync(__dirname+'/config.json')) {
 		throws: false
 	});
 }else var config = {};
+var projectConfig = {};
+if (fs.existsSync(process.cwd()+'/server.json')) {
+	projectConfig = fse.readJsonSync(__dirname+'/server.json', {
+		throws: false
+	});
+}else if (fs.existsSync(process.cwd()+'/config.json')) {
+	projectConfig = fse.readJsonSync(__dirname+'/config.json', {
+		throws: false
+	});
+}
+
 var run = function(){
 	// add check if this is waw project
 	var obj = {
@@ -17,31 +28,33 @@ var run = function(){
 		ext: 'js json'
 	}
 	obj.watch = [process.cwd()+'/server'];
-	var pages = fs.readdirSync(process.cwd() + '/client').filter(function(file) {
-		return fs.statSync(path.join(process.cwd() + '/client', file)).isDirectory();
-	});
-	for (var i = 0; i < pages.length; i++) {
-		if (pages[i] == 'scss') continue; // remove this one day
-		var pageUrl = process.cwd() + '/client/' + pages[i];
-		if (fs.existsSync(pageUrl + '/config.json')) var info = fse
-			.readJsonSync(pageUrl + '/config.json', {
-				throws: false
-			});
-		else continue;
-		if (info&&(info.seo||info.swig) ){
+	var clientRoot = process.cwd()+'/client';
+	if (fs.existsSync(clientRoot + '/config.json')) {
+		var info = fse.readJsonSync(clientRoot + '/config.json', {
+			throws: false
+		});
+		for (var j = 0; j < info.router.length; j++) {
+			obj.watch.push(clientRoot + '/' + info.router[j].src);
+		}
+	} else {
+		var pages = sd._getDirectories(clientRoot);
+		for (var i = 0; i < pages.length; i++) {
+			var pageUrl = clientRoot + '/' + pages[i];
+			if (fs.existsSync(pageUrl + '/config.json')) var info = fse
+				.readJsonSync(pageUrl + '/config.json', {
+					throws: false
+				});
+			else var info = false;
+			if (!info) continue;
 			for (var j = 0; j < info.router.length; j++) {
 				obj.watch.push(pageUrl + '/' + info.router[j].src);
 			}
 		}
 	}
-	var config = fse.readJsonSync(process.cwd()+'/config.json', {
-		throws: false
-	});
-	if(config.swigIgnore) obj.ignore = config.swigIgnore;
+	if(projectConfig.swigIgnore) obj.ignore = projectConfig.swigIgnore;
 	nodemon(obj);
 }
 var serve = function(){
-	var config = fse.readJsonSync(process.cwd()+'/config.json', {throws: false});
 	pm2.connect(function(err) {
 		if (err) {
 			console.error(err);
@@ -60,7 +73,6 @@ var serve = function(){
 	});
 }
 var list = function(){
-	var config = fse.readJsonSync(process.cwd()+'/config.json', {throws: false});
 	pm2.connect(function(err) {
 		if (err) {
 			console.error(err);
@@ -76,28 +88,26 @@ var list = function(){
 	});
 }
 var stopServe = function(){
-	var config = fse.readJsonSync(process.cwd()+'/config.json', {throws: false});
 	pm2.connect(function(err) {
 		if (err) {
 			console.error(err);
 			process.exit(2);
 		}
-		pm2.delete(config.name, function(err, apps) {
+		pm2.delete(projectConfig.name, function(err, apps) {
 			pm2.disconnect();
 			process.exit(2);
 		});
 	});
 }
 var restart = function(){
-	var config = fse.readJsonSync(process.cwd()+'/config.json', {throws: false});
 	pm2.connect(function(err) {
 		if (err) {
 			console.error(err);
 			process.exit(2);
 		}
-		pm2.delete(config.name, function(err, apps) {
+		pm2.delete(projectConfig.name, function(err, apps) {
 			pm2.start({
-				name: config.name,
+				name: projectConfig.name,
 				script: __dirname+'/run/index.js',
 				exec_mode: 'cluster',
 				instances: 1,

@@ -121,7 +121,7 @@ module.exports = function(sd){
 			engines.push(clientRoot + '/page');
 			var info = sd._fse.readJsonSync(clientRoot+'/config.json', {throws: false});
 			for (var j = 0; j < info.router.length; j++) {
-				require(pageUrl + '/' + info.router[j].src)(sd._app, sd);
+				require(clientRoot + '/' + info.router[j].src)(sd._app, sd);
 			}
 		}else{
 			var pages = sd._getDirectories(clientRoot);

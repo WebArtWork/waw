@@ -6,8 +6,14 @@ var sd = {
 	_fse: require('fs-extra'),
 	_git: require('gitty'),
 	_path: require('path'),
+	_config: {}
 };
-sd._config = JSON.parse(sd._fs.readFileSync(process.cwd()+'/config.json','utf8'));
+if (sd._fs.existsSync(process.cwd()+'/server.json')) {
+	sd._config = JSON.parse(sd._fs.readFileSync(process.cwd()+'/server.json','utf8'));
+}else if (sd._fs.existsSync(process.cwd()+'/config.json')) {
+	sd._config = JSON.parse(sd._fs.readFileSync(process.cwd()+'/config.json','utf8'));
+}
+
 require(__dirname + '/scripts')(sd);
 
 sd._app = sd._express();
