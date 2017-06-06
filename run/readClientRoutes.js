@@ -100,12 +100,15 @@ module.exports = function(sd){
 	*	Derer
 	*/
 		var derer  = require('derer');
-		sd._swig = derer;
+		sd._swig = derer; // Delete this one day
 		sd._derer = derer;
-		derer.setDefaults({
-			varControls: ['{{{', '}}}'],
-			cache: sd._config.production
-		});
+		var dererOpts = {
+			varControls: ['{{{', '}}}']
+		}
+		if(!sd._config.production){
+			dererOpts.cache = false;
+		}
+		derer.setDefaults(dererOpts);
 		sd._app.engine('html', derer.renderFile);
 		sd._app.set('view engine', 'html');
 		sd._app.set('view cache', true);

@@ -85,7 +85,7 @@ sd._app.use(favicon(process.cwd() + sd._config.icon));
 sd._io = require('socket.io').listen(server);
 
 // var mongo = require('socket.io-adapter-mongo');
-// sd._io.adapter(mongo({ host: sd._config.mongo.host||'localhost', port: sd._config.mongo.port||'27017', db: sd._config.mongo.db||'test' }));
+// sd._io.adapter(mongo(sd._mongoUrl));
 
 var passportSocketIo = require("passport.socketio");
 

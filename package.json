@@ -5,7 +5,7 @@
 		"framework",
 		"waw"
 	],
-	"version": "0.6.8",
+	"version": "0.7.0",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
 	"author": {
@@ -32,7 +32,6 @@
 	"preferGlobal": "true",
 	"dependencies": {
 		"npmi": "*",
-		
 		"pm2": "*",
 		"derer": "*",
 		"gitty": "*",
