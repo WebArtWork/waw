@@ -112,6 +112,25 @@ module.exports = function(sd){
 		sd._app.engine('html', derer.renderFile);
 		sd._app.set('view engine', 'html');
 		sd._app.set('view cache', true);
+		sd._derer.setFilter('string',function(input){
+			return input&&input.toString()||'';
+		});
+		var df = {};
+		var addLang = function(folder){
+			var files = sd._getFiles(folder);
+			for (var i = 0; i < files.length; i++) {
+				var words = require(folder+'/'+files[i])
+				if(!df[files[i]]) df[files[i]]={};
+				for(key in words){
+					df[files[i]][key.toLowerCase()] = words[key];
+				}
+			}
+		}
+		sd._derer.setFilter('tr', function(word, file){
+			if(df[file]&&df[file][word.toLowerCase()])
+				return df[file][word.toLowerCase()];
+			else return word;
+		});
 	/*
 	*	Managing Pages
 	*/
@@ -126,6 +145,7 @@ module.exports = function(sd){
 			for (var j = 0; j < info.router.length; j++) {
 				require(clientRoot + '/' + info.router[j].src)(sd._app, sd);
 			}
+			addLang(clientRoot + '/lang');			
 		}else{
 			var pages = sd._getDirectories(clientRoot);
 			for (var i = 0; i < pages.length; i++) {
@@ -141,6 +161,7 @@ module.exports = function(sd){
 				for (var j = 0; j < info.router.length; j++) {
 					require(pageUrl + '/' + info.router[j].src)(sd._app, sd);
 				}
+				addLang(pageUrl + '/lang');
 			}
 		}
 		sd._app.set('views', engines);
