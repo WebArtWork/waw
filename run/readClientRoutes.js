@@ -1,5 +1,5 @@
 var folders = ['css','fonts','gen','html','img','js','lang','page'];
-var ext = ['.css','.ttf','woff','woff2','svg','otf','.js','.html','.gif','.jpg','.png'];
+var ext = ['.css','.ttf','.woff','.woff2','.svg','.otf','.js','.html','.gif','.jpg','.png'];
 module.exports = function(sd){
 	console.log('READING CLIENT SIDE');
 	/*
@@ -86,10 +86,10 @@ module.exports = function(sd){
 		sd._app.use(function(req, res, next) {
 			if(req.originalUrl.indexOf('api')>-1) return next();
 			for (var i = 0; i < ext.length; i++) {
-				if( sd._isEndOfStr(req.originalUrl, ext[i]) ) {
+				if( sd._isEndOfStr(req.originalUrl.split('?')[0], ext[i]) ) {
 					for (var j = 0; j < folders.length; j++) {
 						if(req.originalUrl.indexOf(folders[j])>-1){
-							return res.sendFile(process.cwd() + '/client' + req.originalUrl);
+							return res.sendFile(process.cwd() + '/client' + req.originalUrl.split('?')[0]);
 						}
 					}
 				}
