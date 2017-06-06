@@ -114,7 +114,7 @@ module.exports = function(sd){
 		}
 		sd._isEndOfStr = function(str, strCheck){
 			var length = strCheck.length;
-			return str.slice(str.length-length)==strCheck;
+			return str.slice(str.length-length).toLowerCase()==strCheck.toLowerCase();
 		}
 		sd._cmpId = function(objA, objB){
 			return objA._id.toString()==objB._id.toString();
