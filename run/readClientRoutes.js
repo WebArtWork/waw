@@ -131,6 +131,10 @@ module.exports = function(sd){
 				return df[file][word.toLowerCase()];
 			else return word;
 		});
+		sd._derer.setFilter('trf', function(file){
+			if(df[file]) return JSON.stringify(df[file]);
+			else return JSON.stringify({});
+		});
 	/*
 	*	Managing Pages
 	*/

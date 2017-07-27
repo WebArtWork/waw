@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-var nodemon = require('nodemon');
-var pm2 = require('pm2');
 var path = require('path');
 var fs = require('fs');
 var fse = require('fs-extra');
@@ -22,6 +20,7 @@ if (fs.existsSync(process.cwd()+'/server.json')) {
 }
 
 var run = function(){
+	var nodemon = require('../nodemon');
 	// add check if this is waw project
 	var obj = {
 		script: __dirname+'/run/index.js',
@@ -57,13 +56,14 @@ var run = function(){
 	nodemon(obj);
 }
 var serve = function(){
+	var pm2 = require('../pm2');
 	pm2.connect(function(err) {
 		if (err) {
 			console.error(err);
 			process.exit(2);
 		}
 		pm2.start({
-			name: config.name,
+			name: projectConfig.name||process.cwd(),
 			script: __dirname+'/run/index.js',
 			exec_mode: 'cluster',
 			instances: 1,
@@ -75,6 +75,7 @@ var serve = function(){
 	});
 }
 var list = function(){
+	var pm2 = require('../pm2');
 	pm2.connect(function(err) {
 		if (err) {
 			console.error(err);
@@ -90,26 +91,28 @@ var list = function(){
 	});
 }
 var stopServe = function(){
+	var pm2 = require('../pm2');
 	pm2.connect(function(err) {
 		if (err) {
 			console.error(err);
 			process.exit(2);
 		}
-		pm2.delete(projectConfig.name, function(err, apps) {
+		pm2.delete(projectConfig.name||process.cwd(), function(err, apps) {
 			pm2.disconnect();
 			process.exit(2);
 		});
 	});
 }
 var restart = function(){
+	var pm2 = require('../pm2');
 	pm2.connect(function(err) {
 		if (err) {
 			console.error(err);
 			process.exit(2);
 		}
-		pm2.delete(projectConfig.name, function(err, apps) {
+		pm2.delete(projectConfig.name||process.cwd(), function(err, apps) {
 			pm2.start({
-				name: projectConfig.name,
+				name: projectConfig.name||process.cwd(),
 				script: __dirname+'/run/index.js',
 				exec_mode: 'cluster',
 				instances: 1,
@@ -180,20 +183,13 @@ if(process.argv[2]){
 			return;
 		case 'i':
 		case 'init':
-			require(__dirname+'/build/git.js').initialize(process.argv[3], process.argv[4]);
-			return;
+			return require(__dirname+'/build/git.js')
+			.initialize(process.argv[3], process.argv[4]);
 		case 'stop':
 			return stopServe();
 		case 'c':
 		case 'crud':
 			require(__dirname+'/build').crud();
-			return;
-		case 'd':
-		case 'domain':
-			require(__dirname+'/build').domain();
-			return;
-		case 'config':
-			require(__dirname+'/build').config(process.argv[3], process.argv[4]);
 			return;
 		case 'cs':
 			process.argv[5]=process.argv[4];
@@ -207,9 +203,19 @@ if(process.argv[2]){
 			process.argv[3]='client';
 			require(__dirname+'/build').crud();
 			return;
+		case 'd':
+		case 'domain':
+			require(__dirname+'/build').domain();
+			return;
+		case 'config':
+			require(__dirname+'/build').config(process.argv[3], process.argv[4]);
+			return;
 		case 'a':
 		case 'add':
 			require(__dirname+'/build').add();
+			return;
+		case 'android':
+			require(__dirname+'/build/cordova.js').android();
 			return;
 		case 'ap':
 			process.argv[4]=process.argv[3];

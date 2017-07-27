@@ -1,14 +1,12 @@
 {
 	"name": "NAME",
 	"description": "Description of NAME.",
-	"icon": "/client/public/img/favicon.png",
+	"icon": "/client/img/favicon.png",
 	"prefix": "NAMEPrefix",
 	"license": "MIT",
 	"port": RAND,
 	"session": true,
 	"production": false,
-	"root": "public",
-	"customRootLink": true,
 	"mongo":{
 		"host": "localhost",
 		"port": 27017,

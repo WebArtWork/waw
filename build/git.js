@@ -127,7 +127,7 @@ var initFolder = function(dest){
 	fse.mkdirs(dest+'/client');
 	fse.mkdirs(dest+'/server');
 	var ProjectName = dest.split('/');
-	ProjectName = ProjectName[ProjectName.length-1];
+	ProjectName = ProjectName[ProjectName.length-1].replace(/\s/g, '');
 	fse.copySync(__dirname + '/configSample.json', dest+'/config.json');
 	fse.copySync(__dirname + '/ignore', dest+'/.gitignore');
 	gu.writeFile(dest+'/config.json', [{
@@ -137,7 +137,19 @@ var initFolder = function(dest){
 		from: 'RAND',
 		to: Math.floor(Math.random() * 9999) + 1000
 	}], dest+'/config.json');
-	gu.close('Project successfully initialized.');
+
+	var myRepo = git(dest+'/client');
+	myRepo.init(function() {
+		myRepo.addRemote('origin', 'git@github.com:WebArtWork/wawAngular.git', function(err) {
+			myRepo.checkout('master', ['-b'], function(err) {
+				myRepo.pull('origin', 'master', function() {
+					fs.unlink(dest+'/client/.gitignore');
+					gu.close('Project successfully initialized.');
+				});
+			});
+		});
+	});
+	
 }
 module.exports.initialize = function(url, branch){
 	if(url&&url.indexOf('@')>-1){
@@ -157,7 +169,13 @@ module.exports.initialize = function(url, branch){
 		if(fs.existsSync(dest)) gu.close('Project already exists.');
 		fse.mkdirs(dest);
 		initFolder(dest);
-	}else initFolder(process.cwd());
+	}else{
+		fs.readdir(process.cwd(), function(err, files) {
+			if (!files.length) {
+				initFolder(process.cwd());
+			}else gu.close('This folder is not empty.');
+		});
+	}
 }
 // General prototypes
 	String.prototype.capitalize = function(all) {

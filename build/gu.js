@@ -85,3 +85,6 @@ module.exports.close = function(message) {
 	console.log(message);
 	process.exit(0);
 }
+module.exports.fileExist = function(path) {
+	return fs.existsSync(path);
+}
