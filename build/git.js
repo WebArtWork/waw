@@ -3,6 +3,9 @@ var fse = require('fs-extra');
 var gu = require(__dirname+'/gu.js');
 var git = require('gitty');
 var recursive = require('recursive-readdir');
+var wawPages = {
+	ng: 'git@github.com:WebArtWork/wawAngular.git'
+}
 var wawParts = {
 	user: 'git@github.com:WebArtWork/part-user.git',
 	db: 'git@github.com:WebArtWork/part-local-db.git',
@@ -126,7 +129,8 @@ module.exports.fetchOrigin = function(){
 var initFolder = function(dest){
 	fse.mkdirs(dest+'/client');
 	fse.mkdirs(dest+'/server');
-	var ProjectName = dest.split('/');
+	fse.mkdirs(dest+'/server/user');
+	var ProjectName = dest.split(require('path').sep);
 	ProjectName = ProjectName[ProjectName.length-1].replace(/\s/g, '');
 	fse.copySync(__dirname + '/configSample.json', dest+'/config.json');
 	fse.copySync(__dirname + '/ignore', dest+'/.gitignore');
@@ -137,19 +141,34 @@ var initFolder = function(dest){
 		from: 'RAND',
 		to: Math.floor(Math.random() * 9999) + 1000
 	}], dest+'/config.json');
-
-	var myRepo = git(dest+'/client');
-	myRepo.init(function() {
-		myRepo.addRemote('origin', 'git@github.com:WebArtWork/wawAngular.git', function(err) {
-			myRepo.checkout('master', ['-b'], function(err) {
-				myRepo.pull('origin', 'master', function() {
-					fs.unlink(dest+'/client/.gitignore');
-					gu.close('Project successfully initialized.');
+	gu._parallel([function(next){
+		var userRepo = git(dest+'/server/user');
+		userRepo.init(function() {
+			userRepo.addRemote('origin', wawParts.user, function(err) {
+				userRepo.checkout('master', ['-b'], function(err) {
+					userRepo.pull('origin', 'master', function(err) {
+						fse.removeSync(dest+'/server/user/.git');
+						next();
+					});
 				});
 			});
 		});
-	});
-	
+	},function(next){
+		var clientRepo = git(dest+'/client');
+		clientRepo.init(function() {
+			clientRepo.addRemote('origin', wawPages.ng, function(err) {
+				clientRepo.checkout('master', ['-b'], function(err) {
+					clientRepo.pull('origin', 'master', function() {
+						fse.removeSync(dest+'/client/.git');
+						fse.removeSync(dest+'/client/.gitignore');
+						next();
+					});
+				});
+			});
+		});
+	}],function(){
+		gu.close('Project successfully initialized.');
+	});	
 }
 module.exports.initialize = function(url, branch){
 	if(url&&url.indexOf('@')>-1){

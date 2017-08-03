@@ -353,23 +353,28 @@ if (gu.fs.existsSync(configPath)) {
 				crudClient(obj);
 			});
 		}else{
-			var pages = gu.getDirectories(process.cwd() + '/client');
-			if(pages.length == 0) return console.log("You don't have any page.");
-			else if(pages.length == 1) return require(__dirname + '/pm').crudClient(obj.part, pages[0]);
-			var question = 'Give page you want to use:\n';
-			for (var i = 1; i < pages.length+1; i++) {
-				question += i + ') ' + pages[i-1] + '\n';
-			}
-			question += 'Choose: ';
-			rl.question(question, function(name) {
-				name = name.toLowerCase();
-				for (var i = 0; i < pages.length; i++) {
-					if(name == pages[i] || name == (i+1).toString()){
-						return require(__dirname + '/pm').crudClient(obj.part, pages[i]);
-					}
+			var clientRoot = process.cwd() + '/client';
+			if(gu.fs.existsSync(clientRoot+'/config.json')){
+				return require(__dirname + '/pm').crudClient(obj.part, clientRoot);
+			}else{
+				var pages = gu.getDirectories(clientRoot);
+				if(pages.length == 0) return console.log("You don't have any page.");
+				else if(pages.length == 1) return require(__dirname + '/pm').crudClient(obj.part, pages[0]);
+				var question = 'Give page you want to use:\n';
+				for (var i = 1; i < pages.length+1; i++) {
+					question += i + ') ' + pages[i-1] + '\n';
 				}
-				crudClient(obj);
-			});
+				question += 'Choose: ';
+				rl.question(question, function(name) {
+					name = name.toLowerCase();
+					for (var i = 0; i < pages.length; i++) {
+						if(name == pages[i] || name == (i+1).toString()){
+							return require(__dirname + '/pm').crudClient(obj.part, clientRoot+'/'+pages[i]);
+						}
+					}
+					crudClient(obj);
+				});
+			}
 		}
 	}
 	var crudServer = function(obj){
@@ -379,23 +384,28 @@ if (gu.fs.existsSync(configPath)) {
 				crudServer(obj);
 			});
 		}else{
-			var pages = gu.getDirectories(process.cwd() + '/client');
-			if(pages.length == 0) return console.log("You don't have any page.");
-			else if(pages.length == 1) return require(__dirname + '/pm').crudServer(obj.part, pages[0]);
-			var question = 'Give page you want to use:\n';
-			for (var i = 1; i < pages.length+1; i++) {
-				question += i + ') ' + pages[i-1] + '\n';
-			}
-			question += 'Choose: ';
-			rl.question(question, function(name) {
-				name = name.toLowerCase();
-				for (var i = 0; i < pages.length; i++) {
-					if(name == pages[i] || name == (i+1).toString()){
-						return require(__dirname + '/pm').crudServer(obj.part, pages[i]);
-					}
+			var clientRoot = process.cwd() + '/client';
+			if(gu.fs.existsSync(clientRoot+'/config.json')){
+				return require(__dirname + '/pm').crudServer(obj.part, clientRoot);
+			}else{
+				var pages = gu.getDirectories(clientRoot);
+				if(pages.length == 0) return console.log("You don't have any page.");
+				else if(pages.length == 1) return require(__dirname + '/pm').crudServer(obj.part, pages[0]);
+				var question = 'Give page you want to use:\n';
+				for (var i = 1; i < pages.length+1; i++) {
+					question += i + ') ' + pages[i-1] + '\n';
 				}
-				crudServer(obj);
-			});
+				question += 'Choose: ';
+				rl.question(question, function(name) {
+					name = name.toLowerCase();
+					for (var i = 0; i < pages.length; i++) {
+						if(name == pages[i] || name == (i+1).toString()){
+							return require(__dirname + '/pm').crudServer(obj.part, clientRoot+'/'+pages[i]);
+						}
+					}
+					crudServer(obj);
+				});
+			}
 		}
 	}
 	module.exports.crud = function(){

@@ -88,3 +88,55 @@ module.exports.close = function(message) {
 module.exports.fileExist = function(path) {
 	return fs.existsSync(path);
 }
+
+
+module.exports._parallel = function(arr, callback){
+	var counter = arr.length;
+	for (var i = 0; i < arr.length; i++) {
+		arr[i](function(){
+			if(--counter===0) callback();
+		});
+	}
+}
+module.exports._serial = function(arr, callback, opt){
+	serial(0, arr, callback, opt);
+}
+var serial = function(i, arr, callback, opt){
+	if(i>=arr.length) return callback();
+	arr[i](function(){
+		serial(++i, arr, callback, opt);
+	}, opt);
+}
+module.exports._each = function(arr, func, callback){
+	var counter = arr.length;
+	if(counter===0) return callback();
+	for (var i = 0; i < arr.length; i++) {
+		func(arr[i], function(){
+			if(--counter===0) callback();
+		});
+	}
+}
+module.exports._arrsToArr = function(arrs){
+	var newArr = [];
+	for (var i = 0; i < arrs.length; i++) {
+		for (var j = 0; j < arrs[i].length; j++) {
+			newArr.push(arrs[i][j]);
+		}
+	}
+	return newArr;
+}
+module.exports._isEndOfStr = function(str, strCheck){
+	var length = strCheck.length;
+	return str.slice(str.length-length).toLowerCase()==strCheck.toLowerCase();
+}
+module.exports._cmpId = function(objA, objB){
+	return objA._id.toString()==objB._id.toString();
+}
+module.exports._hasId = function(arr, obj) {
+	for (var i = arr.length - 1; i >= 0; i--) {
+		if (arr[i]._id === obj._id) {
+			return i;
+		}
+	}
+	return false;
+}

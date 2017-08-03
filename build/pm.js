@@ -81,7 +81,6 @@ var recursive = require('recursive-readdir');
 		partLoc = process.cwd() + '/server/' + part;
 		if(!partLoc) return gu.close('Please select part fetch crud.');
 		if(!page) return gu.close("You don't have selected the page.");
-		page = process.cwd() + '/client/' + page;
 		if(!fs.existsSync(page)) return gu.close("Page you have selected doesn't exists.");
 		if(!fs.existsSync(partLoc)||!fs.existsSync(partLoc+'/part.json'))
 			return gu.close("Part you have selected doesn't exists.");
@@ -93,7 +92,6 @@ var recursive = require('recursive-readdir');
 		partLoc = process.cwd() + '/server/' + part;
 		if(!partLoc) return gu.close('Please select part fetch crud.');
 		if(!page) return gu.close("You don't have selected the page.");
-		page = process.cwd() + '/client/' + page;
 		if(!fs.existsSync(page)) return gu.close("Page you have selected doesn't exists.");
 		if(!fs.existsSync(partLoc)||!fs.existsSync(partLoc+'/part.json'))
 			return gu.close("Part you have selected doesn't exists.");
