@@ -5,7 +5,7 @@ module.exports = function(sd){
 	/*
 	*	Minify Script
 	*/
-		if(sd._config.iconsminify){
+		if(!sd._config.ignoreGenerateFonts){
 			var fontifier = require('svg-fontify');
 			var getListOfSvgs = function(dest){
 				sd._fse.mkdirsSync(dest);
@@ -33,31 +33,29 @@ module.exports = function(sd){
 				}
 			}
 		}
-		if(sd._config.jsminify){
-			var minifier = require('js-minify');
-			var getListOfComponents = function(dest){
-				sd._fse.mkdirs(dest);
-				var libs = sd._getFiles(dest);
-				libs.sort(function(a,b){
-					if(a>b) return 1;
-					else return -1;
-				});
-				for (var i = 0; i < libs.length; i++) {
-					libs[i]=dest+'/'+libs[i];
-				}
-				return libs;
+		var minifier = require('js-minify');
+		var getListOfComponents = function(dest){
+			sd._fse.mkdirs(dest);
+			var libs = sd._getFiles(dest);
+			libs.sort(function(a,b){
+				if(a>b) return 1;
+				else return -1;
+			});
+			for (var i = 0; i < libs.length; i++) {
+				libs[i]=dest+'/'+libs[i];
 			}
-			var generateLibs = function(dest){
-				if (sd._fs.existsSync(dest+'/lab')) {
-					var lab = getListOfComponents(dest+'/lab');
-					if(lab.length==0) return;
-					minifier({
-						files: lab,
-						way: dest + '/gen/',
-						prefix: sd._config.prefix,
-						production: false
-					});
-				}
+			return libs;
+		}
+		var generateLibs = function(dest){
+			if (sd._fs.existsSync(dest+'/lab')) {
+				var lab = getListOfComponents(dest+'/lab');
+				if(lab.length==0) return;
+				minifier({
+					files: lab,
+					way: dest + '/gen/',
+					prefix: sd._config.prefix,
+					production: false
+				});
 			}
 		}
 	/*
@@ -141,8 +139,8 @@ module.exports = function(sd){
 		var clientRoot = process.cwd()+'/client';
 		var engines = [];
 		if(sd._fs.existsSync(clientRoot+'/config.json')){
-			if(sd._config.jsminify) generateLibs(clientRoot);
-			if(sd._config.iconsminify) generateFonts(clientRoot, 'public');
+			generateLibs(clientRoot);
+			if(!sd._config.ignoreGenerateFonts) generateFonts(clientRoot, 'public');
 			engines.push(clientRoot + '/html');
 			engines.push(clientRoot + '/page');
 			var info = sd._fse.readJsonSync(clientRoot+'/config.json', {throws: false});

@@ -37,6 +37,7 @@ module.exports = function(sd, next){
 				console.log('To connect with waw framework you have to attach waw user token.');
 				return next();
 			}
+				return next();
 			sd._http.post('/api/idea/bridge', {
 				idea: sd._config.idea,
 				token: config.users[0].token

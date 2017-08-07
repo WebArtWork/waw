@@ -8,10 +8,16 @@ var sd = {
 	_path: require('path'),
 	_config: {}
 };
+if (!sd._fs.existsSync(process.cwd()+'/config.json')) {
+	console.log('This is not waw project.');
+	return process.exit(0);
+}
+sd._config = JSON.parse(sd._fs.readFileSync(process.cwd()+'/config.json','utf8'));
 if (sd._fs.existsSync(process.cwd()+'/server.json')) {
-	sd._config = JSON.parse(sd._fs.readFileSync(process.cwd()+'/server.json','utf8'));
-}else if (sd._fs.existsSync(process.cwd()+'/config.json')) {
-	sd._config = JSON.parse(sd._fs.readFileSync(process.cwd()+'/config.json','utf8'));
+	var extra = JSON.parse(sd._fs.readFileSync(process.cwd()+'/server.json','utf8'));
+	for(var key in extra){
+		sd._config[key] = extra[key];
+	}
 }
 
 require(__dirname + '/scripts')(sd);
