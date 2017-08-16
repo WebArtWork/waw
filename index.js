@@ -3,6 +3,7 @@ var path = require('path');
 var fs = require('fs');
 var fse = require('fs-extra');
 var gu = require(__dirname+'/build/gu.js');
+var npmi = require('npmi');
 if (fs.existsSync(__dirname+'/config.json')) {
 	var config = fse.readJsonSync(__dirname+'/config.json', {
 		throws: false

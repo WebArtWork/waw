@@ -26,7 +26,13 @@ sd._app = sd._express();
 
 var server = require('http').Server(sd._app);
 var session = require('express-session');
-sd._mongoUrl = 'mongodb://'+(sd._config.mongo.host||'localhost')+':'+(sd._config.mongo.port||'27017')+'/'+(sd._config.mongo.db||'test');
+var mongoAuth = '';
+if(sd._config.mongo.user&&sd._config.mongo.pass){
+	mongoAuth = sd._config.mongo.user + ':' + sd._config.mongo.pass + '@';
+}
+sd._mongoUrl = 'mongodb://'+mongoAuth+(sd._config.mongo.host||'localhost')+':'+(sd._config.mongo.port||'27017')+'/'+(sd._config.mongo.db||'test');
+console.log(sd._mongoUrl);
+
 var favicon = require('serve-favicon');
 
 var cookieParser = require('cookie-parser');

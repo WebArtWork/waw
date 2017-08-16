@@ -156,8 +156,8 @@ module.exports = function(sd){
 					.readJsonSync(pageUrl+'/config.json', {throws: false});
 				else var info = false;
 				if(!info) continue;
-				if(sd._config.jsminify) generateLibs(pageUrl);
-				if(sd._config.iconsminify) generateFonts(pageUrl, pages[i]);
+				generateLibs(pageUrl);
+				if(!sd._config.ignoreGenerateFonts) generateFonts(pageUrl, pages[i]);
 				engines.push(pageUrl + '/html');
 				engines.push(pageUrl + '/page');
 				for (var j = 0; j < info.router.length; j++) {
