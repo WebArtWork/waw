@@ -49,6 +49,7 @@ module.exports = function(sd, partJson) {
 						doc.save(function(){
 							req.body.name = update.name;
 							sd._io.in(doc._id).emit(cname+"Update", req.body);
+							req.body.doc = doc;
 							res.json(req.body);
 						});
 					});

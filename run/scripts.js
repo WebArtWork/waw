@@ -31,6 +31,17 @@ module.exports = function(sd){
 	/*
 	*	Crud Use
 	*/
+		var waits = [];
+		sd._wait_next = function(){
+			if(waits.length>0){
+				waits.pop();
+			}
+			if(waits.length>0) waits[waits.length-1]();
+		}
+		sd._wait = function(funcs){
+			waits.unshift(funcs);
+			if(waits.length==1) waits[0]();
+		}
 		sd._ensureUpdateObject = function(req, res, next){
 			if(Array.isArray(req.body)) return res.json(false);
 			if(typeof req.body != 'object')  return res.json(false);
