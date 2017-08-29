@@ -128,10 +128,7 @@ var restart = function(){
 
 
 var adduser = function(){
-	var newUser = JSON.parse(process.argv[3]);
-	if(!newUser.name||!newUser.token) gu.close("Not correct user.");
-	if(!config.users) config.users=[];
-	config.users.unshift(newUser);
+	config.user = process.argv[3];
 	fse.writeJsonSync(__dirname+'/config.json', config);
 	gu.close("User successfully added.");
 }

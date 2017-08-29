@@ -1,7 +1,7 @@
 var fs = require('fs');
 var npmi = require('npmi');
-var request = require('request');
 module.exports = function(sd, next){
+	sd._request = require('request');
 
 	if (sd._fs.existsSync(__dirname+'/../config.json')) {
 		var config = sd._fse.readJsonSync(__dirname+'/../config.json', {
@@ -12,7 +12,7 @@ module.exports = function(sd, next){
 	sd._http = {};
 	var url = 'http://pagefly.webart.work'
 	sd._http.post = function(link, obj, callback){
-		request({
+		sd._request({
 			method: 'POST',
 			uri: url + link,
 			json: obj
@@ -22,7 +22,7 @@ module.exports = function(sd, next){
 		});
 	}
 	sd._http.get = function(link, callback){
-		request({
+		sd._request({
 			method: 'GET',
 			uri: url + link
 		}, function(error, response, body) {

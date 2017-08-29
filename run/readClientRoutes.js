@@ -2,6 +2,11 @@ var folders = ['css','fonts','gen','html','img','js','lang','page'];
 var ext = ['.css','.ttf','.woff','.woff2','.svg','.otf','.js','.html','.gif','.jpg','.png'];
 module.exports = function(sd){
 	console.log('READING CLIENT SIDE');
+	if (sd._fs.existsSync(__dirname+'/../config.json')) {
+		var devConfig = sd._fse.readJsonSync(__dirname+'/../config.json', {
+			throws: false
+		});
+	}else var devConfig = {};
 	/*
 	*	Minify Script
 	*/
@@ -114,8 +119,41 @@ module.exports = function(sd){
 			return input&&input.toString()||'';
 		});
 		var df = {};
+		var ff = {};
+		var fillFiles = function(folder, files, word){
+			var langs = {};
+			for (var i = 0; i < files.length; i++) {
+				var words = require(folder+'/'+files[i]);
+				langs[files[i]] = words;
+				if(!words[word]){
+					words[word] = '';
+					sd._fs.writeFileSync(folder+'/'+files[i], 'module.exports = '+JSON.stringify(words), 'utf-8');
+				}
+			}
+			if(!sd._config.waw_idea||!devConfig.user) return;
+			sd._wait(function(){
+				sd._request.post({
+					uri: 'https://webart.work/api/idea/addTranslate',
+					form: {
+						_id: sd._config.waw_idea,
+						langs: langs,
+						token: devConfig.user
+					}
+				}, sd._wait_next);
+			});
+		}
+		var checkFiles = function(word, file){
+			for(var folder in ff){
+				for (var i = 0; i < ff[folder].length; i++) {
+					if(ff[folder][i]==file){
+						return fillFiles(folder, ff[folder], word);
+					}
+				}
+			}
+		}
 		var addLang = function(folder){
 			var files = sd._getFiles(folder);
+			ff[folder] = files;
 			for (var i = 0; i < files.length; i++) {
 				var words = require(folder+'/'+files[i])
 				if(!df[files[i]]) df[files[i]]={};
@@ -127,11 +165,10 @@ module.exports = function(sd){
 		sd._derer.setFilter('tr', function(word, file){
 			if(df[file]&&df[file][word.toLowerCase()])
 				return df[file][word.toLowerCase()];
-			else return word;
-		});
-		sd._derer.setFilter('trf', function(file){
-			if(df[file]) return JSON.stringify(df[file]);
-			else return JSON.stringify({});
+			else{
+				if(typeof df[file][word.toLowerCase()] != 'string') checkFiles(word, file);
+				return word;
+			}
 		});
 	/*
 	*	Managing Pages
