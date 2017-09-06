@@ -29,7 +29,7 @@ if (fs.existsSync(process.cwd()+'/server.json')) {
 module.exports.fetch = function(page){
 	if(!config.waw_idea) gu.close('Please provide idea ._id, from idea settings into waw project config file.');
 	request.post({
-		uri: 'https://webart.work/api/idea/getTranslates',
+		uri: 'http://pagefly.webart.work/api/idea/getTranslates',
 		form: {
 			_id: config.waw_idea,
 			token: devConfig()
@@ -86,7 +86,7 @@ module.exports.update = function(page){
 		form.langs[files[i]] = words;
 	}
 	request.post({
-		uri: 'https://webart.work/api/idea/fillTranslates',
+		uri: 'http://pagefly.webart.work/api/idea/fillTranslates',
 		form: form
 	}, function(){
 		gu.close('Translations succesfully updates.');

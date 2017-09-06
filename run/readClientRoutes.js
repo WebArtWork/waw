@@ -138,7 +138,7 @@ module.exports = function(sd){
 			if(!sd._config.waw_idea||!devConfig.user) return;
 			sd._wait(function(){
 				sd._request.post({
-					uri: 'https://webart.work/api/idea/addTranslate',
+					uri: 'http://pagefly.webart.work/api/idea/addTranslate',
 					form: {
 						_id: sd._config.waw_idea,
 						langs: langs,
