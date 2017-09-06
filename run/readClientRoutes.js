@@ -38,29 +38,31 @@ module.exports = function(sd){
 				}
 			}
 		}
-		var minifier = require('js-minify');
-		var getListOfComponents = function(dest){
-			sd._fse.mkdirs(dest);
-			var libs = sd._getFiles(dest);
-			libs.sort(function(a,b){
-				if(a>b) return 1;
-				else return -1;
-			});
-			for (var i = 0; i < libs.length; i++) {
-				libs[i]=dest+'/'+libs[i];
-			}
-			return libs;
-		}
-		var generateLibs = function(dest){
-			if (sd._fs.existsSync(dest+'/lab')) {
-				var lab = getListOfComponents(dest+'/lab');
-				if(lab.length==0) return;
-				minifier({
-					files: lab,
-					way: dest + '/gen/',
-					prefix: sd._config.prefix,
-					production: false
+		if(!sd._config.ignoreGenerateLibs){
+			var minifier = require('js-minify');
+			var getListOfComponents = function(dest){
+				sd._fse.mkdirs(dest);
+				var libs = sd._getFiles(dest);
+				libs.sort(function(a,b){
+					if(a>b) return 1;
+					else return -1;
 				});
+				for (var i = 0; i < libs.length; i++) {
+					libs[i]=dest+'/'+libs[i];
+				}
+				return libs;
+			}
+			var generateLibs = function(dest){
+				if (sd._fs.existsSync(dest+'/lab')) {
+					var lab = getListOfComponents(dest+'/lab');
+					if(lab.length==0) return;
+					minifier({
+						files: lab,
+						way: dest + '/gen/',
+						prefix: sd._config.prefix,
+						production: false
+					});
+				}
 			}
 		}
 	/*
@@ -118,6 +120,9 @@ module.exports = function(sd){
 		sd._derer.setFilter('string',function(input){
 			return input&&input.toString()||'';
 		});
+	/*
+	*	Translates
+	*/
 		var df = {};
 		var ff = {};
 		var fillFiles = function(folder, files, word){
@@ -127,13 +132,14 @@ module.exports = function(sd){
 				langs[files[i]] = words;
 				if(!words[word]){
 					words[word] = '';
-					sd._fs.writeFileSync(folder+'/'+files[i], 'module.exports = '+JSON.stringify(words), 'utf-8');
+					sd._fs.writeFileSync(folder+'/'+files[i]+'.js', 'module.exports = '+JSON.stringify(words), 'utf-8');
 				}
 			}
 			if(!sd._config.waw_idea||!devConfig.user) return;
 			sd._wait(function(){
 				sd._request.post({
-					uri: 'https://webart.work/api/idea/addTranslate',
+					//uri: 'https://webart.work/api/idea/addTranslate',
+					uri: 'http://localhost:4587/api/idea/addTranslate',
 					form: {
 						_id: sd._config.waw_idea,
 						langs: langs,
@@ -153,9 +159,18 @@ module.exports = function(sd){
 		}
 		var addLang = function(folder){
 			var files = sd._getFiles(folder);
+			for (var i = 0; i < files.length; i++) {
+				var previousFileName = files[i];
+				files[i] = files[i].replace('.js','');
+				if(files[i].indexOf('.')>=0){
+					files[i] = sd._rpl(files[i], '.', '');
+					sd._fs.writeFileSync(folder+'/'+files[i]+'.js', sd._fs.readFileSync(folder+'/'+previousFileName, 'utf8'), 'utf8');
+					sd._fs.unlinkSync(folder+'/'+previousFileName);
+				}
+			}
 			ff[folder] = files;
 			for (var i = 0; i < files.length; i++) {
-				var words = require(folder+'/'+files[i])
+				var words = require(folder+'/'+files[i]+'.js');
 				if(!df[files[i]]) df[files[i]]={};
 				for(key in words){
 					df[files[i]][key.toLowerCase()] = words[key];
@@ -176,8 +191,8 @@ module.exports = function(sd){
 		var clientRoot = process.cwd()+'/client';
 		var engines = [];
 		if(sd._fs.existsSync(clientRoot+'/config.json')){
-			generateLibs(clientRoot);
 			if(!sd._config.ignoreGenerateFonts) generateFonts(clientRoot, 'public');
+			if(!sd._config.ignoreGenerateLibs) generateLibs(clientRoot);
 			engines.push(clientRoot + '/html');
 			engines.push(clientRoot + '/page');
 			var info = sd._fse.readJsonSync(clientRoot+'/config.json', {throws: false});
@@ -193,7 +208,7 @@ module.exports = function(sd){
 					.readJsonSync(pageUrl+'/config.json', {throws: false});
 				else var info = false;
 				if(!info) continue;
-				generateLibs(pageUrl);
+				if(!sd._config.ignoreGenerateLibs) generateLibs(pageUrl);
 				if(!sd._config.ignoreGenerateFonts) generateFonts(pageUrl, pages[i]);
 				engines.push(pageUrl + '/html');
 				engines.push(pageUrl + '/page');

@@ -164,6 +164,20 @@ if(process.argv[2]){
 		case 'w':
 		case 'watch':
 			return list();
+		case 't':
+		case 'tr':
+		case 'translate':
+			if(process.argv[3].toLowerCase()=='update'||process.argv[3].toLowerCase()=='u')
+				require(__dirname+'/build/tr.js')
+				.update(process.argv[4]);
+			else require(__dirname+'/build/tr.js').fetch(process.argv[4]);
+			return;
+		case 'tf':
+			require(__dirname+'/build/tr.js').fetch(process.argv[3]);
+			return;
+		case 'tu':
+			require(__dirname+'/build/tr.js').update(process.argv[3]);
+			return;
 		case 'u':
 		case 'update':
 			require(__dirname+'/build/git.js').fetch(process.argv[3], function(){

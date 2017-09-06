@@ -46,7 +46,9 @@ module.exports = function(sd, partJson) {
 					}, function(err, doc){
 						if(err||!doc) return res.json(false);
 						sd._searchInObject(doc, req.body, update.keys);
-						doc.save(function(){
+						if(req.body.mark) doc.markModified(req.body.mark);
+						doc.save(function(err){
+							if(err) console.log('Error from save document: ', err);
 							req.body.name = update.name;
 							sd._io.in(doc._id).emit(cname+"Update", req.body);
 							req.body.doc = doc;

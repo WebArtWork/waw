@@ -138,6 +138,9 @@ module.exports = function(sd){
 			}
 			return false;
 		}
+		sd._rpl = function(str, g, r){
+			return str.split(g).join(r);
+		}
 	/*
 	*	End of support Scritping
 	*/
