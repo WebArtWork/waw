@@ -128,7 +128,7 @@ module.exports = function(sd){
 		var fillFiles = function(folder, files, word){
 			var langs = {};
 			for (var i = 0; i < files.length; i++) {
-				var words = require(folder+'/'+files[i]);
+				var words = require(folder+'/'+files[i]+'.js');
 				langs[files[i]] = words;
 				if(!words[word]){
 					words[word] = '';
@@ -138,8 +138,7 @@ module.exports = function(sd){
 			if(!sd._config.waw_idea||!devConfig.user) return;
 			sd._wait(function(){
 				sd._request.post({
-					//uri: 'https://webart.work/api/idea/addTranslate',
-					uri: 'http://localhost:4587/api/idea/addTranslate',
+					uri: 'https://webart.work/api/idea/addTranslate',
 					form: {
 						_id: sd._config.waw_idea,
 						langs: langs,

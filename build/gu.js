@@ -140,3 +140,6 @@ module.exports._hasId = function(arr, obj) {
 	}
 	return false;
 }
+module.exports._rpl = function(str, g, r){
+	return str.split(g).join(r);
+}
