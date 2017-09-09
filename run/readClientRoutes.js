@@ -137,6 +137,8 @@ module.exports = function(sd){
 			}
 			if(!sd._config.waw_idea||!devConfig.user) return;
 			sd._wait(function(){
+				console.log('langs');
+				console.log(langs);
 				sd._request.post({
 					uri: 'http://pagefly.webart.work/api/idea/addTranslate',
 					form: {
@@ -180,7 +182,7 @@ module.exports = function(sd){
 			if(df[file]&&df[file][word.toLowerCase()])
 				return df[file][word.toLowerCase()];
 			else{
-				if(typeof df[file][word.toLowerCase()] != 'string') checkFiles(word, file);
+				if(df[file]&&typeof df[file][word.toLowerCase()] != 'string') checkFiles(word, file);
 				return word;
 			}
 		});
