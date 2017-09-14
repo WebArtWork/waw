@@ -9,18 +9,27 @@ if (fs.existsSync(__dirname+'/config.json')) {
 		throws: false
 	});
 }else var config = {};
-var projectConfig = {};
-if (fs.existsSync(process.cwd()+'/server.json')) {
-	projectConfig = fse.readJsonSync(process.cwd()+'/server.json', {
-		throws: false
-	})||{};
-}else if (fs.existsSync(process.cwd()+'/config.json')) {
+var projectConfig = false;
+
+if (fs.existsSync(process.cwd()+'/config.json')) {
 	projectConfig = fse.readJsonSync(process.cwd()+'/config.json', {
 		throws: false
 	})||{};
 }
+if (fs.existsSync(process.cwd()+'/server.json')) {
+	var extra = fse.readJsonSync(process.cwd()+'/server.json', {
+		throws: false
+	})||{};
+	for(var key in extra){
+		projectConfig[key] = extra[key];
+	}
+}
 
 var run = function(){
+	if(!projectConfig){
+		console.log('This is not waw project');
+		process.exit();
+	}
 	var nodemon = require('../nodemon');
 	// add check if this is waw project
 	var obj = {
@@ -53,10 +62,14 @@ var run = function(){
 			}
 		}
 	}
-	if(projectConfig.swigIgnore) obj.ignore = projectConfig.swigIgnore;
+	if(projectConfig.dererIgnore) obj.ignore = projectConfig.dererIgnore;
 	nodemon(obj);
 }
 var serve = function(){
+	if(!projectConfig){
+		console.log('This is not waw project');
+		process.exit();
+	}
 	var pm2 = require('../pm2');
 	pm2.connect(function(err) {
 		if (err) {
@@ -76,6 +89,10 @@ var serve = function(){
 	});
 }
 var list = function(){
+	if(!projectConfig){
+		console.log('This is not waw project');
+		process.exit();
+	}
 	var pm2 = require('../pm2');
 	pm2.connect(function(err) {
 		if (err) {
@@ -105,6 +122,10 @@ var stopServe = function(){
 	});
 }
 var restart = function(){
+	if(!projectConfig){
+		console.log('This is not waw project');
+		process.exit();
+	}
 	var pm2 = require('../pm2');
 	pm2.connect(function(err) {
 		if (err) {

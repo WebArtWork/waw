@@ -5,7 +5,7 @@
 		"framework",
 		"waw"
 	],
-	"version": "0.7.17",
+	"version": "0.7.19",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
 	"author": {
@@ -13,15 +13,18 @@
 		"email": "crackeraki@gmail.com",
 		"url": "https://github.com/CrackerakiUA"
 	},
-	"contributors": [{
-		"name": "Sikora Serg",
-		"email": "sikorasergii@gmail.com",
-		"url": "https://github.com/SikoraSergii"
-	}, {
-		"name": "Andriy Momot",
-		"email": "Anrehecil@gmail.com",
-		"url": "https://github.com/Anrehecil"
-	}],
+	"contributors": [
+		{
+			"name": "Sikora Serg",
+			"email": "sikorasergii@gmail.com",
+			"url": "https://github.com/SikoraSergii"
+		},
+		{
+			"name": "Andriy Momot",
+			"email": "Anrehecil@gmail.com",
+			"url": "https://github.com/Anrehecil"
+		}
+	],
 	"engines": {
 		"node": ">=6.10.0"
 	},
@@ -31,30 +34,30 @@
 	},
 	"preferGlobal": "true",
 	"dependencies": {
-		"npmi": "*",
-		"derer": "*",
-		"gitty": "*",
-		"morgan": "*",
-		"request": "*",
-		"express": "*",
-		"node-cmd": "*",
-		"fs-extra": "*",
-		"passport": "*",
-		"mongoose": "*",
-		"socket.io": "1.7.4",
-		"socket.io-adapter-mongo": "*",
-		"js-minify": "*",
-		"svg-fontify": "*",
+		"autoprefixer": "*",
 		"body-parser": "*",
 		"connect-mongo": "*",
-		"serve-favicon": "*",
 		"cookie-parser": "*",
+		"derer": "^1.0.0",
+		"express": "*",
 		"express-session": "*",
+		"fs-extra": "*",
+		"gitty": "*",
+		"js-minify": "^0.1.7",
 		"method-override": "*",
-    	"recursive-readdir": "*",
-		"passport.socketio": "*",
+		"mongoose": "*",
+		"morgan": "*",
+		"node-cmd": "*",
 		"node-sass-middleware": "*",
-		"autoprefixer": "*",
-		"postcss-middleware": "*"
+		"npmi": "*",
+		"passport": "*",
+		"passport.socketio": "*",
+		"postcss-middleware": "*",
+		"recursive-readdir": "*",
+		"request": "*",
+		"serve-favicon": "*",
+		"socket.io": "1.7.4",
+		"socket.io-adapter-mongo": "*",
+		"svg-fontify": "*"
 	}
 }

@@ -64,6 +64,18 @@ module.exports = function(sd){
 					});
 				}
 			}
+			var generateLibsWithList = function(dest, files, name){
+				if (sd._fs.existsSync(dest+'/lab')) {
+					console.log('generating!!!');
+					minifier({
+						files: files,
+						way: dest + '/gen/',
+						prefix: sd._config.prefix,
+						production: false,
+						name: name
+					});
+				}
+			}
 		}
 	/*
 	*	scss
@@ -193,10 +205,25 @@ module.exports = function(sd){
 		var engines = [];
 		if(sd._fs.existsSync(clientRoot+'/config.json')){
 			if(!sd._config.ignoreGenerateFonts) generateFonts(clientRoot, 'public');
-			if(!sd._config.ignoreGenerateLibs) generateLibs(clientRoot);
 			engines.push(clientRoot + '/html');
 			engines.push(clientRoot + '/page');
 			var info = sd._fse.readJsonSync(clientRoot+'/config.json', {throws: false});
+			
+			/*
+			*	Generate Script
+			*/
+			if(!sd._config.ignoreGenerateLibs){
+				generateLibs(clientRoot);
+				if(info.lab){
+					for (var i = 0; i < info.lab.length; i++) {
+						for (var j = 0; j < info.lab[i].files.length; j++) {
+							info.lab[i].files[j] = clientRoot + '/lab/' + info.lab[i].files[j];
+						}
+						generateLibsWithList(clientRoot, info.lab[i].files, info.lab[i].name);
+					}
+				}
+			}
+
 			for (var j = 0; j < info.router.length; j++) {
 				require(clientRoot + '/' + info.router[j].src)(sd._app, sd);
 			}
@@ -209,7 +236,24 @@ module.exports = function(sd){
 					.readJsonSync(pageUrl+'/config.json', {throws: false});
 				else var info = false;
 				if(!info) continue;
-				if(!sd._config.ignoreGenerateLibs) generateLibs(pageUrl);
+
+
+				/*
+				*	Generate Script
+				*/
+				if(!sd._config.ignoreGenerateLibs){
+					generateLibs(pageUrl);
+					if(info.lab){
+						for (var i = 0; i < info.lab.length; i++) {
+							for (var j = 0; j < info.lab[i].files.length; j++) {
+								info.lab[i].files[j] = pageUrl + '/lab/' + info.lab[i].files[j];
+							}
+							generateLibsWithList(pageUrl, info.lab[i].files, info.lab[i].name);
+						}
+					}
+				}
+
+				
 				if(!sd._config.ignoreGenerateFonts) generateFonts(pageUrl, pages[i]);
 				engines.push(pageUrl + '/html');
 				engines.push(pageUrl + '/page');
