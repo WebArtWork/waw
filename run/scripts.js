@@ -85,6 +85,11 @@ module.exports = function(sd){
 				else if (typeof checkingArr[i] == 'object') sd._searchInObject(checkingArr[i], obj);
 			}
 		}
+		sd._dataUrl2loc = function(dataUrl, url, cb){
+			var base64Data = dataUrl.replace(/^data:image\/png;base64,/,'').replace(/^data:image\/jpeg;base64,/,'');
+			var decodeData=new Buffer(base64Data,'base64');
+			sd._fs.writeFile(url, decodeData, cb);
+		}
 	/*
 	*	General Use
 	*/
