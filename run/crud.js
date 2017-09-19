@@ -44,6 +44,7 @@ module.exports = function(sd, partJson) {
 						_id: req.body._id,
 						moderators: req.user._id
 					}, function(err, doc){
+						if(err||!doc) console.log('err: ', err);
 						if(err||!doc) return res.json(false);
 						sd._searchInObject(doc, req.body, update.keys);
 						if(req.body.mark) doc.markModified(req.body.mark);
