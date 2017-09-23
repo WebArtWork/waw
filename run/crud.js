@@ -11,32 +11,36 @@ module.exports = function(sd, partJson) {
 		if(partJson.crud){
 			// Init
 			var router = sd._initRouter('/api/'+name);
-			// create
-			router.post("/create", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
-				var doc = new Schema();
-				if(typeof doc.create !== 'function'){
-					return res.json(false);
-				}
-				doc.create(req.body, req.user, sd);	
-				doc.save(function(err){
-					if(err) return res.json(false);
-					res.json(doc);
-				});			
-			});
-			router.post("/createCb", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
-				var doc = new Schema();
-				if(typeof doc.create !== 'function'){
-					return res.json(false);
-				}
-				doc.create(req.body, req.user, sd, function(){
+			/*
+			*	Create Routes
+			*/
+				router.post("/create", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
+					var doc = new Schema();
+					if(typeof doc.create !== 'function'){
+						return res.json(false);
+					}
+					doc.create(req.body, req.user, sd);	
 					doc.save(function(err){
 						if(err) return res.json(false);
-						req.body._id = doc._id;
-						res.json(req.body);
+						res.json(doc);
+					});			
+				});
+				router.post("/createCb", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
+					var doc = new Schema();
+					if(typeof doc.create !== 'function'){
+						return res.json(false);
+					}
+					doc.create(req.body, req.user, sd, function(){
+						doc.save(function(err){
+							if(err) return res.json(false);
+							req.body._id = doc._id;
+							res.json(req.body);
+						});
 					});
 				});
-			});
-			// update
+			/*
+			*	Update Routes
+			*/
 			if(!partJson.crud.updates) partJson.crud.updates=[];
 			var updateRoute = function(update){
 				router.post("/update"+update.name, sd['sp'+name+'ensure']||sd._ensure, sd._ensureUpdateObject, function(req, res) {
@@ -44,7 +48,6 @@ module.exports = function(sd, partJson) {
 						_id: req.body._id,
 						moderators: req.user._id
 					}, function(err, doc){
-						if(err||!doc) console.log('err: ', err);
 						if(err||!doc) return res.json(false);
 						sd._searchInObject(doc, req.body, update.keys);
 						if(req.body.mark) doc.markModified(req.body.mark);

@@ -146,6 +146,9 @@ module.exports = function(sd){
 		sd._rpl = function(str, g, r){
 			return str.split(g).join(r);
 		}
+		sd._id = function(doc, id){
+			return doc._id.toString() == id.toString();
+		}
 	/*
 	*	End of support Scritping
 	*/
