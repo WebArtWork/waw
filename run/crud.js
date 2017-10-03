@@ -12,6 +12,16 @@ module.exports = function(sd, partJson) {
 			// Init
 			var router = sd._initRouter('/api/'+name);
 			/*
+			*	Get Routes
+			*/
+				router.post("/get", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
+					Schema.find(sd['sp'+name+'qg']||{
+						moderators: req.user._id
+					}, function(err, docs) {
+						res.json(docs || []);
+					});
+				});
+			/*
 			*	Create Routes
 			*/
 				router.post("/create", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
