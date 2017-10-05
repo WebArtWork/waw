@@ -25,6 +25,12 @@ if (fs.existsSync(process.cwd()+'/server.json')) {
 	}
 }
 
+var runcss = function(){
+	require('../nodemon')({
+		script: __dirname+'/run/runcss.js',
+		ext: 'js json'
+	});
+}
 var run = function(){
 	if(!projectConfig){
 		console.log('This is not waw project');
@@ -173,6 +179,9 @@ if(process.argv[2]){
 		case 'r':
 		case 'run':
 			return run();
+		case 'rc':
+		case 'run css':
+			return runcss();
 		case 's':
 		case 'start':
 			return serve();
