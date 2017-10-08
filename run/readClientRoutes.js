@@ -66,7 +66,7 @@ module.exports = function(sd){
 			}
 			var generateLibsWithList = function(dest, files, name){
 				if (sd._fs.existsSync(dest+'/lab')) {
-					console.log('generating!!!');
+					console.log('generating!!!: ', name);
 					minifier({
 						files: files,
 						way: dest + '/gen/',

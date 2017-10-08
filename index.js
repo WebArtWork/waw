@@ -180,7 +180,7 @@ if(process.argv[2]){
 		case 'run':
 			return run();
 		case 'rc':
-		case 'run css':
+		case 'runcss':
 			return runcss();
 		case 's':
 		case 'start':

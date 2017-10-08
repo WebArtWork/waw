@@ -23,6 +23,18 @@ module.exports = function(sd){
 			if(req.user) next();
 			else res.json(false);
 		}
+		sd._nextAfterTimeout = function(req, res, next){
+			if(!req.session) return next();
+			req.session.ti=req.local.ti;
+			req.session.save();
+			setTimeout(function(){
+				req.session.reload(function(err) {
+					if(req.session.ti==req.local.ti){
+						next();
+					}
+				});
+			}, req.local.t);
+		}
 		sd._initRouter = function(api){
 			var router = sd._express.Router();
 			sd._app.use(api, router);
