@@ -7,6 +7,14 @@ module.exports = function(sd){
 			throws: false
 		});
 	}else var devConfig = {};
+	var clientRoot = process.cwd()+'/client';
+	if(sd._fs.existsSync(clientRoot+'/config.json')){		
+		var info = sd._fse.readJsonSync(clientRoot+'/config.json', {throws: false});
+	}else{
+		console.log("WAW Project looks to don't have client.");
+		process.exit();
+	}
+	var engines = [];
 	/*
 	*	Minify Script
 	*/
@@ -133,133 +141,121 @@ module.exports = function(sd){
 	/*
 	*	Translates
 	*/
-		var df = {};
+		var translateFolder = clientRoot + '/lang';
+		var df = sd._df = {};
 		var ff = {};
-		var fillFiles = function(folder, files, word){
-			var langs = {};
-			for (var i = 0; i < files.length; i++) {
-				var words = require(folder+'/'+files[i]+'.js');
-				langs[files[i]] = words;
-				if(!words[word]){
-					words[word] = '';
-					sd._fs.writeFileSync(folder+'/'+files[i]+'.js', 'module.exports = '+JSON.stringify(words), 'utf-8');
-				}
+		ff = sd._getFiles(translateFolder);
+		for (var i = 0; i < ff.length; i++) {
+			var previousFileName = ff[i];
+			ff[i] = ff[i].replace('.js','');
+			if(ff[i].indexOf('.')>=0){
+				ff[i] = sd._rpl(ff[i], '.', '');
+				sd._fs.writeFileSync(translateFolder+'/'+ff[i]+'.js', sd._fs.readFileSync(translateFolder+'/'+previousFileName, 'utf8'), 'utf8');
+				sd._fs.unlinkSync(translateFolder+'/'+previousFileName);
 			}
-			if(!sd._config.waw_idea||!devConfig.user) return;
+		}
+		for (var i = 0; i < ff.length; i++) {
+			var words = require(translateFolder+'/'+ff[i]+'.js');
+			if(!df[ff[i]]) df[ff[i]]={};
+			for(key in words){
+				df[ff[i]][key] = words[key];
+			}
+		}
+		sd._generate_translate_file = function(){
+			var data = sd._fs.readFileSync(__dirname+'/js/translate.js', 'utf8');
+			data=data.replace('LANG_ARR', JSON.stringify(ff)).replace('INNER_DF', JSON.stringify(df));
+			sd._fs.writeFileSync(clientRoot + '/gen/translate.js', data, 'utf8');
+		}
+		if(info.translate&&!sd._fs.existsSync(clientRoot + '/gen/translate.js')){
+			sd._generate_translate_file();
+		}
+		/*
+		*	Below we make content accessible by working project
+		*/
+		var addWordToIdea = function(word){
 			sd._wait(function(){
-				console.log('langs');
-				console.log(langs);
 				sd._request.post({
-					uri: 'http://pagefly.webart.work/api/idea/addTranslate',
+					uri: 'http://pagefly.webart.work/api/idea/addWord',
 					form: {
 						_id: sd._config.waw_idea,
-						langs: langs,
+						langs: ff,
+						word: word,
 						token: devConfig.user
 					}
 				}, sd._wait_next);
 			});
 		}
+		var fillFiles = function(word){
+			var _generate_translate_file = false;
+			for (var i = 0; i < ff.length; i++) {
+				var words = require(translateFolder+'/'+ff[i]+'.js');
+				if(!words[word]){
+					words[word] = '';
+					_generate_translate_file = true;
+					df[ff[i]] = words;
+					sd._fs.writeFileSync(translateFolder+'/'+ff[i]+'.js', 'module.exports = '+JSON.stringify(words), 'utf-8');
+				}
+			}
+			if(info.translate&&_generate_translate_file) sd._generate_translate_file();
+			if(_generate_translate_file&&sd._config.waw_idea&&devConfig.user){
+				addWordToIdea(word);
+			}
+		}
 		var checkFiles = function(word, file){
 			for(var folder in ff){
-				for (var i = 0; i < ff[folder].length; i++) {
-					if(ff[folder][i]==file){
-						return fillFiles(folder, ff[folder], word);
+				for (var i = 0; i < ff.length; i++) {
+					if(ff[i]==file){
+						return fillFiles(word);
 					}
 				}
 			}
 		}
-		var addLang = function(folder){
-			var files = sd._getFiles(folder);
-			for (var i = 0; i < files.length; i++) {
-				var previousFileName = files[i];
-				files[i] = files[i].replace('.js','');
-				if(files[i].indexOf('.')>=0){
-					files[i] = sd._rpl(files[i], '.', '');
-					sd._fs.writeFileSync(folder+'/'+files[i]+'.js', sd._fs.readFileSync(folder+'/'+previousFileName, 'utf8'), 'utf8');
-					sd._fs.unlinkSync(folder+'/'+previousFileName);
-				}
-			}
-			ff[folder] = files;
-			for (var i = 0; i < files.length; i++) {
-				var words = require(folder+'/'+files[i]+'.js');
-				if(!df[files[i]]) df[files[i]]={};
-				for(key in words){
-					df[files[i]][key.toLowerCase()] = words[key];
-				}
-			}
-		}
 		sd._derer.setFilter('tr', function(word, file){
-			if(df[file]&&df[file][word.toLowerCase()])
-				return df[file][word.toLowerCase()];
+			word = word.replace('"',"'");
+			if(df[file]&&df[file][word])
+				return df[file][word];
 			else{
-				if(df[file]&&typeof df[file][word.toLowerCase()] != 'string') checkFiles(word, file);
+				if(df[file]&&typeof df[file][word] != 'string') checkFiles(word, file);
 				return word;
+			}
+		});
+		sd._app.post("/waw/translate", function(req, res, next){
+			if(req.hostname=='localhost') next();
+			else res.json(false);
+		}, function(req, res) {
+			req.body.word = req.body.word.replace('"',"'");
+			if(df[req.body.lang]&&df[req.body.lang][req.body.word])
+				return res.json(df[req.body.lang][req.body.word]);
+			else{
+				if(df[req.body.lang]&&typeof df[req.body.lang][req.body.word] != 'string')
+					checkFiles(req.body.word, req.body.lang);
+				res.json(true);
 			}
 		});
 	/*
 	*	Managing Pages
 	*/
-		var clientRoot = process.cwd()+'/client';
-		var engines = [];
-		if(sd._fs.existsSync(clientRoot+'/config.json')){
-			if(!sd._config.ignoreGenerateFonts) generateFonts(clientRoot, 'public');
-			engines.push(clientRoot + '/html');
-			engines.push(clientRoot + '/page');
-			var info = sd._fse.readJsonSync(clientRoot+'/config.json', {throws: false});
-			
-			/*
-			*	Generate Script
-			*/
-			if(!sd._config.ignoreGenerateLibs){
-				generateLibs(clientRoot);
-				if(info.lab){
-					for (var i = 0; i < info.lab.length; i++) {
-						for (var j = 0; j < info.lab[i].files.length; j++) {
-							info.lab[i].files[j] = clientRoot + '/lab/' + info.lab[i].files[j];
-						}
-						generateLibsWithList(clientRoot, info.lab[i].files, info.lab[i].name);
+		if(!sd._config.ignoreGenerateFonts) generateFonts(clientRoot, 'public');
+		engines.push(clientRoot + '/html');
+		engines.push(clientRoot + '/page');
+		
+		/*
+		*	Generate Script
+		*/
+		if(!sd._config.ignoreGenerateLibs){
+			generateLibs(clientRoot);
+			if(info.lab){
+				for (var i = 0; i < info.lab.length; i++) {
+					for (var j = 0; j < info.lab[i].files.length; j++) {
+						info.lab[i].files[j] = clientRoot + '/lab/' + info.lab[i].files[j];
 					}
+					generateLibsWithList(clientRoot, info.lab[i].files, info.lab[i].name);
 				}
 			}
+		}
 
-			for (var j = 0; j < info.router.length; j++) {
-				require(clientRoot + '/' + info.router[j].src)(sd._app, sd);
-			}
-			addLang(clientRoot + '/lang');			
-		}else{
-			var pages = sd._getDirectories(clientRoot);
-			for (var i = 0; i < pages.length; i++) {
-				var pageUrl = clientRoot+'/'+pages[i];
-				if(sd._fs.existsSync(pageUrl+'/config.json')) var info = sd._fse
-					.readJsonSync(pageUrl+'/config.json', {throws: false});
-				else var info = false;
-				if(!info) continue;
-
-
-				/*
-				*	Generate Script
-				*/
-				if(!sd._config.ignoreGenerateLibs){
-					generateLibs(pageUrl);
-					if(info.lab){
-						for (var i = 0; i < info.lab.length; i++) {
-							for (var j = 0; j < info.lab[i].files.length; j++) {
-								info.lab[i].files[j] = pageUrl + '/lab/' + info.lab[i].files[j];
-							}
-							generateLibsWithList(pageUrl, info.lab[i].files, info.lab[i].name);
-						}
-					}
-				}
-
-				
-				if(!sd._config.ignoreGenerateFonts) generateFonts(pageUrl, pages[i]);
-				engines.push(pageUrl + '/html');
-				engines.push(pageUrl + '/page');
-				for (var j = 0; j < info.router.length; j++) {
-					require(pageUrl + '/' + info.router[j].src)(sd._app, sd);
-				}
-				addLang(pageUrl + '/lang');
-			}
+		for (var j = 0; j < info.router.length; j++) {
+			require(clientRoot + '/' + info.router[j].src)(sd._app, sd);
 		}
 		sd._app.set('views', engines);
 	/*
