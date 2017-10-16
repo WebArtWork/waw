@@ -198,15 +198,14 @@ if(process.argv[2]){
 		case 'tr':
 		case 'translate':
 			if(process.argv[3].toLowerCase()=='update'||process.argv[3].toLowerCase()=='u')
-				require(__dirname+'/build/tr.js')
-				.update(process.argv[4]);
-			else require(__dirname+'/build/tr.js').fetch(process.argv[4]);
+				require(__dirname+'/build/tr.js').update();
+			else require(__dirname+'/build/tr.js').fetch();
 			return;
 		case 'tf':
-			require(__dirname+'/build/tr.js').fetch(process.argv[3]);
+			require(__dirname+'/build/tr.js').fetch();
 			return;
 		case 'tu':
-			require(__dirname+'/build/tr.js').update(process.argv[3]);
+			require(__dirname+'/build/tr.js').update();
 			return;
 		case 'u':
 		case 'update':

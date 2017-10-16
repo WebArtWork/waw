@@ -5,13 +5,6 @@ var request = require('request');
 var askPage = function(){
 	gu.close('Please provide page.');
 }
-var getPage = function(page){
-	if(page&&fs.existsSync(process.cwd()+'/client/'+page+'/config.json')){
-		return process.cwd()+'/client/'+page+'/lang';
-	}else if(fs.existsSync(process.cwd()+'/client/config.json')){
-		return process.cwd()+'/client/lang';
-	}else askPage();
-}
 var devConfig = function(){
 	if (fs.existsSync(__dirname + '/../config.json')) {
 		return fse.readJsonSync(__dirname + '/../config.json', {
@@ -29,16 +22,18 @@ if (fs.existsSync(process.cwd()+'/server.json')) {
 module.exports.fetch = function(page){
 	if(!config.waw_idea) gu.close('Please provide idea ._id, from idea settings into waw project config file.');
 	request.post({
-		uri: 'http://pagefly.webart.work/api/idea/getTranslates',
+		uri: 'http://localhost:4587/api/idea/getTranslates',
+		//uri: 'http://pagefly.webart.work/api/idea/getTranslates',
 		form: {
 			_id: config.waw_idea,
 			token: devConfig()
 		}
 	}, function(err, resp){
+		var clientRoot = process.cwd() + '/client';
+		var translateFolder = clientRoot + '/lang';
 		var translates = JSON.parse(resp.body);
 		if(!translates) gu.close("Translates didn't fetched, check your enviroment.");
-		
-		var folder = getPage(page);
+		var folder = translateFolder;
 		var files = gu.getFiles(folder);
 		for (var i = 0; i < files.length; i++) {
 			var previousFileName = files[i];
@@ -60,17 +55,31 @@ module.exports.fetch = function(page){
 			}
 			fs.writeFileSync(folder+'/'+files[i]+'.js', 'module.exports = '+JSON.stringify(words), 'utf-8');
 		}
+		if(fse.readJsonSync(clientRoot+'/config.json', {throws: false}).translate){
+			var df = {};
+			for (var i = 0; i < files.length; i++) {
+				var words = require(translateFolder+'/'+files[i]+'.js');
+				if(!df[files[i]]) df[files[i]]={};
+				for(key in words){
+					df[files[i]][key] = words[key];
+				}
+			}
+			var data = fs.readFileSync(__dirname+'/../run/js/translate.js', 'utf8');
+			data=data.replace('LANG_ARR', JSON.stringify(files)).replace('INNER_DF', JSON.stringify(df));
+			fs.writeFileSync(clientRoot + '/gen/translate.js', data, 'utf8');
+		}
 		gu.close('Translations succesfully fetched from waw idea.');
 	});
 }
-module.exports.update = function(page){
+module.exports.update = function(){
 	if(!config.waw_idea) gu.close('Please provide idea ._id, from idea settings into waw project config file.');
 	var form = {		
 		_id: config.waw_idea,
 		token: devConfig()
 	}
-	var folder = getPage(page);
+	var folder = process.cwd()+'/client/lang';
 	var files = gu.getFiles(folder);
+	if(files.length==0) gu.close("You don't have any files translated.");
 	for (var i = 0; i < files.length; i++) {
 		var previousFileName = files[i];
 		files[i] = files[i].replace('.js','');
@@ -80,10 +89,29 @@ module.exports.update = function(page){
 			fs.unlinkSync(folder+'/'+previousFileName);
 		}
 	}
-	form.langs = {};
+	form.languages = files;
+	var langs = {};
+	form.translates = [];
 	for (var i = 0; i < files.length; i++) {
-		var words = require(folder+'/'+files[i]+'.js');
-		form.langs[files[i]] = words;
+		langs[files[i]] = require(folder+'/'+files[i]+'.js');
+		for(var word in langs[files[i]]){
+			var needToAdd = true;
+			for (var j = 0; j < form.translates.length; j++) {
+				if(form.translates[j].word == word){
+					form.translates[j].translate[files[i]]=langs[files[i]][word];
+					needToAdd = false;
+					break;
+				}
+			}
+			if(needToAdd){
+				var newWord = {
+					word: word,
+					translate: {}
+				}				
+				newWord.translate[files[i]]=langs[files[i]][word];
+				form.translates.push(newWord);
+			}
+		}
 	}
 	request.post({
 		uri: 'http://pagefly.webart.work/api/idea/fillTranslates',
@@ -92,3 +120,12 @@ module.exports.update = function(page){
 		gu.close('Translations succesfully updates.');
 	});
 }
+
+/*
+case 'tf':
+	require(__dirname+'/build/tr.js').fetch(process.argv[3]);
+	return;
+case 'tu':
+	require(__dirname+'/build/tr.js').update(process.argv[3]);
+	return;
+*/
