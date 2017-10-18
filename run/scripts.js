@@ -103,6 +103,16 @@ module.exports = function(sd){
 			sd._fs.writeFile(url, decodeData, cb);
 		}
 	/*
+	*	Image Management
+	*/
+		sd._dataUrlToLocation = function(dataUrl, loc, file, cb){
+			var base64Data = dataUrl.replace(/^data:image\/png;base64,/, '').replace(/^data:image\/jpeg;base64,/, '');
+			var decodeData = new Buffer(base64Data, 'base64');
+			var filename = Date.now() + '_0.jpg';
+			sd._fse.mkdirs(loc);
+			sd._fs.writeFile(loc+'/'+file, decodeData, cb);
+		}
+	/*
 	*	General Use
 	*/
 		sd._parallel = function(arr, callback){

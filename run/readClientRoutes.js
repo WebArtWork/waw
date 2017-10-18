@@ -173,6 +173,7 @@ module.exports = function(sd){
 		*	Below we make content accessible by working project
 		*/
 		var addWordToIdea = function(word){
+			return;
 			sd._wait(function(){
 				sd._request.post({
 					uri: 'http://pagefly.webart.work/api/idea/addWord',
