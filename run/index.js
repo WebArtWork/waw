@@ -2,6 +2,7 @@ var sd = {
 	_express: require('express'),
 	_passport: require('passport'),
 	_mongoose: require('mongoose'),
+	_package: require(__dirname+'/../package'),
 	_fs: require('fs'),
 	_fse: require('fs-extra'),
 	_git: require('gitty'),

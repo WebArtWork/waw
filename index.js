@@ -3,7 +3,6 @@ var path = require('path');
 var fs = require('fs');
 var fse = require('fs-extra');
 var gu = require(__dirname+'/build/gu.js');
-var npmi = require('npmi');
 if (fs.existsSync(__dirname+'/config.json')) {
 	var config = fse.readJsonSync(__dirname+'/config.json', {
 		throws: false
@@ -263,14 +262,19 @@ if(process.argv[2]){
 			process.argv[3]='part';
 			require(__dirname+'/build').add();
 			return;
-		case 'app':
+		case 'arp':
 			process.argv[4]=process.argv[3];
-			process.argv[3]='publicpage';
+			process.argv[3]='routepage';
 			require(__dirname+'/build').add();
 			return;
 		case 'alp':
 			process.argv[4]=process.argv[3];
 			process.argv[3]='localpage';
+			require(__dirname+'/build').add();
+			return;
+		case 'asp':
+			process.argv[4]=process.argv[3];
+			process.argv[3]='simplepage';
 			require(__dirname+'/build').add();
 			return;
 		case '--version':

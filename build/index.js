@@ -16,7 +16,7 @@ if (gu.fs.existsSync(configPath)) {
 	waw add
 */
 	var getAddOption = function(callback){
-		rl.question('What do you want to add into your waw project?\n1) Part\n2) Public Page\n3) Local Page\nChoose: ', function(answer){
+		rl.question('What do you want to add into your waw project?\n1) Part\n2) Routing Page\n3) Local Page\n4) Simple Page\nChoose: ', function(answer){
 			answer = answer.toLowerCase();
 			if(answer=='1'||answer=='2'||answer=='3'||answer=='public page'||
 				answer=='p'||answer=='pp'||answer=='lp'||
@@ -81,16 +81,28 @@ if (gu.fs.existsSync(configPath)) {
 			require(__dirname + '/pm').addPageLocal(name);
 		});
 	}
-	var addPagePublic = function(){
+	var addPageRouting = function(){
 		var pages = gu.getDirectories(process.cwd() + '/client');
 		rl.question('Give page you want to create: ', function(name) {
 			for (var i = 0; i < pages.length; i++) {
 				if(name.toLowerCase() == pages[i]){
 					console.log('This page already exists');
-					return addPagePublic();
+					return addPageRouting();
 				}
 			}
-			require(__dirname + '/pm').addPagePublic(name);
+			require(__dirname + '/pm').addPageRouting(name);
+		});
+	}
+	var addPageSimple = function(){
+		var pages = gu.getDirectories(process.cwd() + '/client');
+		rl.question('Give page you want to create: ', function(name) {
+			for (var i = 0; i < pages.length; i++) {
+				if(name.toLowerCase() == pages[i]){
+					console.log('This page already exists');
+					return addPageRouting();
+				}
+			}
+			require(__dirname + '/pm').addPageRouting(name);
 		});
 	}
 	module.exports.add = function(){
@@ -105,15 +117,32 @@ if (gu.fs.existsSync(configPath)) {
 					else return require(__dirname+'/pm')
 						.create(process.argv[4]);
 				case '2':
-				case 'pp':
-				case 'publicpage':
-					return require(__dirname+'/pm')
-					.addPagePublic(process.argv[4]);
+				case 'rp':
+				case 'routepage':
+					if(process.argv[4]){
+						return require(__dirname+'/pm')
+						.addPageRouting(process.argv[4]);
+					}else {
+						return addPageRouting({});
+					}
 				case '3':
 				case 'lp':
 				case 'localpage':
-					return require(__dirname+'/pm')
-					.addPageLocal(process.argv[4]);
+					if(process.argv[4]){
+						return require(__dirname+'/pm')
+						.addPageLocal(process.argv[4]);
+					}else {
+						return addPageLocal({});
+					}
+				case '4':
+				case 'sp':
+				case 'simplepage':
+					if(process.argv[4]){
+						return require(__dirname+'/pm')
+						.addPageSimple(process.argv[4]);
+					}else {
+						return addPageSimple({});
+					}
 				default: 
 					return console.log('Wrong Command.');
 			}
@@ -125,13 +154,17 @@ if (gu.fs.existsSync(configPath)) {
 					case 'part':
 						return createPart();
 					case '2':
-					case 'pp':
-					case 'public page':
-						return addPagePublic({});
+					case 'rp':
+					case 'routing page':
+						return addPageRouting({});
 					case '3':
 					case 'lp':
 					case 'local page':
 						return addPageLocal({});
+					case '4':
+					case 'sp':
+					case 'simple page':
+						return addPageSimple({});
 				}
 			});
 		}

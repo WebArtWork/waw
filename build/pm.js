@@ -30,29 +30,17 @@ var recursive = require('recursive-readdir');
 /*
 *	Page Management
 */
-	module.exports.addPageLocal = function(page){
-		var pages = gu.getDirectories(process.cwd() + '/client');
-		for (var i = 0; i < pages.length; i++) {
-			if (page.toLowerCase() == pages[i]) {
-				return gu.close('This page already exists');
-			}
-		}
-		var dest = process.cwd() + '/client/' + page;
-		fse.copySync(__dirname+'/PageLocal', dest);
-		var renames = [{
-			from: 'PAGENAME',
-			to: page
-		}];
-		recursive(dest, function(err, files) {
-			if(files){
-				for (var i = 0; i < files.length; i++) {
-					gu.writeFile(files[i], renames, files[i]);
-				}
-			};
-			gu.close("Local Page has been successfully created.");
-		});
+	module.exports.addPageRouting = function(page){
+		console.log('page: '+page);
+		gu.close("Routing Page has been successfully created.");
 	}
-	module.exports.addPagePublic = function(page){
+	module.exports.addPageLocal = function(page){
+		console.log('page: '+page);
+		gu.close("Local Page has been successfully created.");
+	}
+	module.exports.addPageSimple = function(page){
+		console.log('page: '+page);
+		gu.close("Simple Page has been successfully created.");
 		var pages = gu.getDirectories(process.cwd() + '/client');
 		for (var i = 0; i < pages.length; i++) {
 			if (page.toLowerCase() == pages[i]) {

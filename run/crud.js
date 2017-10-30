@@ -7,6 +7,56 @@ module.exports = function(sd, partJson) {
 			var Schema = require(schemaLoc);
 			sd[cname] = Schema;
 		}else return;
+	// SOLR
+		if(partJson.solr){
+			/*
+			var solr = require('solr');
+			var client = solr.createClient();
+			Schema.find({}, function(err, docs){
+				var docsArr = [];
+				var addDocToArr = function(doc){
+					docsArr.push(function(n){
+						client.add(doc, n);
+					});
+				}
+				for (var i = 0; i < docs.length; i++) {
+					addDocToArr(docs[i]);
+				}
+				sd._parallel(docsArr, function(){
+					client.commit(function(err) {});
+				});
+			});
+			sd['_solr_'+cname] = {
+				add: function(doc, next){
+					client.add(doc, function(){
+						client.commit(next);
+					});
+				},
+				remove: function(doc, next){
+					client.del(null, {
+						_id: doc._id
+					}, function(err, response) {
+						client.commit(next);
+					});
+				},
+				update: function(doc){
+					client.del(null, {
+						_id: doc._id
+					}, function(err, response) {
+						client.add(doc, function(){
+							client.commit(next);
+						});
+					});
+				},
+				query: function(query, cb){
+					client.query(query, function(err, response) {
+						var responseObj = JSON.parse(response);
+						cb(responseObj.response.docs);
+					});
+				},
+			}
+			//*/
+		}
 	// Routes
 		if(partJson.crud){
 			// Init
@@ -89,6 +139,7 @@ module.exports = function(sd, partJson) {
 			});
 		}
 	// Socket Management
+		/*
 		if (sd._fs.existsSync(schemaLoc)) {
 			sd._io.on('connection', function(socket) {
 				if (socket.request.user) {
@@ -108,6 +159,7 @@ module.exports = function(sd, partJson) {
 				}
 			});
 		}
+		*/
 	// End of Crud
 };
 // General prototypes
