@@ -10,5 +10,6 @@ module.exports = function(sd, next){
 	for (var i = 0; i < sd._dependencies.length; i++) {
 		addInstall(sd._dependencies[i]);
 	}
-	sd._parallel(installs, next);
+	if(installs.length==0) next();
+	else sd._parallel(installs, next);
 }
