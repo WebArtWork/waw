@@ -4,16 +4,17 @@
 */
 var df = INNER_DF;
 var langs = LANG_ARR;
+var lang = langs[0];
 app.config(function ($translateProvider) {
 	for(var lang in df){
 		$translateProvider.translations(lang, df[lang]);
 	}
 	$translateProvider.preferredLanguage(langs[0]);
 	$translateProvider.useSanitizeValueStrategy('sanitizeParameters');
-}).service('translate', function($translate, $http){
+	$translateProvider.useMissingTranslationHandler('missingTranslate');
+}).factory('missingTranslate', function() {
 	var wordsToAdd = [];
-	var lang = langs[0];
-	$translate.failCallback(function(word){
+	return function(word) {
 		for (var i = 0; i < wordsToAdd.length; i++) {
 			if(wordsToAdd[i]==word) return;
 		}
@@ -22,7 +23,8 @@ app.config(function ($translateProvider) {
 			word: word,
 			lang: lang
 		});
-	});
+	};
+}).service('translate', function($translate, $http){
 	this.set = function(_lang){
 		for (var i = 0; i < langs.length; i++) {
 			if(langs[i]==_lang){
