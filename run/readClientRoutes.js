@@ -145,14 +145,44 @@ module.exports = function(sd){
 		var df = sd._df = {};
 		var ff = {};
 		ff = sd._getFiles(translateFolder);
+		var addSetLang = function(lang){
+			sd['_set_' + lang] = function(req, res, next) {
+				if (req.user) {
+					req.user.lang = lang;
+					req.user.save();
+				} else req.session.lang = lang;
+				next();
+			};
+		}
 		for (var i = 0; i < ff.length; i++) {
 			var previousFileName = ff[i];
 			ff[i] = ff[i].replace('.js','');
+			addSetLang(ff[i]);
 			if(ff[i].indexOf('.')>=0){
 				ff[i] = sd._rpl(ff[i], '.', '');
 				sd._fs.writeFileSync(translateFolder+'/'+ff[i]+'.js', sd._fs.readFileSync(translateFolder+'/'+previousFileName, 'utf8'), 'utf8');
 				sd._fs.unlinkSync(translateFolder+'/'+previousFileName);
 			}
+		}
+		sd._ro = function(req, res, obj){
+			if(req.user&&req.user.lang) obj.lang = req.user.lang;
+			else if(req.session.lang) obj.lang = req.session.lang;
+			else obj.lang = ff[0];
+			if(req.originalUrl=='/'){
+				for (var i = 0; i < ff.length; i++) {
+					obj[ff[i]+'Url'] = '/en';
+				}
+			}else{
+				for (var i = 0; i < ff.length; i++) {
+					obj[ff[i]+'Url'] = req.originalUrl;
+					for (var j = 0; j < ff.length; j++) {
+						obj[ff[i]+'Url'] = obj[ff[i]+'Url'].replace('/'+ff[j],'');
+					}
+					obj[ff[i]+'Url'] += '/' + ff[i];
+					
+				}
+			}
+			return obj;
 		}
 		for (var i = 0; i < ff.length; i++) {
 			var words = require(translateFolder+'/'+ff[i]+'.js');
