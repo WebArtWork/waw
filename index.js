@@ -39,16 +39,28 @@ var run = function(){
 	// add check if this is waw project
 	var obj = {
 		script: __dirname+'/run/index.js',
-		ext: 'js json'
+		ext: 'js json html css'
 	}
 	obj.watch = [process.cwd()+'/server'];
 	var clientRoot = process.cwd()+'/client';
+	fse.mkdirsSync(clientRoot);
+	fse.mkdirsSync(process.cwd()+'/client');
+	obj.ignore = projectConfig.dererIgnore||[];
 	if (fs.existsSync(clientRoot + '/config.json')) {
 		var info = fse.readJsonSync(clientRoot + '/config.json', {
 			throws: false
 		});
 		for (var j = 0; j < info.router.length; j++) {
 			obj.watch.push(clientRoot + '/' + info.router[j].src);
+		}
+		if(Array.isArray(info.plugins)){			
+			for (var j = 0; j < info.plugins.length; j++) {
+				let pluginLoc = clientRoot + '/js/' + info.plugins[j];
+				fse.mkdirsSync(pluginLoc);
+				obj.ignore.push(pluginLoc+'/'+info.plugins[j]+'.js');
+				obj.ignore.push(pluginLoc+'/'+info.plugins[j]+'-min.js');
+				obj.watch.push(pluginLoc);
+			}
 		}
 	} else {
 		var pages = fs.readdirSync(process.cwd() + '/client').filter(function(file) {
@@ -67,7 +79,7 @@ var run = function(){
 			}
 		}
 	}
-	if(projectConfig.dererIgnore) obj.ignore = projectConfig.dererIgnore;
+	console.log('obj: ',obj);
 	nodemon(obj);
 }
 var serve = function(){
@@ -151,8 +163,6 @@ var restart = function(){
 		});
 	});
 }
-
-
 var adduser = function(){
 	config.user = process.argv[3];
 	fse.writeJsonSync(__dirname+'/config.json', config);
@@ -162,7 +172,6 @@ var listusers = function(){
 	if(!config.users) gu.close("You don't have any users");
 	gu.close(config.users);
 }
-
 if(process.argv[2]){
 	switch(process.argv[2].toLowerCase()){
 		// Waw User Management

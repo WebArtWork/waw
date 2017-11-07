@@ -291,6 +291,51 @@ module.exports = function(sd){
 		}
 		sd._app.set('views', engines);
 	/*
+	*	Plugins Management
+	*/
+		var jsRoot = clientRoot + '/js';
+		if(Array.isArray(info.plugins)){
+			var plugins = [];
+			for (var i = 0; i < info.plugins.length; i++) {
+				sd._fse.removeSync(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'.js');
+				sd._fse.removeSync(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'-min.js');
+				var files = sd._getFiles(jsRoot+'/'+info.plugins[i]);
+				let plugin = {
+					name: info.plugins[i],
+					html: [],
+					dep: '',
+					js: []
+				}
+				for (var j = files.length - 1; j >= 0; j--) {
+					if(sd._isEndOfStr(files[j], '.js')){
+						let file = files[j].slice(0, files[j].length-3);
+						plugin.dep+=(plugin.dep&&', '||'')+'"'+file+'"';
+						plugin.js.push(file);
+					}else if(sd._isEndOfStr(files[j], '.html')){
+						let file = files[j].slice(0, files[j].length-5);
+						plugin.dep+=(plugin.dep&&', '||'')+'"'+file+'"';
+						plugin.html.push(file);
+					}
+				}
+				let data = sd._fs.readFileSync(__dirname+'/js/plugin.js.js', 'utf8');
+				data=data.replace('NAME', plugin.name);
+				data=data.replace('MODULES', plugin.dep);
+				for (var j = 0; j < plugin.html.length; j++) {
+					let html = sd._fs.readFileSync(__dirname+'/js/plugin.html.js', 'utf8');
+					let htmlReplace = sd._fs.readFileSync(jsRoot+'/'+info.plugins[i]+'/'+plugin.html[j]+'.html', 'utf8');
+					html=html.replace('HTML', htmlReplace);
+					html=html.replace('FILE', plugin.html[j]);
+					html=html.replace('FILE', plugin.html[j]);
+					data+='\n'+html;
+				}
+				for (var j = 0; j < plugin.js.length; j++) {
+					let jsdata = sd._fs.readFileSync(jsRoot+'/'+info.plugins[i]+'/'+plugin.js[j]+'.js', 'utf8');
+					data+='\n'+jsdata;
+				}
+				sd._fs.writeFileSync(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'.js', data, 'utf8');
+			}
+		}
+	/*
 	*	End of Client Routing
 	*/
 }
