@@ -182,6 +182,7 @@ module.exports = function(sd){
 					
 				}
 			}
+			obj.user = req.user;
 			return obj;
 		}
 		for (var i = 0; i < ff.length; i++) {
