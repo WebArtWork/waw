@@ -79,7 +79,6 @@ var run = function(){
 			}
 		}
 	}
-	console.log('obj: ',obj);
 	nodemon(obj);
 }
 var serve = function(){
