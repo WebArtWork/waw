@@ -90,35 +90,34 @@ sd._app.use(sd._passport.initialize());
 sd._app.use(sd._passport.session());
 sd._app.set('view cache', true);
 
-
-
 sd._app.use(favicon(process.cwd() + sd._config.icon));
 
 // Socket Management
 sd._io = require('socket.io').listen(server);
-
-// var mongo = require('socket.io-adapter-mongo');
-// sd._io.adapter(mongo(sd._mongoUrl));
-
-// var passportSocketIo = require("passport.socketio");
-
-// sd._io.use(passportSocketIo.authorize({
-// 	passport: sd._passport,
-// 	cookieParser: cookieParser,
-// 	key: 'express.sid.'+sd._config.prefix,
-// 	secret: 'thisIsCoolSecretFromWaWFramework'+sd._config.prefix,
-// 	store: store,
-// 	success: function(data, accept) {
-// 		console.log('successful connection to socket.io');
-// 		accept();
-// 	},
-// 	fail: function(data, message, error, accept) {
-// 		console.log('error');
-// 		console.log(error);
-// 		console.log('failed connection to socket.io:', message);
-// 		accept();
-// 	}
-// }));
+sd._io_connections = [];
+sd._io.on('connection', function (socket) {
+	for (var i = 0; i < sd._io_connections.length; i++) {
+		if(typeof sd._io_connections[i] == 'function'){
+			sd._io_connections[i](socket);
+		}
+	}
+});
+var passportSocketIo = require("passport.socketio");
+sd._io.use(passportSocketIo.authorize({
+	passport: sd._passport,
+	cookieParser: cookieParser,
+	key: 'express.sid.'+sd._config.prefix,
+	secret: 'thisIsCoolSecretFromWaWFramework'+sd._config.prefix,
+	store: store,
+	success: function(data, accept) {
+		console.log('passport.socketio has successfully connected to socket.io');
+		accept();
+	},
+	fail: function(data, message, error, accept) {
+		console.log('passport.socketio has failed to connect with socket.io, with error: ', error, ' and meesage: ', meesage);
+		accept();
+	}
+}));
 
 require(__dirname + '/readAllParts')(sd);
 require(__dirname + '/readAllConfigs')(sd, function(){

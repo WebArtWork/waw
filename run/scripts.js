@@ -23,6 +23,18 @@ module.exports = function(sd){
 			if(req.user) next();
 			else res.json(false);
 		}
+		sd._ensureAdmin = function(req, res, next){
+			if(req.user&&req.user.isAdmin) next();
+			else res.json(false);
+		}
+		sd._ensureUrl = function(req, res, next){
+			if(req.user) next();
+			else res.redirect('/');
+		}
+		sd._ensureAdminUrl = function(req, res, next){
+			if(req.user&&req.user.isAdmin) next();
+			else res.redirect('/');
+		}
 		sd._nextAfterTimeout = function(req, res, next){
 			if(!req.session) return next();
 			req.session.ti=req.local.ti;

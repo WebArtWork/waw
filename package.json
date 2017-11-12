@@ -5,7 +5,7 @@
 		"framework",
 		"waw"
 	],
-	"version": "0.7.39",
+	"version": "0.8.0",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
 	"author": {
@@ -54,7 +54,6 @@
 		"request": "^2.83.0",
 		"serve-favicon": "^2.4.5",
 		"socket.io": "^2.0.4",
-		"socket.io-adapter-mongo": "^2.0.0",
 		"solr": "^0.3.0",
 		"svg-fontify": "0.0.9"
 	}

@@ -137,6 +137,10 @@ module.exports = function(sd){
 		sd._app.set('view cache', true);
 		sd._derer.setFilter('string',function(input){
 			return input&&input.toString()||'';
+		});		
+		sd._derer.setFilter('fixlink',function(link){
+			if(link.indexOf('//')>0) return link;
+			else return 'http://'+link;
 		});
 	/*
 	*	Translates

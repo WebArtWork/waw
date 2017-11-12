@@ -138,28 +138,28 @@ module.exports = function(sd, partJson) {
 				});
 			});
 		}
-	// Socket Management
-		/*
-		if (sd._fs.existsSync(schemaLoc)) {
-			sd._io.on('connection', function(socket) {
-				if (socket.request.user) {
-					Schema.find(sd['socket' + cname + 'q'] || {
-						moderators: socket.request.user._id
-					}, function(err, docs) {
-						if (!err&&docs){
-							docs.forEach(function(doc) {
-								socket.join(doc._id);
-							});
-						}
-					})
-					if(!sd.__userJoinedRoom){
-						sd.__userJoinedRoom=true;
-						socket.join(socket.request.user._id);
-					}
+	/*
+	*	Socket Register
+	*/
+	sd._io_connections.push(function(socket){
+		console.log(socket.request.user);
+		if (socket.request.user) {
+			Schema.find(sd['socket' + cname + 'q'] || {
+				moderators: socket.request.user._id
+			}, function(err, docs) {
+				console.log(docs);
+				if (!err && docs) {
+					docs.forEach(function(doc) {
+						socket.join(doc._id);
+					});
 				}
-			});
+			})
+			if (!sd.__userJoinedRoom) {
+				sd.__userJoinedRoom = true;
+				socket.join(socket.request.user._id);
+			}
 		}
-		*/
+	});
 	// End of Crud
 };
 // General prototypes
