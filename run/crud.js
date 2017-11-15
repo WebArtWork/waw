@@ -64,8 +64,24 @@ module.exports = function(sd, partJson) {
 			/*
 			*	Get Routes
 			*/
+				router.get("/get", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
+					console.log('called');
+
+
+					console.log(sd['sp'+name+'qg']&&sd['sp'+name+'qg'](req, res)||{
+						moderators: req.user._id
+					});
+
+
+					Schema.find(sd['sp'+name+'qg']&&sd['sp'+name+'qg'](req, res)||{
+						moderators: req.user._id
+					}, function(err, docs) {
+						console.log(docs);
+						res.json(docs || []);
+					});
+				});
 				router.post("/get", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
-					Schema.find(sd['sp'+name+'qg']||{
+					Schema.find(sd['sp'+name+'qg']&&sd['sp'+name+'qg'](req, res)||{
 						moderators: req.user._id
 					}, function(err, docs) {
 						res.json(docs || []);
