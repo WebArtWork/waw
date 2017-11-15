@@ -19,15 +19,7 @@ var install = function(name, vOrCB, cb, forceInstall, loc){
 		version: vOrCB,
 		path: loc,
 		forceInstall: true,
-	}, function(err){
-		if(err) console.log("You couldn't install package: "+name);
-		try {
-			require(name);
-		} catch (err) {
-			console.log("You couldn't use package: "+name);
-		}
-		cb();
-	});
+	}, cb);
 }
 module.exports.install = install;
 module.exports.i = install;

@@ -196,6 +196,55 @@ module.exports.initialize = function(url, branch){
 		});
 	}
 }
+module.exports.initializePlugin = function(url, branch){
+	if(url&&url.indexOf('@')>-1){
+		var name = url.split('/');
+		name = name[name.length-1].replace('.git','');
+		var dest = process.cwd()+'/'+name;
+	}else if(url){
+		var dest = process.cwd()+'/'+url;
+	}else{
+		gu.close('Please specify plugin name or repo link.');
+	}
+	fse.mkdirs(dest);
+	var config = fse.readJsonSync(dest+'/client/config.json', {
+		throws: false
+	})||{};
+	gu._serial([function(next){
+		var myRepo = git(dest);
+		myRepo.init(function(){
+			myRepo.addRemote('origin', 'git@github.com:WebArtWork/waw_angular_plugin.git', function(err){
+				myRepo.checkout('master', ['-b'], function(err) {
+					myRepo.pull('origin', 'master', function() {
+						fse.removeSync(dest+'/.git');
+						next();
+					});
+				});
+			});
+		});
+	}, function(next){
+		if(url&&url.indexOf('@')>-1){
+			fse.mkdirs(dest+'/client/js/'+name);
+			config.plugins = [name];
+			var repoPlugin = git(dest+'/client/js/'+name);
+			repoPlugin.init(function(){
+				repoPlugin.addRemote('origin', url, function(err){
+					repoPlugin.checkout(branch||'master', ['-b'], function(err) {
+						repoPlugin.pull('origin', branch||'master', next);
+					});
+				});
+			});
+		}else{
+			fse.mkdirs(dest+'/client/js/'+url);
+			config.plugins = [url];
+		}
+	}], function(){
+		gu.fse.writeJsonSync(dest+'/client/config.json', config, {
+			throws: false
+		});
+		gu.close('Plugin workground initialized.');
+	});
+}
 // General prototypes
 	String.prototype.capitalize = function(all) {
 		if (all) {

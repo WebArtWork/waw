@@ -142,7 +142,6 @@ module.exports = function(sd, partJson) {
 	*	Socket Register
 	*/
 	sd._io_connections.push(function(socket){
-		console.log(socket.request.user);
 		if (socket.request.user) {
 			Schema.find(sd['socket' + cname + 'q'] || {
 				moderators: socket.request.user._id
@@ -155,6 +154,7 @@ module.exports = function(sd, partJson) {
 				}
 			})
 			if (!sd.__userJoinedRoom) {
+				console.log(socket.request.user);
 				sd.__userJoinedRoom = true;
 				socket.join(socket.request.user._id);
 			}

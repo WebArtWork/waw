@@ -28,11 +28,13 @@ sd._app = sd._express();
 var server = require('http').Server(sd._app);
 var session = require('express-session');
 var mongoAuth = '';
-if(sd._config.mongo.user&&sd._config.mongo.pass){
-	mongoAuth = sd._config.mongo.user + ':' + sd._config.mongo.pass + '@';
+
+if(sd._config.mongo){
+	if(sd._config.mongo.user&&sd._config.mongo.pass){
+		mongoAuth = sd._config.mongo.user + ':' + sd._config.mongo.pass + '@';
+	}
+	sd._mongoUrl = 'mongodb://'+mongoAuth+(sd._config.mongo.host||'localhost')+':'+(sd._config.mongo.port||'27017')+'/'+(sd._config.mongo.db||'test');
 }
-sd._mongoUrl = 'mongodb://'+mongoAuth+(sd._config.mongo.host||'localhost')+':'+(sd._config.mongo.port||'27017')+'/'+(sd._config.mongo.db||'test');
-console.log(sd._mongoUrl);
 
 var favicon = require('serve-favicon');
 
@@ -53,10 +55,12 @@ sd._app.use(bodyParser.urlencoded({
 sd._app.use(bodyParser.json({
 	'limit': '50mb'
 }));
-
-var store = new(require("connect-mongo")(session))({
-	url: sd._mongoUrl
-});
+var store;
+if(sd._mongoUrl){
+	store = new(require("connect-mongo")(session))({
+		url: sd._mongoUrl
+	});
+}
 var sessionMaxAge = 365 * 24 * 60 * 60 * 1000;
 if(typeof sd._config.session == 'number'){
 	sessionMaxAge = sd._config.session;
@@ -114,7 +118,7 @@ sd._io.use(passportSocketIo.authorize({
 		accept();
 	},
 	fail: function(data, message, error, accept) {
-		console.log('passport.socketio has failed to connect with socket.io, with error: ', error, ' and meesage: ', meesage);
+		console.log('passport.socketio has failed to connect with socket.io, with error: ', error, ' and meesage: ', message);
 		accept();
 	}
 }));

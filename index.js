@@ -35,6 +35,8 @@ var run = function(){
 		console.log('This is not waw project');
 		process.exit();
 	}
+	fse.mkdirsSync(process.cwd()+'/server');
+	fse.mkdirsSync(process.cwd()+'/client');
 	var nodemon = require('../nodemon');
 	// add check if this is waw project
 	var obj = {
@@ -229,6 +231,10 @@ if(process.argv[2]){
 				run();
 			});
 			return;
+		case 'p':
+		case 'plugin':
+			return require(__dirname+'/build/git.js')
+			.initializePlugin(process.argv[3], process.argv[4], process.argv[5]);
 		case 'i':
 		case 'init':
 			return require(__dirname+'/build/git.js')
