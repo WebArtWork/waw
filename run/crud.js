@@ -65,18 +65,9 @@ module.exports = function(sd, partJson) {
 			*	Get Routes
 			*/
 				router.get("/get", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
-					console.log('called');
-
-
-					console.log(sd['sp'+name+'qg']&&sd['sp'+name+'qg'](req, res)||{
-						moderators: req.user._id
-					});
-
-
 					Schema.find(sd['sp'+name+'qg']&&sd['sp'+name+'qg'](req, res)||{
 						moderators: req.user._id
 					}, function(err, docs) {
-						console.log(docs);
 						res.json(docs || []);
 					});
 				});
@@ -148,6 +139,7 @@ module.exports = function(sd, partJson) {
 				}, function(err){
 					if(err) res.json(false);
 					else{
+						sd._fse.remove(process.cwd()+'/server/'+name+'/client/files/'+req.body._id);
 						sd._io.in(req.body._id).emit(cname+"Delete", req.body);
 						res.json(true);
 					}
