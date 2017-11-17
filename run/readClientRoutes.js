@@ -317,7 +317,7 @@ module.exports = function(sd){
 						plugin.js.push(file);
 					}else if(sd._isEndOfStr(files[j], '.html')){
 						let file = files[j].slice(0, files[j].length-5);
-						plugin.dep+=(plugin.dep&&', '||'')+'"'+file+'"';
+						plugin.dep+=(plugin.dep&&', '||'')+'"'+file+'.html"';
 						plugin.html.push(file);
 					}
 				}
