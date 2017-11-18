@@ -67,14 +67,7 @@ module.exports = function(sd, partJson) {
 				router.get("/get", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
 					Schema.find(sd['sp'+name+'qg']&&sd['sp'+name+'qg'](req, res)||{
 						moderators: req.user._id
-					}, function(err, docs) {
-						res.json(docs || []);
-					});
-				});
-				router.post("/get", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
-					Schema.find(sd['sp'+name+'qg']&&sd['sp'+name+'qg'](req, res)||{
-						moderators: req.user._id
-					}, function(err, docs) {
+					}).populate(sd['sp'+name+'qgp']&&sd['sp'+name+'qgp'](req, res)||{}).exec(function(err, docs) {
 						res.json(docs || []);
 					});
 				});
