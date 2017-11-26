@@ -9,6 +9,10 @@ var sd = {
 	_path: require('path'),
 	_config: {}
 };
+var derer  = require('derer');
+sd._swig = derer;
+sd._derer = derer;
+
 if (!sd._fs.existsSync(process.cwd()+'/config.json')) {
 	console.log('This is not waw project.');
 	return process.exit(0);

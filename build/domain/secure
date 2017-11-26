@@ -2,7 +2,7 @@ server {
   server_name NAME;
   listen 443;
   ssl on;
-  ssl_certificate    /etc/letsencrypt/live/NAME/cert.pem;
+  ssl_certificate    /etc/letsencrypt/live/NAME/fullchain.pem;
   ssl_certificate_key    /etc/letsencrypt/live/NAME/privkey.pem;
   location / {
     client_max_body_size 10M;

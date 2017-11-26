@@ -147,16 +147,14 @@ module.exports = function(sd, partJson) {
 			Schema.find(sd['socket' + cname + 'q'] || {
 				moderators: socket.request.user._id
 			}, function(err, docs) {
-				console.log(docs);
 				if (!err && docs) {
 					docs.forEach(function(doc) {
 						socket.join(doc._id);
 					});
 				}
 			})
-			if (!sd.__userJoinedRoom) {
-				console.log(socket.request.user);
-				sd.__userJoinedRoom = true;
+			if (!socket.request.user.__userJoinedRoom) {
+				socket.request.user.__userJoinedRoom = true;
 				socket.join(socket.request.user._id);
 			}
 		}

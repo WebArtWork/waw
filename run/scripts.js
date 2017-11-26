@@ -83,6 +83,8 @@ module.exports = function(sd){
 					return checkingObj[obj.place].splice(obj.val, 1);
 				}else if(Array.isArray(checkingObj[obj.place])&&obj.splice){
 					return checkingObj[obj.place].splice(obj.val, 1, obj.add);
+				}else if(Array.isArray(checkingObj[obj.place])&&typeof obj.save == 'number'){
+					return checkingObj[obj.place][obj.save] = obj.val;
 				}
 				return checkingObj[obj.place] = obj.val;
 			}

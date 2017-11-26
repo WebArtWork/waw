@@ -122,17 +122,14 @@ module.exports = function(sd){
 	/*
 	*	Derer
 	*/
-		var derer  = require('derer');
-		sd._swig = derer; // Delete this one day
-		sd._derer = derer;
 		var dererOpts = {
 			varControls: ['{{{', '}}}']
 		}
 		if(!sd._config.production){
 			dererOpts.cache = false;
 		}
-		derer.setDefaults(dererOpts);
-		sd._app.engine('html', derer.renderFile);
+		sd._derer.setDefaults(dererOpts);
+		sd._app.engine('html', sd._derer.renderFile);
 		sd._app.set('view engine', 'html');
 		sd._app.set('view cache', true);
 		sd._derer.setFilter('string',function(input){
