@@ -297,6 +297,19 @@ module.exports = function(sd){
 		var jsRoot = clientRoot + '/js';
 		var cssRoot = clientRoot + '/css';
 		sd._fse.mkdirs(cssRoot+'/plugins');
+		var wplugs = [{
+			name: 'wdrag',
+			repo: 'git@github.com:WebArtWork/wdrag.git'
+		},{
+			name: 'wcom',
+			repo: 'git@github.com:WebArtWork/wcom.git'
+		},{
+			name: 'wcrop',
+			repo: 'git@github.com:WebArtWork/wcrop.git'
+		},{
+			name: 'wmodal ',
+			repo: 'git@github.com:WebArtWork/wmodal.git'
+		}];
 		var compareCssFiles = function(injsfile, incssfile){
 			var mtjs, mtcss;
 			if (sd._fs.existsSync(injsfile)) {
@@ -320,10 +333,25 @@ module.exports = function(sd){
 				sd._fs.writeFileSync(injsfile, sd._fs.readFileSync(incssfile,'utf8'), 'utf8');
 			}
 		}
+		var createPlugin = function(plugin){
+			for (var i = 0; i < wplugs.length; i++) {
+				if(wplugs[i].name == plugin){
+					return sd._initRepo({
+						repo: wplugs[i].repo,
+						root: jsRoot+'/'+plugin
+					});
+				}
+			}
+			sd._fse.mkdirs(jsRoot+'/'+info.plugins[i]);
+		}
 		if(Array.isArray(info.plugins)&&info.plugins.length>0){
 			var plugins = [];
 			var includeCss = '';
 			for (var i = 0; i < info.plugins.length; i++) {
+				if(!sd._fs.existsSync(jsRoot+'/'+info.plugins[i])){
+					createPlugin(info.plugins[i]);
+					continue;
+				}
 				includeCss+='@import "plugins/'+info.plugins[i]+'";\r\n';
 				compareCssFiles(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'.scss', cssRoot+'/plugins/'+info.plugins[i]+'.scss');
 				sd._fse.removeSync(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'.js');

@@ -185,6 +185,15 @@ module.exports = function(sd){
 			return doc._id.toString() == id.toString();
 		}
 	/*
+	*	Git Management
+	*/
+		var git = require('gitty');
+		sd._initRepo = function(opts, cb){
+			if(!opts.root||!opts.repo) return cb&&cb();
+			sd._fse.mkdirs(opts.root);
+			git.clone(opts.root, opts.repo, {}, cb);
+		}
+	/*
 	*	End of support Scritping
 	*/
 }
