@@ -295,9 +295,37 @@ module.exports = function(sd){
 	*	Plugins Management
 	*/
 		var jsRoot = clientRoot + '/js';
-		if(Array.isArray(info.plugins)){
+		var cssRoot = clientRoot + '/css';
+		sd._fse.mkdirs(cssRoot+'/plugins');
+		var compareCssFiles = function(injsfile, incssfile){
+			var mtjs, mtcss;
+			if (sd._fs.existsSync(injsfile)) {
+				mtjs = sd._fs.statSync(injsfile).mtime;
+				mtjs = new Date(mtjs).getTime();
+			}
+			if (sd._fs.existsSync(incssfile)) {
+				mtcss = sd._fs.statSync(incssfile).mtime;
+				mtcss = new Date(mtcss).getTime();
+			}
+			if(!mtjs&&!mtcss){
+				sd._fs.writeFileSync(injsfile, '', 'utf8');
+				sd._fs.writeFileSync(incssfile, '', 'utf8');
+			}else if(!mtjs){
+				sd._fs.writeFileSync(injsfile, sd._fs.readFileSync(incssfile,'utf8'), 'utf8');
+			}else if(!mtcss){
+				sd._fs.writeFileSync(incssfile, sd._fs.readFileSync(injsfile,'utf8'), 'utf8');
+			}else if(mtjs>mtcss){
+				sd._fs.writeFileSync(incssfile, sd._fs.readFileSync(injsfile,'utf8'), 'utf8');
+			}else if(mtjs<mtcss){
+				sd._fs.writeFileSync(injsfile, sd._fs.readFileSync(incssfile,'utf8'), 'utf8');
+			}
+		}
+		if(Array.isArray(info.plugins)&&info.plugins.length>0){
 			var plugins = [];
+			var includeCss = '';
 			for (var i = 0; i < info.plugins.length; i++) {
+				includeCss+='@import "plugins/'+info.plugins[i]+'";\r\n';
+				compareCssFiles(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'.scss', cssRoot+'/plugins/'+info.plugins[i]+'.scss');
 				sd._fse.removeSync(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'.js');
 				sd._fse.removeSync(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'-min.js');
 				var files = sd._getFiles(jsRoot+'/'+info.plugins[i]);
@@ -335,6 +363,7 @@ module.exports = function(sd){
 				}
 				sd._fs.writeFileSync(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'.js', data, 'utf8');
 			}
+			sd._fs.writeFileSync(cssRoot+'/plugins.scss', includeCss, 'utf8');
 		}
 	/*
 	*	End of Client Routing
