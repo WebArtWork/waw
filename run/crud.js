@@ -65,9 +65,15 @@ module.exports = function(sd, partJson) {
 			*	Get Routes
 			*/
 				router.get("/get", sd['sp'+name+'ensure']||sd._next, function(req, res) {
-					Schema.find(sd['sp'+name+'qg']&&sd['sp'+name+'qg'](req, res)||{
+					let populate = sd['sp'+name+'qgp']&&sd['sp'+name+'qgp'](req, res)||false;
+					let query = sd['sp'+name+'qg']&&sd['sp'+name+'qg'](req, res)||{
 						moderators: req.user._id
-					}).populate(sd['sp'+name+'qgp']&&sd['sp'+name+'qgp'](req, res)||{}).exec(function(err, docs) {
+					};
+					query = Schema.find(query);
+					if(populate){
+						query.populate(populate);
+					}
+					query.exec(function(err, docs) {
 						res.json(docs || []);
 					});
 				});

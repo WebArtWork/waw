@@ -307,8 +307,11 @@ module.exports = function(sd){
 			name: 'wcrop',
 			repo: 'git@github.com:WebArtWork/wcrop.git'
 		},{
-			name: 'wmodal ',
+			name: 'wmodal',
 			repo: 'git@github.com:WebArtWork/wmodal.git'
+		},{
+			name: 'wedit',
+			repo: 'git@github.com:WebArtWork/wedit.git'
 		}];
 		var compareCssFiles = function(injsfile, incssfile){
 			var mtjs, mtcss;
@@ -342,7 +345,7 @@ module.exports = function(sd){
 					});
 				}
 			}
-			sd._fse.mkdirs(jsRoot+'/'+info.plugins[i]);
+			sd._fse.mkdirs(jsRoot+'/'+plugin);
 		}
 		if(Array.isArray(info.plugins)&&info.plugins.length>0){
 			var plugins = [];
