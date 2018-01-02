@@ -342,6 +342,8 @@ module.exports = function(sd){
 					return sd._initRepo({
 						repo: wplugs[i].repo,
 						root: jsRoot+'/'+plugin
+					}, function(){
+						sd._fse.remove(jsRoot+'/'+plugin+'/.git');
 					});
 				}
 			}

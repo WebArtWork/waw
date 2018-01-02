@@ -58,7 +58,7 @@ var run = function(){
 		if(Array.isArray(info.plugins)){			
 			for (var j = 0; j < info.plugins.length; j++) {
 				let pluginLoc = clientRoot + '/js/' + info.plugins[j];
-				fse.mkdirsSync(pluginLoc);
+				//fse.mkdirsSync(pluginLoc);
 				obj.ignore.push(pluginLoc+'/'+info.plugins[j]+'.js');
 				obj.ignore.push(pluginLoc+'/'+info.plugins[j]+'-min.js');
 				obj.watch.push(pluginLoc);

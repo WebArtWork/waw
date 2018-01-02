@@ -12,7 +12,7 @@ app.config(function ($translateProvider) {
 	$translateProvider.preferredLanguage(langs[0]);
 	$translateProvider.useSanitizeValueStrategy('sanitizeParameters');
 	$translateProvider.useMissingTranslationHandler('missingTranslate');
-}).factory('missingTranslate', function() {
+}).factory('missingTranslate', function($http) {
 	var wordsToAdd = [];
 	return function(word) {
 		for (var i = 0; i < wordsToAdd.length; i++) {
@@ -24,7 +24,7 @@ app.config(function ($translateProvider) {
 			lang: lang
 		});
 	};
-}).service('translate', function($translate, $http){
+}).service('translate', function($translate){
 	this.set = function(_lang){
 		for (var i = 0; i < langs.length; i++) {
 			if(langs[i]==_lang){

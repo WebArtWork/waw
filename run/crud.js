@@ -5,6 +5,7 @@ module.exports = function(sd, partJson) {
 		var schemaLoc = process.cwd() + '/server/' + name + '/schema.js';
 		if (sd._fs.existsSync(schemaLoc)) {
 			var Schema = require(schemaLoc);
+			if(partJson.schema) Schema=Schema[partJson.schema];
 			sd[cname] = Schema;
 		}else return;
 	// SOLR
@@ -130,6 +131,25 @@ module.exports = function(sd, partJson) {
 			for (var i = 0; i < partJson.crud.updates.length; i++) {
 				updateRoute(partJson.crud.updates[i]);
 			}
+			var updateRouteAll = function(update){
+				router.post("/update/all"+update.name, sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
+					Schema.findOne(sd['sp'+name+'qa'+update.name]&&sd['sp'+name+'qa'+update.name](req,res)||{
+						_id: req.body._id,
+						moderators: req.user._id
+					}, function(err, doc){
+						if(err||!doc) return res.json(false);
+						for (var i = 0; i < update.keys.length; i++) {
+							doc[update.keys[i]] = req.body[update.keys[i]];
+						}
+						doc.save(function(){
+							res.json(doc);
+						});
+					});
+				});
+			}
+			for (var i = 0; i < partJson.crud.updatesAll.length; i++) {
+				updateRouteAll(partJson.crud.updatesAll[i]);
+			}
 			// delete
 			router.post("/delete", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
 				Schema.remove(sd['sp'+name+'r']||{
@@ -158,7 +178,7 @@ module.exports = function(sd, partJson) {
 						socket.join(doc._id);
 					});
 				}
-			})
+			});
 			if (!socket.request.user.__userJoinedRoom) {
 				socket.request.user.__userJoinedRoom = true;
 				socket.join(socket.request.user._id);
