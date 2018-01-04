@@ -128,8 +128,10 @@ module.exports = function(sd, partJson) {
 					});
 				});
 			}
-			for (var i = 0; i < partJson.crud.updates.length; i++) {
-				updateRoute(partJson.crud.updates[i]);
+			if(partJson.crud.updates){
+				for (var i = 0; i < partJson.crud.updates.length; i++) {
+					updateRoute(partJson.crud.updates[i]);
+				}
 			}
 			var updateRouteAll = function(update){
 				router.post("/update/all"+update.name, sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
@@ -147,8 +149,10 @@ module.exports = function(sd, partJson) {
 					});
 				});
 			}
-			for (var i = 0; i < partJson.crud.updatesAll.length; i++) {
-				updateRouteAll(partJson.crud.updatesAll[i]);
+			if(partJson.crud.updatesAll){
+				for (var i = 0; i < partJson.crud.updatesAll.length; i++) {
+					updateRouteAll(partJson.crud.updatesAll[i]);
+				}
 			}
 			// delete
 			router.post("/delete", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
