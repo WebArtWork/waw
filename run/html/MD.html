@@ -1,0 +1,6 @@
+{% for file in files %}
+<div>
+	<h1 title="{{{file.loc}}}">{{{file.file}}}</h1>
+	<p>{{{file.text|safe}}}</p>
+</div>
+{% endfor %}

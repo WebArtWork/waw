@@ -7,6 +7,7 @@ var sd = {
 	_fse: require('fs-extra'),
 	_git: require('gitty'),
 	_path: require('path'),
+	_readdir: require('recursive-readdir'),
 	_config: {}
 };
 var derer  = require('derer');
