@@ -52,6 +52,10 @@ module.exports = function(sd){
 			sd._app.use(api, router);
 			return router;
 		}
+		sd._ensureLocalhost = function(req, res, next){
+			if(req.host.toLowerCase()=='localhost') next();
+			else res.redirect('/');
+		}
 	/*
 	*	Crud Use
 	*/

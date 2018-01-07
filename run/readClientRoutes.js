@@ -150,12 +150,13 @@ module.exports = function(sd){
 			var file = {
 				text: converter.makeHtml(text),
 				loc: loc,
-				file: locs[locs.length-1]
+				file: locs[locs.length-1].split('.')[0]
 			}
     		return file;
 		}
 		var getTemplate = function(_root, cb){
 			sd._readdir(_root, function(err, files){
+				files.sort();
 				var _files = [];
 				for (var i = 0; i < files.length; i++) {
 					if(sd._isEndOfStr(files[i].toLowerCase(), '.md')){
@@ -170,19 +171,19 @@ module.exports = function(sd){
 				files: req.body.files
 			}));
 		}
-		sd._app.get("/waw/docs", function(req, res, next) {
+		sd._app.get("/waw/docs", sd._ensureLocalhost, function(req, res, next) {
 			getTemplate(__dirname, function(files){
 				req.body.files = files;
 				next();
 			});
 		}, renderDocs);
-		sd._app.get("/waw/cdocs", function(req, res, next) {
+		sd._app.get("/waw/cdocs", sd._ensureLocalhost, function(req, res, next) {
 			getTemplate(process.cwd()+'/client', function(files){
 				req.body.files = files;
 				next();
 			});
 		}, renderDocs);
-		sd._app.get("/waw/sdocs", function(req, res, next) {
+		sd._app.get("/waw/sdocs", sd._ensureLocalhost, function(req, res, next) {
 			getTemplate(process.cwd()+'/server', function(files){
 				req.body.files = files;
 				next();

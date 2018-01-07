@@ -5,12 +5,11 @@ var Schema = mongoose.Schema({
 	author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
 	moderators: [{
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'User',
-		unique: true
-	}],
+		ref: 'User'
+	}]
 });
 
-Schema.methods.create = function(obj, user) {
+Schema.methods.create = function(obj, user, sd) {
 	this.author = user._id;
 	this.moderators = [user._id];
 	this.name = obj.name;
