@@ -1,6 +1,21 @@
-{% for file in files %}
-<div>
-	<h1 title="{{{file.loc}}}">{{{file.file}}}</h1>
-	<p>{{{file.text|safe}}}</p>
-</div>
-{% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link href='http://fonts.googleapis.com/css?family=Old+Standard+TT:400,400italic,700' rel='stylesheet' type='text/css'>
+  	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,600' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="foundation.css">
+	<link rel="stylesheet" href="custom.css">
+</head>
+<body>
+	<div class="md-box">
+		{% for file in files %}
+		<div>
+			<h1 title="{{{file.loc}}}">{{{file.file}}}</h1>
+			<p>{{{file.text|safe}}}</p>
+		</div>
+		{% endfor %}
+	</div>
+</body>
+</html>
