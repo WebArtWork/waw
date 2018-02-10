@@ -1,0 +1,43 @@
+//This file contains all application-wide Sass mixins and placeholders
+
+// if we need cut text 
+@mixin truncate($truncate-width, $overflow: ellipsis) {
+	max-width: $truncate-width;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: $overflow; // values are: clip, ellipsis, or a string
+}
+
+// vertical align middle
+@mixin ghostVA() {
+	&:before {
+		content: '';
+		display: inline-block;
+		vertical-align: middle;
+		height: 100%;
+		width: .1px;
+	}
+}
+
+/// Shorthand mixin for offset positioning
+/// @param {String} $position - Either `relative`, `absolute` or `fixed`
+/// @param {Length} $top [null] - Top offset
+/// @param {Length} $right [null] - Right offset
+/// @param {Length} $bottom [null] - Bottom offset
+/// @param {Length} $left [null] - Left offset
+@mixin position($position, $top: null, $right: null, $bottom: null, $left: null) {
+  position: $position;
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+}
+
+// clearfix
+@mixin clearfix {
+  &::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+}

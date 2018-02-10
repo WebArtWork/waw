@@ -2,14 +2,9 @@ var sd = {
 	_express: require('express'),
 	_passport: require('passport'),
 	_mongoose: require('mongoose'),
-	_package: require(__dirname+'/../package'),
-	_fs: require('fs'),
-	_fse: require('fs-extra'),
-	_git: require('gitty'),
-	_path: require('path'),
-	_readdir: require('recursive-readdir'),
 	_config: {}
 };
+require(__dirname+'/../sd')(sd);
 var derer  = require('derer');
 sd._swig = derer;
 sd._derer = derer;
@@ -25,8 +20,6 @@ if (sd._fs.existsSync(process.cwd()+'/server.json')) {
 		sd._config[key] = extra[key];
 	}
 }
-
-require(__dirname + '/scripts')(sd);
 
 sd._app = sd._express();
 
@@ -128,13 +121,8 @@ sd._io.use(passportSocketIo.authorize({
 	}
 }));
 
-require(__dirname + '/readAllParts')(sd);
-require(__dirname + '/readAllConfigs')(sd, function(){
-	require(__dirname + '/readAllModules')(sd, function(){
-		require(__dirname + '/readAllRoutes')(sd);
-		require(__dirname + '/readClientRoutes')(sd);
-
-		server.listen(sd._config.port || 8080);
-		console.log("App listening on port " + (sd._config.port || 8080));
-	});
+require(__dirname + '/server')(sd, function(){
+	require(__dirname + '/client')(sd);
+	server.listen(sd._config.port || 8080);
+	console.log("App listening on port " + (sd._config.port || 8080));
 });

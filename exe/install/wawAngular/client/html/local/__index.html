@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html ng-app="ngapp">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	{% block header %}
+		<title>WAW Framework</title>
+		<meta name="description" content="Initial waw client under angular 1.x and scss.">
+		<meta name="keywords" content="waw, waw framework">
+		<meta name="author" content="Honchar Denys">
+	{% endblock %}
+	<link rel="stylesheet" type="text/css" href="/css/index.css">
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-78236546-11"></script>
+	<script>
+	window.dataLayer = window.dataLayer || [];
+
+	function gtag() { dataLayer.push(arguments); }
+	gtag('js', new Date());
+
+	gtag('config', 'UA-78236546-11');
+	</script>
+
+</head>
+<body>
+	<box>
+		<row style="height: 50px;">
+			{% block topbar %}
+			<box>
+				<lma><a href="/">WAW LOGO</a></lma>
+				{% if !user %}
+					<cma style="width: 100px;"><a href="/Login">Login</a></cma>
+					<cma style="width: 100px;"><a href="/Sign">Sign Up</a></cma>
+				{% endif %}
+				{% if user&&user.isAdmin %}
+					<cma style="width: 100px;"><a href="/Admin">Admin</a></cma>
+				{% endif %}
+				{% if user %}
+					<cma style="width: 200px;">
+						<box>
+							<cma style="width: 50px;">
+								<img src="{{{user.avatarUrl}}}" alt="User Face" style="position: absolute; height: 100%; left: 0px; top: 0px;">
+							</cma>
+							<cma style="width: 150px;">User Name</cma>
+						</box>
+						<!-- <box>
+							<row><a href="/Profile">Profile</a></row>
+							<row><a href="/api/user/logout">Log out</a></row>
+						</box> -->
+					</cma>
+				{% endif %}
+			</box>
+			{% endblock %}
+		</row>
+		<row>
+			{% block body %}{% endblock %}
+		</row>
+	</box>
+	<!-- Script -->
+	{% block script %}
+		<script src="/gen/public-min.js"></script>
+		<script>
+			var app = angular.module('ngapp',[]);
+		</script>
+		<script src="/js/crud.js"></script>
+		<script src="/js/local.js"></script>
+	{% endblock %}
+</body>
+</html>

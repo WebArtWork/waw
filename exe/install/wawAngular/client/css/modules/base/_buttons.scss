@@ -1,0 +1,155 @@
+.btn {
+    position: relative;
+
+    display: inline-block;
+
+    min-width: 100px;
+    padding: 0.7em 1em;
+    margin-bottom: 1em;
+
+    cursor: pointer;
+    text-align: center;
+    vertical-align: top;
+    letter-spacing: 1px;
+    line-height: 1;
+
+    font-family: $ff-title;
+    font-size: $fs-s;
+
+    color: $white;
+    border: none;
+    border-radius: 2px;
+    background: $primary;
+    transition: all 0.3s;
+    &:hover, &:focus {
+        background: $primary-d;
+    }
+
+    .icon {
+        margin-right: 0.75em;
+    }
+
+    // disabled
+    &.m_disabled {
+        cursor: not-allowed;
+
+        opacity: 0.3;
+        background: $black;
+    }
+    &.m_danger {
+        background: $danger;
+        &:hover {
+            background: $danger-d;
+        }
+    }
+
+    // transparent button wuth border
+    &.m_transparent {
+        box-shadow: inset 0 0 0 2px $primary;
+        color: $primary;
+        background: transparent !important;
+        &:hover {
+            box-shadow: inset 0 0 0 2px $primary-d;
+            color: $primary-d;
+        }
+        &.m_accent {
+            box-shadow: inset 0 0 0 2px $accent;
+            color: $accent;
+            &:hover {
+                box-shadow: inset 0 0 0 2px $accent-d;
+            color: $accent-d;
+            }
+        }
+        &.m_danger {
+            box-shadow: inset 0 0 0 2px $danger;
+            color: $danger;
+            &:hover {
+                box-shadow: inset 0 0 0 2px $danger-d;
+            color: $danger-d;
+            }
+        }
+        &.m_black {
+            box-shadow: inset 0 0 0 2px $black;
+            color: $black;
+            &:hover {
+                box-shadow: inset 0 0 0 2px $black-d;
+            color: $black-d;
+            }
+        }
+        &.m_gray {
+            box-shadow: inset 0 0 0 2px $gray;
+            color: $gray;
+            &:hover {
+                box-shadow: inset 0 0 0 2px $gray-d;
+            color: $gray-d;
+            }
+        }
+        &.m_disabled {
+            box-shadow: inset 0 0 0 2px $black;
+            color: $black;
+            &:hover {
+                box-shadow: inset 0 0 0 2px $black;
+                color: $black;
+            }
+
+        }
+    }
+
+    // only icon
+    &.m_icon {
+        min-width: auto;
+        i {
+            margin-right: 0;
+        }
+    }
+
+    // only icon
+    &.m_ricon {
+        min-width: auto;
+        width: 2.45em;
+        height: 2.45em;
+        border-radius: 50%;
+        padding: 0; 
+        i {
+            margin-right: 0;
+        }
+    }
+
+    // accent color
+    &.m_accent {
+        background: $accent;
+        &:hover {
+            background: $accent-d;
+        }
+    }
+
+    // danger color
+    &.m_danger {
+        background: $danger;
+        &:hover {
+            background: $danger-d;
+        }
+    }
+
+    // black color
+    &.m_black {
+        background: $black;
+        &:hover {
+            background: $black-d;
+        }
+    }
+
+    // gray color
+    &.m_gray {
+        background: $gray;
+        &:hover {
+            background: $gray-d;
+        }
+    }
+    &.m_big {
+        font-size: $fs;
+    }
+    &.m_small {
+        font-size: $fs-xs;
+    }
+}

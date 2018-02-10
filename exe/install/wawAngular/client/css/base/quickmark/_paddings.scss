@@ -1,0 +1,80 @@
+//paddings
+.p {
+    padding: $space;
+}
+
+.pt {
+    padding-top: $space;
+}
+
+.pr {
+    padding-right: $space;
+}
+
+.pb {
+    padding-bottom: $space;
+}
+
+.pl {
+    padding-left: $space;
+}
+
+.p2 {
+    padding: $space * 2;
+}
+
+.pt2 {
+    padding-top: $space * 2;
+}
+
+.pr2 {
+    padding-right: $space * 2;
+}
+
+.pb2 {
+    padding-bottom: $space * 2;
+}
+
+.pl2 {
+    padding-left: $space * 2;
+}
+
+.p05 {
+    padding: $space / 2;
+}
+
+.pt05 {
+    padding-top: $space / 2;
+}
+
+.pr05 {
+    padding-right: $space / 2;
+}
+
+.pb05 {
+    padding-bottom: $space / 2;
+}
+
+.pl05 {
+    padding-left: $space / 2;
+}
+
+.p0 {
+    padding: 0;
+}
+
+.pt0 {
+    padding-top: 0;
+}
+
+.pr0 {
+    padding-right: 0;
+}
+
+.pb0 {
+    padding-bottom: 0;
+}
+
+.pl0 {
+    padding-left: 0;
+}

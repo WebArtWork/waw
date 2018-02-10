@@ -1,0 +1,10 @@
+{
+	"name": "Pgen",
+	"router": [{
+		"name": "Basic",
+		"src": "router.js"
+	}],
+	"solr": true,
+	"dependencies": {
+	}
+}

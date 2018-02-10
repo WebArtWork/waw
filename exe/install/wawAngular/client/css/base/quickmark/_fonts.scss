@@ -1,0 +1,60 @@
+//text align
+.ta-c {
+    text-align: center;
+}
+
+.ta-l {
+    text-align: left;
+}
+
+.ta-r {
+    text-align: right;
+}
+
+// font sizes
+
+.fs-xs {
+    font-size: $fs-xs;
+}
+
+.fs-s {
+    font-size: $fs-s;
+}
+
+.fs {
+    font-size: $fs;
+}
+
+.fs-l {
+    font-size: $fs-l;
+}
+
+.fs-xl {
+    font-size: $fs-xl;
+}
+
+.fs-xxl {
+    font-size: $fs-xl;
+}
+
+.fs-xxxl {
+    font-size: $fs-xl;
+}
+
+// font family
+.ff-title {
+    font-family: $ff-title;
+    font-weight: 600;
+}
+
+.ff-base {
+    font-family: $ff-base;
+}
+// zero sizes
+.lh0 {
+    line-height: 0;
+}
+
+.fs0 {
+    font-size: 0;
+}

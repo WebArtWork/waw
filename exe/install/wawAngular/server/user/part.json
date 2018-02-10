@@ -1,0 +1,16 @@
+{
+	"name": "User",
+	"router": [{
+		"name": "Basic",
+		"src": "router.js"
+	}, {
+		"name": "Auth",
+		"src": "auth.js"
+	}],
+	"dependencies": {
+		"passport-local": "*",
+		"bcrypt-nodejs": "*",
+		"mongoose": "*",
+		"async": "*"
+	}
+}
