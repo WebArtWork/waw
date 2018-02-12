@@ -5,7 +5,7 @@
 		"framework",
 		"waw"
 	],
-	"version": "0.9.0",
+	"version": "0.9.1",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
 	"author": {
@@ -18,7 +18,8 @@
 			"name": "Sikora Serg",
 			"email": "sikorasergii@gmail.com",
 			"url": "https://github.com/SikoraSergii"
-		}, {
+		},
+		{
 			"name": "Andriy Momot",
 			"email": "Anrehecil@gmail.com",
 			"url": "https://github.com/Anrehecil"
