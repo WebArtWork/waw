@@ -5,12 +5,16 @@ Framework Build to support every platform and many different technologies. On Mo
 [Node.js](https://nodejs.org) is the main key of the framework, something that's it's built on. To work with framework you have to install it on your environment.
 
 ## Installtion
+```
 npm i -g waw
+```
 
 ### Packages required globally
+```
 npm i -g npmi
 npm i -g pm2
 npm i -g nodemon
+```
 
 
 ## Client Side

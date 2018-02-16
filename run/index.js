@@ -2,6 +2,7 @@ var sd = {
 	_express: require('express'),
 	_passport: require('passport'),
 	_mongoose: require('mongoose'),
+	_request: require('request'),
 	_config: {}
 };
 require(__dirname+'/../sd')(sd);
@@ -27,6 +28,9 @@ var server = require('http').Server(sd._app);
 var session = require('express-session');
 var mongoAuth = '';
 
+var favicon = require('serve-favicon');
+sd._app.use(favicon(process.cwd() + sd._config.icon));
+
 if(sd._config.mongo){
 	if(sd._config.mongo.user&&sd._config.mongo.pass){
 		mongoAuth = sd._config.mongo.user + ':' + sd._config.mongo.pass + '@';
@@ -34,16 +38,11 @@ if(sd._config.mongo){
 	sd._mongoUrl = 'mongodb://'+mongoAuth+(sd._config.mongo.host||'localhost')+':'+(sd._config.mongo.port||'27017')+'/'+(sd._config.mongo.db||'test');
 }
 
-var favicon = require('serve-favicon');
-
 var cookieParser = require('cookie-parser');
 sd._app.use(cookieParser());
 
 var methodOverride = require('method-override');
 sd._app.use(methodOverride('X-HTTP-Method-Override'));
-
-var morgan = require('morgan');
-sd._app.use(morgan('dev'));
 
 var bodyParser = require('body-parser');
 sd._app.use(bodyParser.urlencoded({
@@ -92,7 +91,6 @@ sd._app.use(sd._passport.initialize());
 sd._app.use(sd._passport.session());
 sd._app.set('view cache', true);
 
-sd._app.use(favicon(process.cwd() + sd._config.icon));
 
 // Socket Management
 sd._io = require('socket.io').listen(server);
