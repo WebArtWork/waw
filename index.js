@@ -211,6 +211,7 @@ if(process.argv[2]){
 		case 'u':
 		case 'update':
 			require(exe+'/update').project(process.argv[3], function(){
+				should_have_pm2();
 				restart();
 			});
 			return;
@@ -221,6 +222,7 @@ if(process.argv[2]){
 		case 'lupdate':
 			should_have_nodemon();
 			require(exe+'/git.js').project(process.argv[3], function(){
+				should_have_nodemon();
 				run();
 			});
 			return;

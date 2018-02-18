@@ -16,6 +16,7 @@ module.exports = function(sd){
 		sd._git = require('gitty');
 		sd._path = require('path');
 		sd._readdir = require('recursive-readdir');
+		sd._cmd = require('node-cmd');
 	/*
 	*	Framework Support
 	*/

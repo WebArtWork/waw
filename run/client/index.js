@@ -9,20 +9,21 @@ module.exports = function(sd){
 			var url = req.originalUrl.toLowerCase();
 			if(url.indexOf('/api/')>-1) return next();
 			if(url.indexOf('/waw/')>-1) return next();
+			if(url.indexOf('/sockjs-node/')>-1) return res.redirect('localhost:'+sd._config.angular.localhost+req.originalUrl);
 			if(islocal){
 				for (var i = 0; i < ext.length; i++) {
 					if( sd._isEndOfStr(req.originalUrl.split('?')[0], ext[i]) ) {
 						for (var j = 0; j < folders.length; j++) {
 							if(req.originalUrl.indexOf(folders[j])>-1){
 								return sd._request('http://localhost:'+sd._config.angular.localhost+req.originalUrl.split('?')[0], function(err, resp){
-									res.send(resp.body);
+									resp&&res.send(resp.body);
 								});
 							}
 						}
 					}
 				}
 				sd._request('http://localhost:'+sd._config.angular.localhost, function(err, resp){
-					res.send(resp.body);
+					resp&&res.send(resp.body);
 				});
 			}else{
 				for (var i = 0; i < ext.length; i++) {
