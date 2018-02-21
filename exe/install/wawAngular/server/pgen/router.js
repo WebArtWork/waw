@@ -13,10 +13,12 @@ module.exports = function(sd) {
 		var res = opt.res;
 		var host = req.get('host');
 		if(req.originalUrl.indexOf('/api/')>-1) return next();
-		for (var i = 0; i < sd._pages.length; i++) {
-			if(sd._pages[i].url.toLowerCase() == req.originalUrl.toLowerCase()){
-				var d = sd._derer.renderFile(__dirname+'/client/index.html', sd._pages[i]);
-				return res.send(d);
+		if(sd._pages){
+			for (var i = 0; i < sd._pages.length; i++) {
+				if(sd._pages[i].url.toLowerCase() == req.originalUrl.toLowerCase()){
+					var d = sd._derer.renderFile(__dirname+'/client/index.html', sd._pages[i]);
+					return res.send(d);
+				}
 			}
 		}
 		next();

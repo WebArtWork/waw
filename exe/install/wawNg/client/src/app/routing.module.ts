@@ -11,16 +11,13 @@ import { ProfileComponent } from './user/profile/profile.component';
 const app_routing: Routes = [
   {
     path: 'admin', 
-    children: [
-      { path: 'users', component: UsersComponent },
-      { path: 'profile', component: MyAdminProfileComponent }
-    ]
+    loadChildren: 'app/admin/admin.module#AdminModule'
   },
+  {
+    path: 'user', 
+    loadChildren: 'app/user/user.module#UserModule'
+  }
   
-  { path: 'explore', component: ExploreComponent },
-  { path: 'myProfile', component: MyProfileComponent },
-  { path: 'mySetting', component: MySettingComponent },
-  { path: 'profile', component: ProfileComponent },
 ];
 
 @NgModule({

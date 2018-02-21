@@ -6,9 +6,7 @@ module.exports = function(sd) {
 	*/
 		var router = sd._initRouter('/api/user');
 		if(mongoose.connection.readyState==0){
-			mongoose.connect(sd._mongoUrl, {
-				useMongoClient: true
-			});
+			mongoose.connect(sd._mongoUrl);
 			mongoose.Promise = global.Promise;
 		}
 		sd._passport.serializeUser(function(user, done) {

@@ -12,9 +12,7 @@ import { AdminModule } from './admin/admin.module';
   ],
   imports: [
     BrowserModule,
-    RoutingModule,
-    UserModule,
-    AdminModule
+    RoutingModule
     
   ],
   providers: [],
