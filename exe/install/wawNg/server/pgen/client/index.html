@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{{{title}}}</title>
+	<meta name="description" content="{{{description}}}">
+	<meta name="keywords" content="{{{keywords}}}">
+	<meta name="author" content="{{{author}}}">
+	{% for link in cssFiles %}
+	<link rel="stylesheet" type="text/css" href="{{{link}}}">
+	{% endfor %}
+</head>
+<body>
+	{{{html|safe}}}
+</body>
+</html>

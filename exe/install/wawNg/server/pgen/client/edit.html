@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html ng-app="ngapp">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>WAW Framework</title>
+	<meta name="description" content="Initial waw client under angular 1.x and scss.">
+	<meta name="keywords" content="waw, waw framework">
+	<meta name="author" content="Honchar Denys">
+
+	<!-- this should be the only link we call to use this page -->
+	<link rel="stylesheet" href="/css/editor.css">
+
+	<!-- below should be moved to editor.css -->
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/meditor.css">
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.2.2/css/foundation.min.css" rel="stylesheet" type="text/css">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+	<box ng-controller="MainCtrl">
+		<cel>
+    		<p meditor ng-model="model.text"></p>
+		</cel>
+		<cel>
+			<scroll>
+				<box>
+					<row>
+						<label>
+							<h3>Title</h3>
+							<input type="text" ng-model="page.title">
+						</label>
+					</row>
+					<row>
+						<label>
+							<h3>Description</h3>
+							<textarea type="text" ng-model="page.description"></textarea>
+						</label>
+					</row>
+					<row>
+						<label>
+							<h3>Keywords</h3>
+							<textarea type="text" ng-model="page.keywords"></textarea>
+						</label>
+					</row>
+					<!-- links_translates -->
+					<row>
+						<button ng-click="links_translates.push({});">Add new translated link</button>
+					</row>
+					<row ng-repeat="trans in links_translates">
+						<label>
+							<h3>Keywords</h3>
+							<textarea type="text" ng-model="page.keywords"></textarea>
+						</label>
+						<label>
+							<h3>Keywords</h3>
+							<textarea type="text" ng-model="page.keywords"></textarea>
+						</label>
+						<button>Delete</button>
+					</row>
+				</box>
+			</scroll>
+		</cel>
+	</box>
+
+	<script src="/gen/pgen-min.js"></script>
+	<script>
+		var app = angular.module('ngapp',['angular-meditor']).controller('MainCtrl', function($scope, $rootScope, $http) {
+			'use strict';
+
+			var model = $scope.model = {};
+			model.text = 'angular-meditor using ng-model.';
+
+			return $rootScope.$on('$routeChangeSuccess', function() {});
+		});
+
+	</script>
+</body>
+</html>
