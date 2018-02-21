@@ -1,0 +1,270 @@
+{% extends 'render.html' %}
+
+{% block header %}
+	<title>Good_Life</title>
+	<meta name="description" content="Webpage of Good_Life">
+	<meta name="keywords" content="Good_Life">
+	<meta name="author" content="Honchar Denys">
+	<link rel="stylesheet" type="text/css" href="/index.css">
+{% endblock %}
+
+{% block body %}
+	{% include 'topbar.html' %}
+
+	<div class="p2">
+
+		<hr>
+		<h3>Task list</h2>
+		<hr>
+
+		<h4>Base</h4>
+		<ul>
+			<li>Helpers</li>
+		</ul>
+		<h4>Layouts</h4>
+		<ul>
+			<li>Topbar (ваниль для стікі)</li>
+			<li>Footer</li>
+			<li>Normal grid</li>
+			<li>Flexbox grid</li>
+			<li>Sidebar (ваніль)</li>
+			<li>Modal (визов ангулярка)</li>
+			<li>Alerts (визов ангулярка)</li>
+			<li>Viewer (навєрно ваніль, визов ангулярка)</li>
+		</ul>
+		<h4>Modules</h4>
+		<ul>
+			<li>Tables (как то респоннсів сочинити)</li>
+			<li>Badges</li>
+			<li>Breadcrumbs</li>
+			<li>Divider</li>
+		</ul>
+		<h4>Modules - advanced</h4>
+		<ul>
+			<li>Accordion (ваніль)</li>
+			<li>Dropdown (визов ангулярка)</li>
+			<li>Parallax (без js бажано)</li>
+			<li>Pagination (статіка)</li>
+			<li>Progress (ангулярка)</li>
+			<li>Spinner (визов ангулярка)</li>
+			<li>Tabs (ваніль)</li>
+			<li>Tooltips (може ваніль, хотя напевн обійдеться)</li>
+		</ul>
+		<h4>Utils</h4>
+		<ul>
+			<li>Media map</li>
+			<li>Media visibility</li>
+		</ul>
+	<!-- Headings -->
+		<hr>
+		<h3>Headings</h3>
+		<hr>
+
+		<h1>Heading 1</h1>
+		<h2>Heading 2</h2>
+		<h3>Heading 3</h3>
+		<h4>Heading 4</h4>
+		<h5>Heading 5</h5>
+		<h6>Heading 6</h6>
+
+	<!-- Textes -->
+		<hr>
+		<h3>Textes</h2>
+		<hr>
+		<p><b>p - paragraph</b> - Rhizopoda hoseman sodomic myxomyoma lavenite circumspection illinition conscriptionist psychodrama demethylate Pinnipedia penetrability liturgiology villously binal superdying shire stretchberry Sylphon nephron urticose plectridium menosepsis interparliamentary</p>
+		<blockquote cite="">
+		<b>blockquote</b> - For 50 years, WWF has been protecting the future of nature. The world's leading conservation organization, WWF works in 100 countries and is supported by 1.2 million members in the United States and close to 5 million globally.
+		</blockquote>
+		<blockquote class="m_primary" cite="">
+		<b>blockquote - m_primary</b> - lithoglyptics rumor misregulate shutdown merosome arthromeric masterly bohireen wrung epinette mastigobranchia viragin nonsystematic chronoscopy procombination uninforming anorth astigmatoscopy scorify unemployable cicely bellmaster Vermicularia daughterhood
+		</blockquote>
+		<blockquote class="m_accent" cite="">
+		<b>blockquote - m_accent</b> - egrimony Cheney whinyard follow spininess sculpturer proemployee occipitoatlantal Ganoidei Scorzonera cursor retiringly earnestness predread unupright backchat hydrophyton vaporingly Bishareen leadproof supertrivial replan ranunculaceous tendingly
+		</blockquote>
+		<blockquote class="m_danger" cite="">
+		<b>blockquote - m_danger</b> - inexpungeable forleft mead puppyfoot coregency narrational crotaphitic overeyebrowed Hellen cricoarytenoid icho foggily unsubstantially stabilizer sporophyll tunish hypodermis clicket epigastric horst corky uncoin sesquichloride tool
+		</blockquote>
+
+	<!-- Links -->
+		<hr>
+		<h3>Links</h3>
+		<hr>
+		<div>
+			<a href="#">Chile</a>
+			<a href="#">Micronesia</a>
+			<a href="#">Samoa</a>
+			<a href="#">Tanzania</a>
+		</div>
+
+	<!-- Lists -->
+		<hr>
+		<h3>Lists</h3>
+		<hr>
+		<!-- Standart list -->
+		<ul>
+		  <li>Simple list</li>
+		  <li>Vatican City</li>
+		  <li>Somalia</li>
+		  <li>Fiji</li>
+		</ul>
+
+		<!-- Ordered list -->
+		<ol>
+		  <li>Ordered list</li>
+		  <li>Panama</li>
+		  <li>Afghanistan</li>
+		  <li>Egypt</li>
+		</ol>
+
+		<!-- List with more space -->
+		<ul class="m_vspace">
+		  <li><b>m_vspace</b> - more space</li>
+		  <li>Chad</li>
+		  <li>Guyana</li>
+		  <li>Malawi</li>
+		</ul>
+
+		<!-- List without points -->
+		<ol class="m_clear">
+		  <li><b>m_clear</b> - list without points</li>
+		  <li>Panama</li>
+		  <li>Afghanistan</li>
+		  <li>Egypt</li>
+		</ol>
+
+		<!-- Inline list -->
+		<ul class="m_inline">
+		  <li><b>m_inline</b> - inline list</li>
+		  <li>Argentina</li>
+		  <li>Pakistan</li>
+		  <li>Venezuela</li>
+		</ul>
+
+	<!-- Buttons -->
+		<hr>
+		<h3>Buttons</h3>
+		<hr>
+		<div>
+			<button class="btn">Button</button>
+			<button class="btn"><i class="icon icon-status5"></i>With icon</button>
+			<button class="btn m_disabled">m_disabled</button>
+			<div>
+				<button class="btn m_accent">m_accent</button>
+				<button class="btn m_danger">m_danger</button>
+				<button class="btn m_black">m_black</button>
+				<button class="btn m_gray">m_gray</button>
+			</div>	
+			<div>
+				<button class="btn m_transparent">m_transparent</button>
+				<button class="btn m_transparent m_disabled">& m_disabled</button>
+				<button class="btn m_transparent m_accent">& m_accent</button>
+				<button class="btn m_transparent m_danger">& m_danger</button>
+				<button class="btn m_transparent m_black">& m_black</button>
+				<button class="btn m_transparent m_gray">& m_gray</button>
+			</div>
+			<div>
+				<button class="btn m_icon" title="m_icon - only icon"><i class="icon icon-twitter"></i></button>
+				<button class="btn m_ricon" title="m_ricon - only icon"><i class="icon icon-status1"></i></button>
+			</div>
+			<div>
+				<button class="btn m_big">m_big</button>
+				<button class="btn m_small">m_small</button>
+			</div>
+			
+		</div>
+
+	<!-- Forms -->	
+		<hr>
+		<h3>Forms</h2>
+		<hr>
+		<input type="text" placeholder="Placeholder">
+		<div class="formwrap">
+			<label class="formwrap_label" for="testInput">With label</label>
+			<div class="formbox">
+				<div class="formbox_inp">
+					<input id="testInput" type="text" placeholder="Placeholder">
+				</div>
+			</div>
+		</div>
+		<div class="formwrap">
+			<label class="formwrap_label" for="testInput2">With button</label>
+			<div class="formbox">
+				<div class="formbox_inp">
+					<input id="testInput2" type="text" placeholder="Placeholder">
+				</div>
+				<div class="formbox_btn">
+					<button class="btn m_right">Button</button>
+				</div>
+			</div>
+		</div>
+		<div class="formwrap">
+			<label class="formwrap_label" for="testInput3">With icon</label>
+			<div class="formbox">
+				<div class="formbox_inp m_icon">
+					<input id="testInput3" type="password" placeholder="password">
+					<i class="icon icon-lock"></i>
+				</div>
+			</div>
+		</div>
+		<div class="formwrap">
+			<label class="formwrap_label" for="testInput4">With right icon</label>
+			<div class="formbox">
+				<div class="formbox_inp m_ricon">
+					<input id="testInput4" type="text" placeholder="Your name">
+					<i class="icon icon-user"></i>
+				</div>
+			</div>
+		</div>
+
+		<!-- Forms control elements -->	
+		<hr>
+		<h3>Forms control elements</h2>
+		<hr>
+		<div>
+			<label class="mark">
+				<input type="checkbox">
+				<span class="mark_sign"><span></span></span>
+				<div class="mark_text">Russia</div>
+			</label>		
+			<label class="mark">
+				<input type="checkbox">
+				<span class="mark_sign"><span></span></span>
+				<div class="mark_text">Canada</div>
+			</label>		
+			<label class="mark">
+				<input type="checkbox">
+				<span class="mark_sign"><span></span></span>
+				<div class="mark_text">Suriname</div>
+			</label>
+		</div>
+		<div>
+			<label class="mark m_radio">
+				<input type="radio" name="testradio">
+				<span class="mark_sign"><span></span></span>
+				<div class="mark_text">El Salvador</div>
+			</label>		
+			<label class="mark m_radio">
+				<input type="radio" name="testradio">
+				<span class="mark_sign"><span></span></span>
+				<div class="mark_text">San Marino</div>
+			</label>		
+			<label class="mark m_radio">
+				<input type="radio" name="testradio">
+				<span class="mark_sign"><span></span></span>
+				<div class="mark_text">Spain</div>
+			</label>		
+			<label class="mark m_radio">
+				<input type="radio" name="testradio">
+				<span class="mark_sign"><span></span></span>
+				<div class="mark_text">Brazil</div>
+			</label>
+		</div>
+		<div>
+			<div class="range-wrap">
+				<input type="range">
+			</div>
+			
+		</div>
+
+	</div>
+{% endblock %}

@@ -1,0 +1,206 @@
+// common classes
+.hidden {
+	display: none;
+}
+.invisible {
+    visibility: hidden;
+}
+
+// visible only on some breakpoint
+.show-only-xs {
+	display: none;
+	@include bp-only(xs) {
+		display: inherit;
+	}
+}
+.show-only-sm {
+	display: none;
+	@include bp-only(sm) {
+		display: inherit;
+	}
+}
+.show-only-md {
+	display: none;
+	@include bp-only(md) {
+		display: inherit;
+	}
+}
+.show-only-lg {
+	display: none;
+	@include bp-only(lg) {
+		display: inherit;
+	}
+}
+.show-only-xl {
+	display: none;
+	@include bp-only(xl) {
+		display: inherit;
+	}
+}
+.show-only-xxl {
+	display: none;
+	@include bp-only(xxl) {
+		display: inherit;
+	}
+}
+
+// hidden only on some breakpoint
+.hide-only-xs {
+	@include bp-only(xs) {
+		display: none;
+	}
+}
+.hide-only-sm {
+	@include bp-only(sm) {
+		display: none;
+	}
+}
+.hide-only-md {
+	@include bp-only(md) {
+		display: none;
+	}
+}
+.hide-only-lg {
+	@include bp-only(lg) {
+		display: none;
+	}
+}
+.hide-only-xl {
+	@include bp-only(xl) {
+		display: none;
+	}
+}
+.hide-only-xxl {
+	@include bp-only(xxl) {
+		display: none;
+	}
+}
+
+// hide starting from some breakpoint to zero width
+.hide-max-xs {
+	@include bp-max(xs) {
+		display: none;
+	}
+}
+.hide-max-sm {
+	@include bp-max(sm) {
+		display: none;
+	}
+}
+.hide-max-md {
+	@include bp-max(md) {
+		display: none;
+	}
+}
+.hide-max-lg {
+	@include bp-max(lg) {
+		display: none;
+	}
+}
+.hide-max-xl {
+	@include bp-max(xl) {
+		display: none;
+	}
+}
+.hide-max-xxl {
+	@include bp-max(xxl) {
+		display: none;
+	}
+}
+
+// show starting from some breakpoint to zero width
+.show-max-xs {
+	display: none;
+	@include bp-max(xs) {
+		display: inherit;
+	}
+}
+.show-max-sm {
+	display: none;
+	@include bp-max(sm) {
+		display: inherit;
+	}
+}
+.show-max-md {
+	display: none;
+	@include bp-max(md) {
+		display: inherit;
+	}
+}
+.show-max-lg {
+	display: none;
+	@include bp-max(lg) {
+		display: inherit;
+	}
+}
+.show-max-xl {
+	display: none;
+	@include bp-max(xl) {
+		display: inherit;
+	}
+}
+.show-max-xxl {
+	display: none;
+	@include bp-max(xxl) {
+		display: inherit;
+	}
+}
+
+// hide starting from some breakpoint to infinity (no class for smallest breakpoint)
+.hide-min-sm {
+	@include bp-min(sm) {
+		display: none;
+	}
+}
+.hide-min-md {
+	@include bp-min(md) {
+		display: none;
+	}
+}
+.hide-min-lg {
+	@include bp-min(lg) {
+		display: none;
+	}
+}
+.hide-min-xl {
+	@include bp-min(xl) {
+		display: none;
+	}
+}
+.hide-min-xxl {
+	@include bp-min(xxl) {
+		display: none;
+	}
+}
+
+// show starting from some breakpoint to infinity (no class for smallest breakpoint)
+.show-min-sm {
+	display: none;
+	@include bp-min(sm) {
+		display: inherit;
+	}
+}
+.show-min-md {
+	display: none;
+	@include bp-min(md) {
+		display: inherit;
+	}
+}
+.show-min-lg {
+	display: none;
+	@include bp-min(lg) {
+		display: inherit;
+	}
+}
+.show-min-xl {
+	display: none;
+	@include bp-min(xl) {
+		display: inherit;
+	}
+}
+.show-min-xxl {
+	display: none;
+	@include bp-min(xxl) {
+		display: inherit;
+	}
+}

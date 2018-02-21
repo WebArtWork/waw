@@ -1,0 +1,21 @@
+// map for z-index keys
+$layers-map: (
+	underall: -9999,
+	default: 1,
+	dropdown: 3000,
+	modal: 4001
+);
+
+// Functions to call z-index
+@function z($key) {
+	@if map-has-key($layers-map, $key) {
+		@return map-get($layers-map, $key);
+	}
+
+	@warn "Unknown `#{$key}` in $layers-map.";
+	@return null;
+}
+
+// Usage examples:
+// z-index: z(dropdown);
+// z-index: (z(dropdown) + 3);
