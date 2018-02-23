@@ -28,7 +28,7 @@ if (sd._fs.existsSync(process.cwd()+'/server.json')) {
 	if(sd._config.doamins&&sd._fs.existsSync('/etc/nginx/sites-enabled/default')){
 		console.log('happes');
 		for (var i = 0; i < sd._config.doamins.length; i++) {
-			require(__dirname+'/../exe/domain').set(sd._config.doamins[i]);
+			require(__dirname+'/../exe/domain').set(sd, sd._config.doamins[i]);
 		}
 	}
 /*

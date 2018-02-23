@@ -111,18 +111,18 @@ var add_secure = function(sd, config){
 var set_secure = function(sd, config, cb){
 	if (sd._fs.existsSync('/etc/letsencrypt/live/'+config.domain)) {
 		add_secure(sd, config);
-		cb();
+		cb&&cb();
 	}else{
 		add_simple(sd, config);
 		sd._cmd.get('sudo certbot --nginx certonly -d '+config.domain, function(){
 			remove(sd, config.domain);
 			add_secure(sd, config);
-			cb();
+			cb&&cb();
 		});
 	}
 }
 module.exports.set = function(sd, config, cb){
-	if(!config.domain||!config.port) return;
+	if(!config||!config.domain||!config.port) return;
 	remove(sd, config.domain);
 	if(config.secure){
 		set_secure(sd, config, function(){
