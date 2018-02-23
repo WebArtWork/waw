@@ -81,6 +81,7 @@ var run = function(){
 			}
 		}
 	}
+	obj.watch.push(process.cwd()+'/config.json');
 	exeCode(obj);
 }
 var should_have_pm2 = function(){
@@ -218,17 +219,40 @@ if(process.argv[2]){
 		case 'uw':
 			require(exe+'/update').framework();
 			return;
-		case 'lu':
-		case 'lupdate':
-			should_have_nodemon();
-			require(exe+'/git.js').project(process.argv[3], function(){
-				should_have_nodemon();
-				run();
-			});
-			return;
-
-			
-		// BELOW FIX SOON
+		// Domain Management
+		case 'domain_list':
+		case 'domainlist':
+		case 'dl':
+			return require(exe+'/domain').list(require(__dirname+'/sd')());
+		case 'domain_remove':
+		case 'domain_delete':
+		case 'domainremove':
+		case 'domaindelete':
+		case 'dd':
+		case 'dr':
+			return require(exe).remove_domain(require(__dirname+'/sd')());
+		case 'domain_add':
+		case 'domainadd':
+		case 'da':
+			return require(exe).add_domain(require(__dirname+'/sd')());
+		case 'd':
+		case 'domain':
+			if(!process.argv[3]) process.argv[3]='';
+			switch(process.argv[3].toLowerCase()){
+				case 'remove':
+				case 'delete':
+				case 'r':
+				case 'd':
+					return require(exe).remove_domain(require(__dirname+'/sd')());
+				case 'add':
+				case 'a':
+					return require(exe).add_domain(require(__dirname+'/sd')());
+				case 'list':
+				case 'l':
+					return require(exe+'/domain').list(require(__dirname+'/sd')());
+				default:
+					return require(exe).domain(require(__dirname+'/sd')());
+			}
 		// Translate Management
 		case 't':
 		case 'tr':
@@ -242,11 +266,6 @@ if(process.argv[2]){
 			return;
 		case 'tu':
 			require(exe+'/tr.js').update();
-			return;
-		// Domain Management
-		case 'd':
-		case 'domain':
-			require(exe).domain();
 			return;
 		default:
 			return console.log('Wrong Command.');

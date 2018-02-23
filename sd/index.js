@@ -231,7 +231,7 @@ module.exports = function(sd){
 	*	Loging
 	*/
 		sd._close = function(message) {
-			console.log(message);
+			message&&console.log(message);
 			process.exit(0);
 		}
 		sd._log = function(message) {

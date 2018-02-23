@@ -46,12 +46,70 @@ var rl = readline.createInterface({
 	module.exports.project_name = project_name;
 	module.exports.install = install;
 /*
-*	Update Management
-*/
-
-/*
 *	Domain Management
 */
+	var _is_secure;
+	var add_domain = function(sd){
+		rl.question('Pick domain type\n1) Secured with SSL\n2) Not secured\nChoose: ', function(answer){
+			if(!answer) return add_domain(sd);
+			if(answer=='1'){
+				_is_secure = true;
+			}else{
+				_is_secure = false;
+			}
+			get_domain(sd);
+		});
+	};
+	var _domain_url;
+	var get_domain = function(sd){
+		rl.question('Provide domain url: ', function(answer){
+			if(!answer) return get_domain(sd);
+			_domain_url = answer.toLowerCase();
+			get_port(sd);
+		});
+	}
+	var get_port = function(sd){
+		rl.question('Provide app port: ', function(answer){
+			if(!answer) return get_port(sd);
+			require(__dirname+'/domain').set(sd, {
+				secure: _is_secure,
+				domain: _domain_url,
+				port: parseInt(answer)
+			}, function(){
+				sd._close('Domain '+domains[answer-1].name+' has been successfully added.');
+			});
+		});
+	}
+	var remove_domain = function(sd){
+		var q = 'Select domain to remove';
+		var domains = require(__dirname+'/domain').get_domains(sd);
+		for (var i = 0; i < domains.length; i++) {
+			q+='\n'+(i+1)+') '+domains[i].name;
+		}
+		q += '\nChoose: ';
+		rl.question(q, function(answer){
+			if(!answer) return remove_domain(sd);
+			answer = parseInt(answer);
+			require(__dirname+'/domain').remove(sd, domains[answer-1].name);
+			sd._close('Domain '+domains[answer-1].name+' has been successfully removed.');
+		});
+	};
+	var domain = function(sd){
+		rl.question('What do you want to do with domains?\n1) Add new Domain\n2) Remove an Domain\n3) List All Domains\nChoose: ', function(answer) {
+			if (!answer) return add_domain(sd);
+			if (answer == '1') {
+				add_domain(sd);
+			} else if (answer == '2') {
+				remove_domain(sd);
+			} else {
+				require(__dirname+'/domain').list(sd);
+				sd._close();
+			}
+		});
+	}
+	module.exports.domain = domain;
+	module.exports.add_domain = add_domain;
+	module.exports.remove_domain = remove_domain;
 /*
 *	Translate Management
 */
