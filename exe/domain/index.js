@@ -115,7 +115,7 @@ var set_secure = function(sd, config, cb){
 		cb();
 	}else{
 		add_simple(sd, config);
-		sd._cmd.get('sudo sudo certbot --nginx certonly -d '+config.domain, function(){
+		sd._cmd.get('sudo certbot --nginx certonly -d '+config.domain, function(){
 			remove(sd, config.domain);
 			add_secure(sd, config);
 			cb();
