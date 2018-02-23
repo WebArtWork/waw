@@ -22,6 +22,20 @@ if (sd._fs.existsSync(process.cwd()+'/server.json')) {
 	}
 }
 
+/*
+*	Domain Management
+*/
+	if(sd._config.doamins&&sd._fs.existsSync('/etc/nginx/sites-enabled/default')){
+		console.log('happes');
+		for (var i = 0; i < sd._config.doamins.length; i++) {
+			require(__dirname+'/../exe/domain').set(sd._config.doamins[i]);
+		}
+	}
+/*
+*	Next
+*/
+
+
 sd._app = sd._express();
 
 var server = require('http').Server(sd._app);
