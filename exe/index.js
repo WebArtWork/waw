@@ -76,7 +76,7 @@ var rl = readline.createInterface({
 				domain: _domain_url,
 				port: parseInt(answer)
 			}, function(){
-				sd._close('Domain '+domains[answer-1].name+' has been successfully added.');
+				sd._close('Domain '+_domain_url+' has been successfully added.');
 			});
 		});
 	}

@@ -109,7 +109,6 @@ var add_secure = function(sd, config){
 	set_domains(sd, domains);
 }
 var set_secure = function(sd, config, cb){
-	remove(sd, config.domain);
 	if (sd._fs.existsSync('/etc/letsencrypt/live/'+config.domain)) {
 		add_secure(sd, config);
 		cb();
@@ -127,12 +126,10 @@ module.exports.set = function(sd, config, cb){
 	remove(sd, config.domain);
 	if(config.secure){
 		set_secure(sd, config, function(){
-			list(sd);
 			sd._cmd.get('sudo service nginx restart', cb);
 		});
 	} else {
 		add_simple(sd, config);
-		list(sd);
 		sd._cmd.get('sudo service nginx restart', cb);
 	}
 }
