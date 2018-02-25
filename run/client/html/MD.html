@@ -72,20 +72,30 @@
 			text-align: left;
 			margin-top: 40px;
 			background: #fff;
-			padding: 15px;
+			padding: 0 15px 15px 15px;
+			margin-bottom: 15px;
 			border-radius: 5px;
 			border: 1px solid #ccc;
 		}
-		.md-box div .md-header {
+		.md-box div.md-header {
+			height: 38px;
 			background-color: #f6f8fa;
-			border: 1px solid #ccc;
-			padding: 5px 10px;
-			border-radius: 3px;
+			border-bottom: 1px solid #ccc;
+			padding: 5px 20px;
+			margin: 0 -15px;
+			border-radius: 5px 5px 0 0;
+			display: flex;
+			align-items: center;
 		}
-		.md-box div .md-header h1 {
-			font-size: 2em;
+		.md-box div.md-header h1 {
+			font-size: 20px;
 			margin: 0;
-			line-height: 1.5;
+			line-height: 1;
+		}
+		.md-box div.md-header h1 > svg {
+			display: inline-block;
+			vertical-align: middle;
+			margin-right: 10px;
 		}
 		.md-box div p {
 			padding: 10px 30px;
@@ -95,7 +105,7 @@
 	<div style="display: inline-grid;">
 		{% for file in files %}
 		<div class="md-box" style="margin-left: {{{file.level*50}}}px;">
-			<div class="md-header"><h1 title="{{{file.loc}}}">{{{file.file}}}</h1></div>
+			<div class="md-header"><h1 title="{{{file.loc}}}"><svg aria-hidden="true" class="octicon octicon-book" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M3 5h4v1H3V5zm0 3h4V7H3v1zm0 2h4V9H3v1zm11-5h-4v1h4V5zm0 2h-4v1h4V7zm0 2h-4v1h4V9zm2-6v9c0 .55-.45 1-1 1H9.5l-1 1-1-1H2c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h5.5l1 1 1-1H15c.55 0 1 .45 1 1zm-8 .5L7.5 3H2v9h6V3.5zm7-.5H9.5l-.5.5V12h6V3z"></path></svg>{{{file.file}}}</h1></div>
 			<p>{{{file.text|safe}}}</p>
 		</div>
 		{% endfor %}

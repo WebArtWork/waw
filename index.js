@@ -219,6 +219,15 @@ if(process.argv[2]){
 		case 'uw':
 			require(exe+'/update').framework();
 			return;
+		case 'fuw':
+			require(exe+'/update').framework();
+			return;
+		case 'luw':
+			require(exe+'/update').framework();
+			return;
+		case 'fluw':
+			require(exe+'/update').framework();
+			return;
 		// Domain Management
 		case 'domain_list':
 		case 'domainlist':
@@ -258,14 +267,16 @@ if(process.argv[2]){
 		case 'tr':
 		case 'translate':
 			if(process.argv[3].toLowerCase()=='update'||process.argv[3].toLowerCase()=='u')
-				require(exe+'/tr.js').update();
-			else require(exe+'/tr.js').fetch();
+				require(exe+'/translate').update(require(__dirname+'/sd')());
+			else require(exe+'/translate').fetch(require(__dirname+'/sd')());
 			return;
+		case 'translate_fetch':
 		case 'tf':
-			require(exe+'/tr.js').fetch();
+			require(exe+'/translate').fetch(require(__dirname+'/sd')());
 			return;
+		case 'translate_update':
 		case 'tu':
-			require(exe+'/tr.js').update();
+			require(exe+'/translate').update(require(__dirname+'/sd')());
 			return;
 		default:
 			return console.log('Wrong Command.');
