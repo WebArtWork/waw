@@ -31,6 +31,10 @@ if (sd._fs.existsSync(process.cwd()+'/server.json')) {
 			require(__dirname+'/../exe/domain').set(sd, sd._config.doamins[i]);
 		}
 	}
+	sd._domain_get_domains = require(__dirname+'/../exe/domain').get_domains;
+	sd._domain_remove = require(__dirname+'/../exe/domain').remove;
+	sd._domain_list = require(__dirname+'/../exe/domain').list;
+	sd._domain_set = require(__dirname+'/../exe/domain').set;
 /*
 *	Next
 */

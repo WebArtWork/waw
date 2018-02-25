@@ -26,23 +26,7 @@
 			overflow-x: hidden;
 		}
 
-		.md-box {
-			display: inline-block;
-			width: 100%;
-			max-width: 800px;
-			text-align: left;
-			margin-top: 40px;
-			background: #fff;
-			padding: 15px;
-			border-radius: 5px;
-		}
-
-		h1,
-		h2,
-		h3,
-		h4,
-		h5,
-		h6 {
+		h1, h2, h3, h4, h5, h6 {
 			font-family: 'Old Standard TT', serif;
 			font-weight: bold;
 		}
@@ -62,11 +46,17 @@
 			/* Opera 7 */
 			word-wrap: break-word;
 			/* Internet Explorer 5.5+ */
-			background-color: #f8f8f8;
-			border: 1px solid #dfdfdf;
+			/*background-color: #f8f8f8;*/
+			/*border: 1px solid #dfdfdf;*/
 			margin-top: 1.5em;
 			margin-bottom: 1.5em;
-			padding: 0.125rem 0.3125rem 0.0625rem;
+			/*padding: 0.125rem 0.3125rem 0.0625rem;*/
+			
+			padding: 16px;
+		    overflow: auto;
+		    font-size: 85%;
+		    background-color: #f6f8fa;
+		    border-radius: 3px;
 		}
 
 		pre code {
@@ -75,12 +65,37 @@
 			padding: 0;
 		}
 
+		.md-box {
+			display: inline-block;
+			width: 100%;
+			max-width: 800px;
+			text-align: left;
+			margin-top: 40px;
+			background: #fff;
+			padding: 15px;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+		}
+		.md-box div .md-header {
+			background-color: #f6f8fa;
+			border: 1px solid #ccc;
+			padding: 5px 10px;
+			border-radius: 3px;
+		}
+		.md-box div .md-header h1 {
+			font-size: 2em;
+			margin: 0;
+			line-height: 1.5;
+		}
+		.md-box div p {
+			padding: 10px 30px;
+		}
 	</style>
 
-	<div class="md-box">
+	<div style="display: inline-grid;">
 		{% for file in files %}
-		<div>
-			<h1 title="{{{file.loc}}}">{{{file.file}}}</h1>
+		<div class="md-box" style="margin-left: {{{file.level*50}}}px;">
+			<div class="md-header"><h1 title="{{{file.loc}}}">{{{file.file}}}</h1></div>
 			<p>{{{file.text|safe}}}</p>
 		</div>
 		{% endfor %}

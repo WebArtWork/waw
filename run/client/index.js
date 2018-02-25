@@ -3,6 +3,69 @@ var ext = ['.css','.ttf','.woff','.woff2','.svg','.otf','.js','.html','.gif','.j
 module.exports = function(sd){
 	console.log('READING CLIENT SIDE');
 	var clientRoot = process.cwd()+'/client';
+/*
+*	Docs
+*/
+	var showdown  = require('showdown');
+	var converter = new showdown.Converter();
+	var _readFile = function(loc, rpl){
+		var text = sd._fs.readFileSync(loc, 'utf8');
+		var locs = loc.split(sd._path.sep);
+		loc = loc.split(rpl);
+		loc.shift();
+		loc = loc.join(rpl)
+		var file = {
+			level: loc.split(sd._path.sep).length-3,
+			text: converter.makeHtml(text),
+			loc: rpl+loc,
+			file: locs[locs.length-2]
+		}
+		return file;
+	}
+	var getTemplate = function(_root, rpl, cb){
+		sd._readdir(_root, function(err, files){
+			files.sort();
+			var _files = [];
+			for (var i = 0; i < files.length; i++) {
+				if(sd._isEndOfStr(files[i].toLowerCase(), '.md')){
+					_files.push(_readFile(files[i], rpl));
+				}
+			}
+			cb(_files);
+		});
+	}
+	var renderDocs = function(req, res){
+		res.send(sd._derer.renderFile(__dirname+'/html/MD.html', {
+			files: req.body.files
+		}));
+	}
+	sd._app.get("/waw/docs", sd._ensureLocalhost, function(req, res, next) {
+		getTemplate(__dirname+'/../', 'waw', function(files){
+			req.body.files = files;
+			next();
+		});
+	}, renderDocs);
+	sd._app.get("/waw/edocs", sd._ensureLocalhost, function(req, res, next) {
+		getTemplate(__dirname+'/../../exe', 'waw', function(files){
+			req.body.files = files;
+			next();
+		});
+	}, renderDocs);
+	sd._app.get("/waw/cdocs", sd._ensureLocalhost, function(req, res, next) {
+		getTemplate(process.cwd()+'/client', 'client', function(files){
+			req.body.files = files;
+			next();
+		});
+	}, renderDocs);
+	sd._app.get("/waw/sdocs", sd._ensureLocalhost, function(req, res, next) {
+		getTemplate(process.cwd()+'/server', 'server', function(files){
+			req.body.files = files;
+			next();
+		});
+	}, renderDocs);
+/*
+*	waw clients
+*/
 	if(sd._config.angular){
 		sd._app.use(function(req, res, next){
 			var islocal = req.get('host').toLowerCase().indexOf('localhost')==0;
@@ -158,56 +221,6 @@ module.exports = function(sd){
 				if(link.indexOf('//')>0) return link;
 				else return 'http://'+link;
 			});
-		/*
-		*	Docs
-		*/
-			var showdown  = require('showdown');
-			var converter = new showdown.Converter();
-			var _readFile = function(loc){
-				var text = sd._fs.readFileSync(loc, 'utf8');
-				var locs = loc.split('\\');
-				var file = {
-					text: converter.makeHtml(text),
-					loc: loc,
-					file: locs[locs.length-1].split('.')[0]
-				}
-	    		return file;
-			}
-			var getTemplate = function(_root, cb){
-				sd._readdir(_root, function(err, files){
-					files.sort();
-					var _files = [];
-					for (var i = 0; i < files.length; i++) {
-						if(sd._isEndOfStr(files[i].toLowerCase(), '.md')){
-							_files.push(_readFile(files[i]));
-						}
-					}
-					cb(_files);
-				});
-			}
-			var renderDocs = function(req, res){
-				res.send(sd._derer.renderFile(__dirname+'/html/MD.html', {
-					files: req.body.files
-				}));
-			}
-			sd._app.get("/waw/docs", sd._ensureLocalhost, function(req, res, next) {
-				getTemplate(__dirname, function(files){
-					req.body.files = files;
-					next();
-				});
-			}, renderDocs);
-			sd._app.get("/waw/cdocs", sd._ensureLocalhost, function(req, res, next) {
-				getTemplate(process.cwd()+'/client', function(files){
-					req.body.files = files;
-					next();
-				});
-			}, renderDocs);
-			sd._app.get("/waw/sdocs", sd._ensureLocalhost, function(req, res, next) {
-				getTemplate(process.cwd()+'/server', function(files){
-					req.body.files = files;
-					next();
-				});
-			}, renderDocs);
 		/*
 		*	Translates
 		*/
