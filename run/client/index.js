@@ -253,7 +253,7 @@ module.exports = function(sd){
 				else obj.lang = ff[0];
 				if(req.originalUrl=='/'){
 					for (var i = 0; i < ff.length; i++) {
-						obj[ff[i]+'Url'] = '/en';
+						obj[ff[i]+'Url'] = '/'+ff[i];
 					}
 				}else{
 					for (var i = 0; i < ff.length; i++) {
@@ -262,7 +262,6 @@ module.exports = function(sd){
 							obj[ff[i]+'Url'] = obj[ff[i]+'Url'].replace('/'+ff[j],'');
 						}
 						obj[ff[i]+'Url'] += '/' + ff[i];
-						
 					}
 				}
 				obj.user = req.user;
