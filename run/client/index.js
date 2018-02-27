@@ -279,7 +279,7 @@ module.exports = function(sd){
 				data=data.replace('LANG_ARR', JSON.stringify(ff)).replace('INNER_DF', JSON.stringify(df));
 				sd._fs.writeFileSync(clientRoot + '/gen/translate.js', data, 'utf8');
 			}
-			if(info.translate&&!sd._fs.existsSync(clientRoot + '/gen/translate.js')){
+			if(info.translate){
 				sd._generate_translate_file();
 			}
 			/*
