@@ -1,8 +1,9 @@
-module.exports = function(sd, cb, sudo){
-	console.log('install');
-	sd._cmd.get((sudo||'')+'npm i', function(err){
-		console.log('err');
+module.exports = function(sd, cb){
+	sd._cmd.get('npm i', cb);
+	sd._cmd.get('pwd', function(err, body){
+		console.log('err123');
 		console.log(err);
-		cb();
+		console.log('body');
+		console.log(body);
 	});
 }
