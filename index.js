@@ -218,6 +218,7 @@ if(process.argv[2]){
 			return;
 		case 'uw':
 			require(exe+'/update').framework(function(sd){
+				console.log('go install');
 				require(__dirname+'/i.js')(sd, function(){
 					sd._close('Framework waw were successfully updated.');
 				});
