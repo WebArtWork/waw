@@ -3,5 +3,6 @@ module.exports = function(sd, cb, sudo){
 	sd._cmd.get((sudo||'')+'npm i', function(err){
 		console.log('err');
 		console.log(err);
+		cb();
 	});
 }
