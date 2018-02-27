@@ -10,13 +10,13 @@ module.exports.project = function(branch, callback){
 		});
 	});
 }
-module.exports.framework = function(){
+module.exports.framework = function(cb){
 	var myRepo = sd._git(__dirname+'/../..');
 	myRepo.init(function(){
 		myRepo.addRemote('origin', 'git@github.com:WebArtWork/waw.git', function(err){
 			myRepo.fetch('--all',function(err){
-				myRepo.reset('origin/master',function(err){
-					sd._close('Framework waw were successfully updated.');
+				myRepo.reset('origin/master', function(){
+					cb(sd);
 				});
 			});
 		});

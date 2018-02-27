@@ -217,16 +217,34 @@ if(process.argv[2]){
 			});
 			return;
 		case 'uw':
-			require(exe+'/update').framework();
+			require(exe+'/update').framework(function(sd){
+				require(sd, function(){
+					sd._close('Framework waw were successfully updated.');
+				});
+			});
 			return;
 		case 'fuw':
-			require(exe+'/update').framework();
+			require(exe+'/update').framework(function(sd){
+				sd._fse.removeSync(__dirname+'/node_modules');
+				require(sd, function(){
+					sd._close('Framework waw were successfully updated.');
+				});
+			});
 			return;
 		case 'luw':
-			require(exe+'/update').framework();
+			require(exe+'/update').framework(function(sd){
+				require(sd, function(){
+					sd._close('Framework waw were successfully updated.');
+				});
+			});
 			return;
 		case 'fluw':
-			require(exe+'/update').framework();
+			require(exe+'/update').framework(function(sd){
+				sd._fse.removeSync(__dirname+'/node_modules');
+				require(sd, function(){
+					sd._close('Framework waw were successfully updated.');
+				});
+			});
 			return;
 		// Domain Management
 		case 'domain_list':
