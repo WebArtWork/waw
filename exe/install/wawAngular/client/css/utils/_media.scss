@@ -1,0 +1,69 @@
+/* Breakpoints map with keys */
+$breakpoints-map: (
+	xs: 0,
+	sm: 480px,
+	md: 768px,
+	lg: 1024px,
+	xl: 1366px,
+	xxl: 1440px
+) !default;
+
+/* Helper functions for mixins */
+
+// Name of the next breakpoint, or null for the last breakpoint.
+@function breakpoint-next($name, $breakpoints: $breakpoints-map, $breakpoint-names: map-keys($breakpoints)) {
+	$n: index($breakpoint-names, $name);
+	@return if($n < length($breakpoint-names), nth($breakpoint-names, $n + 1), null);
+}
+
+// Minimum breakpoint width. Null for the smallest (first) breakpoint.
+@function breakpoint-min($name, $breakpoints: $breakpoints-map) {
+	$min: map-get($breakpoints, $name);
+	@return if($min != 0, $min, null);
+}
+
+// Maximum breakpoint width. Null for the largest (last) breakpoint. The maximum value is calculated as the minimum of the next one less 0.1.
+@function breakpoint-max($name, $breakpoints: $breakpoints-map) {
+	$next: breakpoint-next($name, $breakpoints);
+	@return if($next, breakpoint-min($next, $breakpoints) - 0.1, null);
+}
+
+/* Media queries mixins */
+
+// Minimum breakpoint width (no query for the smallest breakpoint).
+// Example: @include bp-min(md) { content }
+@mixin bp-min($name, $breakpoints: $breakpoints-map) {
+	$min: breakpoint-min($name, $breakpoints);
+	@if $min {
+		@media (min-width: $min) {
+		@content;
+		}
+	}
+	@else {
+		@content;
+	}
+}
+
+// Maximum breakpoint width (no query for the largest breakpoint).
+// Example: @include bp-max(md) { content }
+@mixin bp-max($name, $breakpoints: $breakpoints-map) {
+	$max: breakpoint-max($name, $breakpoints);
+	@if $max {
+		@media (max-width: $max) {
+			@content;
+		}
+	}
+	@else {
+		@content;
+	}
+}
+
+// Between two breakpoint's (no minimum for the smallest breakpoint, and no maximum for the largest one)
+// Example: @include bp-only(sm) { content }
+@mixin bp-only($name, $breakpoints: $breakpoints-map) {
+	@include bp-min($name, $breakpoints) {
+		@include bp-max($name, $breakpoints) {
+			@content;
+		}
+	}
+}

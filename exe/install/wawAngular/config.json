@@ -1,0 +1,21 @@
+{
+	"name": "wawAngular",
+	"description": "Sample project from waw framework.",
+	"icon": "/client/img/favicon.png",
+	"prefix": "initialize",
+	"license": "MIT",
+	"port": 8080,
+	"session": true,
+	"production": false,
+	"mongo": {
+		"host": "localhost",
+		"port": 27017,
+		"db": "newdb"
+	},
+	"passport": {
+		"local": {
+			"successRedirect": "/",
+			"failureRedirect": "/"
+		}
+	}
+}

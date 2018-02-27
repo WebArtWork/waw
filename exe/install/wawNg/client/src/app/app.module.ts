@@ -1,9 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { WacomModule } from 'wacom';
 import { AppComponent } from './app.component';
 import { RoutingModule } from './routing.module';
 import { UserModule } from './user/user.module';
 import { AdminModule } from './admin/admin.module';
+
 
 
 @NgModule({
@@ -12,10 +14,11 @@ import { AdminModule } from './admin/admin.module';
   ],
   imports: [
     BrowserModule,
-    RoutingModule
-    
+    RoutingModule,
+    WacomModule
   ],
-  providers: [],
+  providers: [
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

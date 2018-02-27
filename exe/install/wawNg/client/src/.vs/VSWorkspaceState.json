@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\app",
+    "\\app\\shared",
+    "\\app\\user",
+    "\\app\\user\\explore",
+    "\\app\\user\\my-profile",
+    "\\app\\user\\my-setting",
+    "\\app\\user\\profile",
+    "\\app\\user\\shared"
+  ],
+  "SelectedNode": "\\app\\user\\explore\\explore.component.ts",
+  "PreviewInSolutionExplorer": false
+}

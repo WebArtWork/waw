@@ -1,0 +1,39 @@
+// no-select option
+.no-select {
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+//borders
+.border-t {
+	border-top: 1px solid $gray;
+}
+
+.border-b {
+	border-bottom: 1px solid $gray;
+}
+
+.border-r {
+	border-right: 1px solid $gray;
+}
+
+.border-l {
+	border-left: 1px solid $gray;
+}
+
+//cursors
+.cu-copy {
+	cursor: copy;
+}
+
+.cu-p {
+	cursor: pointer;
+}
+
+// positions
+.pos-rel {
+	position: relative;
+}

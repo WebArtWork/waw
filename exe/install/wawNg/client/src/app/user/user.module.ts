@@ -5,6 +5,7 @@ import { MyProfileComponent } from './my-profile/my-profile.component';
 import { MySettingComponent } from './my-setting/my-setting.component';
 import { ProfileComponent } from './profile/profile.component';
 import { UserRoutingModule } from './user-routing.module';
+import { UserService } from './shared/user.service';
 
 @NgModule({
   imports: [
@@ -16,6 +17,9 @@ import { UserRoutingModule } from './user-routing.module';
     MyProfileComponent,
     MySettingComponent,
     ProfileComponent
+  ],
+  providers: [
+    UserService
   ]
 })
 export class UserModule { }

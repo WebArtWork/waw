@@ -1,0 +1,77 @@
+.btn {
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+
+	min-width: 100px;
+	padding: 0.7em 1em;
+	margin-bottom: 1em;
+
+
+	text-align: center;
+	font-family: $ff-title;
+	font-size: $fs-s;
+	letter-spacing: 1px;
+	line-height: 1;
+
+	background: $primary;
+	color: $white;
+	border: none;
+	border-radius: 2px;
+
+	cursor: pointer;
+	transition: all 0.3s;
+
+	&:hover,
+	&:focus {
+		opacity: 0.8;
+	}
+}
+
+// disabled
+.btn.m_disabled {
+	background: $black;
+
+	cursor: not-allowed;
+	opacity: 0.3;
+}
+
+// colors
+.btn.m_danger {
+	background: $danger;
+	&:hover {
+		opacity: 0.8;
+	}
+}
+
+.btn.m_accent {
+	background: $accent;
+	&:hover {
+		opacity: 0.8;
+	}
+}
+
+.btn.m_black {
+	background: $black;
+	&:hover {
+		opacity: 0.8;
+	}
+}
+
+.btn.m_gray {
+	background: $gray;
+	&:hover {
+		opacity: 0.8;
+	}
+}
+
+// sizes
+.btn.m_big {
+	min-width: 120px;
+	font-size: $fs-l;
+}
+
+.btn.m_small {
+	min-width: 80px;
+	font-size: $fs-xs;
+}

@@ -1,64 +1,42 @@
 @charset "UTF-8";
 
-// 1. Vendors - files like bootstrap etc.
+// 1. Vendor - files from outsorces, like normalize, bootstrap etc.
 @import "vendor/normalize";
+@import "vendor/animate";
 
 // 2. Utils - configuration and helpers
-@import "utils/variables";
-@import "utils/functions";
-@import "utils/mixins";
+@import "utils/var";
+@import "utils/func";
+@import "utils/mixin";
 @import "utils/z-index";
-@import "utils/media-queries";
+@import "utils/media";
+@import "utils/font";
+@import "utils/print";
 
-// 3. Base - some basic stuff
-@import "base/base";
-@import "base/fonts";
-@import "base/tags";
-@import "base/newtags";
-@import "base/print";
-@import "base/media-visibility";
-@import "base/quickmark/margins";
-@import "base/quickmark/paddings";
-@import "base/quickmark/fonts";
-@import "base/quickmark/sizes";
-@import "base/quickmark/colors";
-@import "base/quickmark/floats";
-@import "base/quickmark/backgrounds";
-@import "base/quickmark/besides";
+// 3. Atoms - simple classes for quickmark
+@import "atoms/margin";
+@import "atoms/padding";
+@import "atoms/font";
+@import "atoms/size";
+@import "atoms/color";
+@import "atoms/float";
+@import "atoms/background";
+@import "atoms/beside";
+@import "atoms/visibility";
 
-// 4. Layout - some related sections
-@import "layouts/topbar";
-@import "layouts/footer";
-@import "layouts/grid";
-@import "layouts/flexgrid";
-@import "layouts/sidebar";
-@import "layouts/modal";
-@import "layouts/alerts";
-@import "layouts/viewer";
+// 4. Layouts - some related sections 
+@import "layouts/base";
 
-// 5. Modules - reuseble modules
-@import "modules/base/headings";
-@import "modules/base/links";
-@import "modules/base/lists";
-@import "modules/base/buttons";
-@import "modules/base/code";
-@import "modules/base/textparts";
-@import "modules/base/forms";
-@import "modules/base/tables";
-@import "modules/base/badges";
-@import "modules/base/breadcrumbs";
-@import "modules/base/divider";
-@import "modules/base/forms-controls";
-@import "modules/complex/accordion";
-@import "modules/complex/dropdown";
-@import "modules/complex/parallax";
-@import "modules/complex/pagination";
-@import "modules/complex/progress";
-@import "modules/complex/spinner";
-@import "modules/complex/tabs";
-@import "modules/complex/tooltips";
+// 5. Elements - reuseble little parts of markdown
+@import "elements/buttons";
+@import "elements/inputs";
+@import "elements/checkradio";
+@import "elements/heading";
+@import "elements/link";
+@import "elements/list";
+@import "elements/textpart";
+@import "elements/img";
 
-// 6. Page - specific styles for separete pages
+@import "elements/complex/scrollbar";
 
-// 7. Themes - files for specific site themes (if it will be needed)
-@import "themes/default";
+// 6. Pages - specific styles for separete pages

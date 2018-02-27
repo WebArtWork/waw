@@ -1,0 +1,75 @@
+// 1 radio  and checkboxes buttons
+.mark {
+	display: inline-table;
+
+	width: auto;
+	margin-bottom: 1em;
+
+	line-height: 1;
+
+	cursor: pointer;
+	transition: all 0.25s;
+
+	input {
+		display: none;
+	}
+
+	&_sign {
+		display: table-cell;
+		vertical-align: top;
+
+		span {
+			display: inline-block;
+
+			width: 0.9em;
+			height: 0.9em;
+			margin-right: 0.5em;
+
+			transition: all 0.25s;
+
+			border: 1px solid $gray;
+		}
+	}
+	&_text {
+		display: table-cell;
+		vertical-align: top;
+		padding-right: 20px;
+	}
+
+}
+
+// Modifier for radio buttons
+.mark.m_radio {
+	.mark_sign {
+		span {
+			border-radius: 50%;
+		}
+	}
+}
+
+// if checked 
+input:checked ~ .mark_sign span {
+	border: 1px solid $primary;
+	background: $primary;
+	box-shadow: inset 0 0 0 3px $white;
+}
+
+input:checked ~ .mark_text {
+	color: $primary;
+}
+
+
+// if disabled
+input:disabled ~ .mark_sign span {
+	cursor: not-allowed;
+
+	opacity: 0.8;
+	border: 1px solid $gray;
+}
+
+input:disabled ~ .mark_text {
+	cursor: not-allowed;
+
+	opacity: 0.8;
+	color: $gray;
+}

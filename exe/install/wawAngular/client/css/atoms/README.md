@@ -1,0 +1,1 @@
+The `atoms/` folder contains quickmark classes. In style of "atomic scss"
