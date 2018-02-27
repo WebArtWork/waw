@@ -218,7 +218,7 @@ if(process.argv[2]){
 			return;
 		case 'uw':
 			require(exe+'/update').framework(function(sd){
-				require(sd, function(){
+				require(__dirname+'/i.js')(sd, function(){
 					sd._close('Framework waw were successfully updated.');
 				});
 			});
@@ -226,14 +226,14 @@ if(process.argv[2]){
 		case 'fuw':
 			require(exe+'/update').framework(function(sd){
 				sd._fse.removeSync(__dirname+'/node_modules');
-				require(sd, function(){
+				require(__dirname+'/i.js')(sd, function(){
 					sd._close('Framework waw were successfully updated.');
 				});
 			});
 			return;
 		case 'luw':
 			require(exe+'/update').framework(function(sd){
-				require(sd, function(){
+				require(__dirname+'/i.js')(sd, function(){
 					sd._close('Framework waw were successfully updated.');
 				});
 			});
@@ -241,7 +241,7 @@ if(process.argv[2]){
 		case 'fluw':
 			require(exe+'/update').framework(function(sd){
 				sd._fse.removeSync(__dirname+'/node_modules');
-				require(sd, function(){
+				require(__dirname+'/i.js')(sd, function(){
 					sd._close('Framework waw were successfully updated.');
 				});
 			});
