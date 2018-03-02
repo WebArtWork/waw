@@ -111,7 +111,7 @@ sd._app.set('view cache', true);
 
 
 // Socket Management
-sd._io = require('socket.io').listen(server);
+sd._io = require('socket.io')(server, { origins: '*:*'});
 sd._io_connections = [];
 sd._io.on('connection', function (socket) {
 	for (var i = 0; i < sd._io_connections.length; i++) {

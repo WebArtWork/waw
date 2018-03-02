@@ -231,21 +231,6 @@ if(process.argv[2]){
 				});
 			});
 			return;
-		case 'luw':
-			require(exe+'/update').framework(function(sd){
-				require(__dirname+'/i.js')(sd, function(){
-					sd._close('Framework waw were successfully updated.');
-				});
-			});
-			return;
-		case 'fluw':
-			require(exe+'/update').framework(function(sd){
-				sd._fse.removeSync(__dirname+'/node_modules');
-				require(__dirname+'/i.js')(sd, function(){
-					sd._close('Framework waw were successfully updated.');
-				});
-			});
-			return;
 		// Domain Management
 		case 'domain_list':
 		case 'domainlist':

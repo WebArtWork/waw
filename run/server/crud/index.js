@@ -60,39 +60,23 @@ module.exports = function(sd, partJson) {
 		}
 	// Routes
 		if(partJson.crud){
-			// Init
 			var router = sd._initRouter('/api/'+name);
-			/*
-			*	Get Routes
-			*/
-				router.get("/get", sd['sp'+name+'ensure']||sd._next, function(req, res) {
-					let populate = sd['sp'+name+'qgp']&&sd['sp'+name+'qgp'](req, res)||false;
-					let query = sd['sp'+name+'qg']&&sd['sp'+name+'qg'](req, res)||{
-						moderators: req.user._id
-					};
-					query = Schema.find(query);
-					if(populate){
-						query.populate(populate);
-					}
-					query.exec(function(err, docs) {
-						res.json(docs || []);
-					});
-				});
 			/*
 			*	Create Routes
 			*/
-				router.post("/create", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
+				router.post("/create", sd['ensure_create_'+name]||sd._ensure, function(req, res) {
 					var doc = new Schema();
 					if(typeof doc.create !== 'function'){
 						return res.json(false);
 					}
-					doc.create(req.body, req.user, sd);	
+					doc.create(req.body, req.user, sd);
 					doc.save(function(err){
 						if(err) return res.json(false);
 						res.json(doc);
-					});			
+					});
 				});
-				router.post("/createCb", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
+				// make above as below
+				router.post("/createCb", sd['ensure_create_'+name]||sd._ensure, function(req, res) {
 					var doc = new Schema();
 					if(typeof doc.create !== 'function'){
 						return res.json(false);
@@ -106,68 +90,118 @@ module.exports = function(sd, partJson) {
 					});
 				});
 			/*
+			*	Get Routes
+			*/
+				var getRoute = function(get_name){
+					let final_name = '_get_'+name;
+					if(get_name) final_name += '_'+get_name;
+					router.get("/get", sd['ensure'+final_name]||sd._next, function(req, res) {
+						let query = sd['query'+final_name]&&sd['query'+final_name](req, res)||{
+							moderators: req.user._id
+						};
+						query = Schema.find(query);
+						let sort = sd['sort'+final_name]&&sd['sort'+final_name](req, res)||false;
+						if(sort){
+							query.sort(sort);
+						}
+						let skip = sd['skip'+final_name]&&sd['skip'+final_name](req, res)||false;
+						if(skip){
+							query.skip(skip);
+						}
+						let limit = sd['limit'+final_name]&&sd['limit'+final_name](req, res)||false;
+						if(limit){
+							query.limit(limit);
+						}
+						let select = sd['select'+final_name]&&sd['select'+final_name](req, res)||false;
+						if(select){
+							query.select(select);
+						}
+						let populate = sd['populate'+final_name]&&sd['populate'+final_name](req, res)||false;
+						if(populate){
+							query.populate(populate);
+						}
+						query.exec(function(err, docs) {
+							res.json(docs || []);
+						});
+					});					
+				}
+				getRoute('');
+				if(partJson.crud.get){
+					for (var i = 0; i < partJson.crud.get.length; i++) {
+						getRoute(partJson.crud.get[i]);
+					}
+				}
+			/*
 			*	Update Routes
 			*/
-			if(!partJson.crud.updates) partJson.crud.updates=[];
-			var updateRoute = function(update){
-				router.post("/update"+update.name, sd['sp'+name+'ensure']||sd._ensure, sd._ensureUpdateObject, function(req, res) {
-					Schema.findOne(sd['sp'+name+'q'+update.name]||{
-						_id: req.body._id,
-						moderators: req.user._id
-					}, function(err, doc){
-						if(err||!doc) return res.json(false);
-						sd._searchInObject(doc, req.body, update.keys);
-						if(req.body.mark) doc.markModified(req.body.mark);
-						doc.save(function(err){
-							if(err) console.log('Error from save document: ', err);
-							req.body.name = update.name;
-							sd._io.in(doc._id).emit(cname+"Update", req.body);
-							req.body.doc = doc;
-							res.json(req.body);
+				var updateRoute = function(update){
+					let final_name = '_update_'+name;
+					if(update) final_name += '_'+update;
+					router.post("/update"+update.name, sd['ensure'+final_name]||sd._ensure, sd._ensureUpdateObject, function(req, res) {
+						Schema.findOne(sd['query'+final_name]&&sd['query'+final_name](req, res)||{
+							id: req.body._id,
+							moderators: req.user._id
+						}, function(err, doc){
+							if(err||!doc) return res.json(false);
+							sd._searchInObject(doc, req.body, update.keys);
+							if(req.body.mark) doc.markModified(req.body.mark);
+							doc.save(function(err){
+								if(err) console.log('Error from save document: ', err);
+								req.body.name = update.name;
+								//sd._io.in(doc._id).emit(cname+"Update", req.body);
+								req.body.doc = doc;
+								res.json(req.body);
+							});
 						});
 					});
-				});
-			}
-			if(partJson.crud.updates){
-				for (var i = 0; i < partJson.crud.updates.length; i++) {
-					updateRoute(partJson.crud.updates[i]);
 				}
-			}
-			var updateRouteAll = function(update){
-				router.post("/update/all"+update.name, sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
-					Schema.findOne(sd['sp'+name+'qa'+update.name]&&sd['sp'+name+'qa'+update.name](req,res)||{
-						_id: req.body._id,
-						moderators: req.user._id
-					}, function(err, doc){
-						if(err||!doc) return res.json(false);
-						for (var i = 0; i < update.keys.length; i++) {
-							doc[update.keys[i]] = req.body[update.keys[i]];
-						}
-						doc.save(function(){
-							res.json(doc);
-						});
-					});
-				});
-			}
-			if(partJson.crud.updatesAll){
-				for (var i = 0; i < partJson.crud.updatesAll.length; i++) {
-					updateRouteAll(partJson.crud.updatesAll[i]);
-				}
-			}
-			// delete
-			router.post("/delete", sd['sp'+name+'ensure']||sd._ensure, function(req, res) {
-				Schema.remove(sd['sp'+name+'r']||{
-					_id: req.body._id,
-					author: req.user._id
-				}, function(err){
-					if(err) res.json(false);
-					else{
-						sd._fse.remove(process.cwd()+'/server/'+name+'/client/files/'+req.body._id);
-						sd._io.in(req.body._id).emit(cname+"Delete", req.body);
-						res.json(true);
+				if(partJson.crud.updates){
+					for (var i = 0; i < partJson.crud.updates.length; i++) {
+						updateRoute(partJson.crud.updates[i]);
 					}
+				}
+				var updateRouteAll = function(update){
+					let final_name = '_update_all_'+name;
+					if(update) final_name += '_'+update;
+					router.post("/update/all"+update.name, sd['ensure_update_all_'+final_name]||sd._ensure, function(req, res) {
+						Schema.findOne(sd['query'+final_name]&&sd['query'+final_name](req, res)||{
+							id: req.body._id,
+							moderators: req.user._id
+						}, function(err, doc){
+							if(err||!doc) return res.json(false);
+							for (var i = 0; i < update.keys.length; i++) {
+								doc[update.keys[i]] = req.body[update.keys[i]];
+							}
+							doc.save(function(){
+								res.json(doc);
+							});
+						});
+					});
+				}
+				if(partJson.crud.updatesAll){
+					for (var i = 0; i < partJson.crud.updatesAll.length; i++) {
+						updateRouteAll(partJson.crud.updatesAll[i]);
+					}
+				}
+			/*
+			*	Delete Route
+			*/
+				router.post("/delete", sd['ensure_delete_'+name]||sd._ensure, function(req, res) {
+					Schema.remove(sd['delete_'+name]&&sd['delete_'+name](req, res)||{
+						_id: req.body._id,
+						author: req.user._id
+					}, function(err){
+						if(err) res.json(false);
+						else{
+							sd._fse.remove(process.cwd()+'/server/'+name+'/client/files/'+req.body._id);
+							sd._io.in(req.body._id).emit(cname+"Delete", req.body);
+							res.json(true);
+						}
+					});
 				});
-			});
+			/*
+			*	End of waw crud
+			*/
 		}
 	/*
 	*	Socket Register
