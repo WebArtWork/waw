@@ -3,7 +3,7 @@
 ## part.json
 Field name is used in waw crud to define sd.CNAME and other crud options like base for update, get etc.<br>
 Field dependencies is exactly the same dependencies which was in package.json. All those modules which will be definded there, will be installed in root folder into node_modules.<br>
-Field crud is configuration for waw crud, define which fields should be updated
+Field crud is configuration for waw crud, define which fields should be updated and how.
 
 ## schema.js
 Here we have the collection define for mongodb. If you use waw crud, you should configure here the create method, so crud create work.

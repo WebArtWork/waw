@@ -21,7 +21,7 @@
 		}],
 		"unique_field": [{
 			"key": "url",
-			"name": "author"
+			"name": "url"
 		}]
 	}
 }

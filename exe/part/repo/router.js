@@ -114,16 +114,16 @@ module.exports = function(sd) {
 	*	custom  query below code
 
 		// Update All AUthor
-		sd['ensure_unique_field_NAME_author'] = function(req, res, next){
+		sd['ensure_unique_field_NAME_url'] = function(req, res, next){
 			next();
 		};
-		sd['search_query_unique_field_NAME_author'] = function(req, res, update){
+		sd['search_query_unique_field_NAME_url'] = function(req, res, update){
 			let query = {};
 			query[update.key] = req.body[update.key];
 			return query;
 		};
 	*/
-		sd['query_unique_field_NAME_author'] = function(req, res){
+		sd['query_unique_field_NAME_url'] = function(req, res){
 			return {
 				_id: req.body._id,
 				author: req.user._id
