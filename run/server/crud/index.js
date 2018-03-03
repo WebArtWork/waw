@@ -163,7 +163,7 @@ module.exports = function(sd, partJson) {
 				var updateRouteAll = function(update){
 					let final_name = '_update_all_'+name;
 					if(update) final_name += '_'+update.name;
-					router.post("/update/all"+update.name, sd['ensure_update_all_'+final_name]||sd._ensure, function(req, res) {
+					router.post("/update/all"+update.name, sd['ensure'+final_name]||sd._ensure, function(req, res) {
 						Schema.findOne(sd['query'+final_name]&&sd['query'+final_name](req, res)||{
 							_id: req.body._id,
 							moderators: req.user._id
@@ -181,6 +181,35 @@ module.exports = function(sd, partJson) {
 				if(partJson.crud.updatesAll){
 					for (var i = 0; i < partJson.crud.updatesAll.length; i++) {
 						updateRouteAll(partJson.crud.updatesAll[i]);
+					}
+				}
+				var unique_field = function(update){
+					let final_name = '_unique_field_'+name;
+					if(update) final_name += '_'+update.name;
+					router.post("/unique/field"+update.name, sd['ensure'+final_name]||sd._ensure, function(req, res) {
+						let query = sd['search_query'+final_name]&&sd['search_query'+final_name](req, res, update);
+						if(!query){
+							query = {};
+							query[update.key] = req.body[update.key];
+						}
+						Schema.findOne(query, function(err, sdoc){
+							if(sdoc) return res.json(false);
+							Schema.findOne(sd['query'+final_name]&&sd['query'+final_name](req, res)||{
+								_id: req.body._id,
+								moderators: req.user._id
+							}, function(err, doc){
+								if(err||!doc) return res.json(false);
+								doc[update.key] = req.body[update.key];
+								doc.save(function(){
+									res.json(doc);
+								});
+							});
+						});
+					});
+				}
+				if(partJson.crud.unique_field){
+					for (var i = 0; i < partJson.crud.unique_field.length; i++) {
+						unique_field(partJson.crud.unique_field[i]);
 					}
 				}
 			/*
