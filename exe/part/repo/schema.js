@@ -4,6 +4,7 @@ var Schema = mongoose.Schema({
 	description: String,
 	author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
 	moderators: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
+	url: {type: String, unique: true, sparse: true, trim: true},
 });
 
 Schema.methods.create = function(obj, user, sd) {

@@ -14,9 +14,14 @@
 		},{
 			"keys": ["moderators"],
 			"name": "author"
-		}], "updates": [{
+		}],
+		"updates": [{
 			"keys": ["name","description"],
 			"name": ""
+		}],
+		"unique_field": [{
+			"key": "url",
+			"name": "author"
 		}]
 	}
 }
