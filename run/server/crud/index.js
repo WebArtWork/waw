@@ -136,10 +136,10 @@ module.exports = function(sd, partJson) {
 			*/
 				var updateRoute = function(update){
 					let final_name = '_update_'+name;
-					if(update) final_name += '_'+update;
+					if(update) final_name += '_'+update.name;
 					router.post("/update"+update.name, sd['ensure'+final_name]||sd._ensure, sd._ensureUpdateObject, function(req, res) {
 						Schema.findOne(sd['query'+final_name]&&sd['query'+final_name](req, res)||{
-							id: req.body._id,
+							_id: req.body._id,
 							moderators: req.user._id
 						}, function(err, doc){
 							if(err||!doc) return res.json(false);
@@ -162,10 +162,10 @@ module.exports = function(sd, partJson) {
 				}
 				var updateRouteAll = function(update){
 					let final_name = '_update_all_'+name;
-					if(update) final_name += '_'+update;
+					if(update) final_name += '_'+update.name;
 					router.post("/update/all"+update.name, sd['ensure_update_all_'+final_name]||sd._ensure, function(req, res) {
 						Schema.findOne(sd['query'+final_name]&&sd['query'+final_name](req, res)||{
-							id: req.body._id,
+							_id: req.body._id,
 							moderators: req.user._id
 						}, function(err, doc){
 							if(err||!doc) return res.json(false);
@@ -206,23 +206,23 @@ module.exports = function(sd, partJson) {
 	/*
 	*	Socket Register
 	*/
-	sd._io_connections.push(function(socket){
-		if (socket.request.user) {
-			Schema.find(sd['socket' + cname + 'q'] || {
-				moderators: socket.request.user._id
-			}, function(err, docs) {
-				if (!err && docs) {
-					docs.forEach(function(doc) {
-						socket.join(doc._id);
-					});
-				}
-			});
-			if (!socket.request.user.__userJoinedRoom) {
-				socket.request.user.__userJoinedRoom = true;
-				socket.join(socket.request.user._id);
-			}
-		}
-	});
+	// sd._io_connections.push(function(socket){
+	// 	if (socket.request.user) {
+	// 		Schema.find(sd['socket' + cname + 'q'] || {
+	// 			moderators: socket.request.user._id
+	// 		}, function(err, docs) {
+	// 			if (!err && docs) {
+	// 				docs.forEach(function(doc) {
+	// 					socket.join(doc._id);
+	// 				});
+	// 			}
+	// 		});
+	// 		if (!socket.request.user.__userJoinedRoom) {
+	// 			socket.request.user.__userJoinedRoom = true;
+	// 			socket.join(socket.request.user._id);
+	// 		}
+	// 	}
+	// });
 	// End of Crud
 };
 // General prototypes

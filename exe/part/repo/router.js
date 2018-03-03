@@ -76,22 +76,11 @@ module.exports = function(sd) {
 		};
 		sd['query_update_NAME'] = function(req, res){
 			return {
-				id: req.body._id,
+				_id: req.body._id,
 				moderators: req.user._id
 			};
 		};
-
-		// Update AUthor
-		sd['ensure_update_NAME_author'] = function(req, res, next){
-			next();
-		};
 	*/
-		sd['query_update_NAME_author'] = function(req, res){
-			return {
-				id: req.body._id,
-				author: req.user._id
-			};
-		};
 	
 	/*
 	*	/api/NAME/update/all
@@ -103,11 +92,22 @@ module.exports = function(sd) {
 		};
 		sd['query_update_all_NAME'] = function(req, res){
 			return {
-				id: req.body._id,
+				_id: req.body._id,
 				moderators: req.user._id
 			};
 		};
+
+		// Update All AUthor
+		sd['ensure_update_all_NAME_author'] = function(req, res, next){
+			next();
+		};
 	*/
+		sd['query_update_all_NAME_author'] = function(req, res){
+			return {
+				_id: req.body._id,
+				author: req.user._id
+			};
+		};
 
 	/*
 	*	/api/NAME/delete

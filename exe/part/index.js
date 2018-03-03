@@ -4,6 +4,7 @@ module.exports = function(name){
 	var dest = process.cwd() + '/server/' + name;
 	if (sd._fs.existsSync(dest)) return sd._close('Part Exists');
 	sd._fse.copy(__dirname + '/repo', dest, function() {
+		sd._fse.removeSync(dest+'/.git');
 		var renames = [{
 			from: 'CNAME',
 			to: name.toLowerCase().capitalize()
