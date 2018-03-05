@@ -134,18 +134,19 @@ module.exports = function(sd) {
 	*	/api/NAME/delete
 	*	custom  query below code
 
-		// Ensure route
-		sd['ensure_delete_NAME'] = function(req, res, next){
+		// Delete and Delete Admin
+		sd['ensure_delete_NAME'] = sd['ensure_delete_NAME_admin'] = function(req, res, next){
 			if(req.user) next();
 			else res.json(false);
 		};
-
-		// Query for delete
-		sd['delete_NAME'] = function(req, res){
+		sd['query_delete_NAME'] = sd['query_delete_NAME_admin'] = function(req, res){
 			return {
 				_id: req.body._id,
 				author: req.user._id
 			}
+		}
+		sd['files_to_remove_delete_NAME'] = sd['files_to_remove_delete_NAME_admin'] = function(req, res){
+			return __dirname+'/files/'+req.body._id;
 		}
 	*/
 
