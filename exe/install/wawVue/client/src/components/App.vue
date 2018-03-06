@@ -7,7 +7,7 @@
  </div>
  
 </template>
-<style scoped>
+<style scoped lang="scss">
   p{
     color: #158;
     text-align: justify;

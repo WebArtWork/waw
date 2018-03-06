@@ -15,5 +15,6 @@
 	}, {
 		"name": "pgen",
 		"files": ["1_angular.js", "meditor.js"]
-	}]
+	}],
+	"plugins": ["wcom"]
 }

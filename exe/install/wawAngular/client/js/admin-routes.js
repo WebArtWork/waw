@@ -7,8 +7,8 @@ a_directives.topbar=function(){
 		templateUrl: '/html/admin/_topbar.html'
 	}
 };
-var userCtrl = function($scope, $http, $timeout, $state){
-	var u = $scope.u = {};
+var userCtrl = function($scope, $http, $timeout, $state, mongo, User){
+	var u = $scope.u = User;
 	var selectUser = function(){
 		for (var i = 0; i < u.allUsers.length; i++) {
 			if(u.allUsers[i]._id == $state.params._id){
@@ -17,23 +17,22 @@ var userCtrl = function($scope, $http, $timeout, $state){
 			}
 		}
 	}
-	if(!u.allUsers){
-		$http.get('/api/user/admin/users').then(function(resp){
-			u.allUsers = resp.data;
-			if($state.params._id) selectUser();
-		});
-	}else if($state.params._id){
-		selectUser();
+	u.allUsers = mongo.get('user', {}, {
+		query: 'getadmin'
+	}, function(){
+		if($state.params._id) selectUser();
+	});
+	u.delete = function(user){
+		return mongo.delete('user', user, 'admin');
 	}
-	console.log();
-	u.create = function(email, password) {
-		$http.post('/api/user/admin/create', {
-			password: user.password,
-			email: user.email
-		}).then(function(resp){
-			if(resp.data) u.allUsers.push(resp.data);
-		});
-	}
+
+
+
+
+
+
+
+
 	u.update = function(user) {
 		$timeout.cancel(user.ut);
 		$http.post('/api/user/admin/update', {
@@ -55,11 +54,6 @@ var userCtrl = function($scope, $http, $timeout, $state){
 			u.update(user);
 		}, 1000);
 	}
-	u.delete = function(user){
-		$http.post('/api/user/admin/delete', {
-			_id: user._id
-		});
-	}
 	u.changePassword = function(newPass){
 		$http.post('/api/user/admin/changePassword',{
 			newPass: newPass
@@ -77,6 +71,10 @@ app.config(function($stateProvider, $locationProvider, $urlRouterProvider) {
 		name: 'Profile', controller: userCtrl,
 		url: root+'/Profile/:_id',
 		templateUrl: '/html/admin/Profile.html'
+	}).state({
+		name: 'SuperAdmin', controller: userCtrl,
+		url: root+'/SuperAdmin',
+		templateUrl: '/html/admin/SuperAdmin.html'
 	});
 	$locationProvider.html5Mode(true);
 });

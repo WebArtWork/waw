@@ -1,0 +1,27 @@
+ul, ol, dl {
+    margin-bottom: 1em;
+    padding: 0;
+
+    list-style-position: inside;
+    &.m_vspace {
+        li {
+            padding-bottom: 0.5em;
+        }
+    }
+    &.m_inline {
+        @include clearfix;
+        li {
+            float: left;
+
+            margin-left: 1em;
+            &:first-of-type {
+                margin-left: 0;
+
+                list-style-type: none;
+            }
+        }
+    }
+    &.m_clear {
+        list-style-type: none;
+    }
+}

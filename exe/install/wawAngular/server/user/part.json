@@ -7,10 +7,22 @@
 		"name": "Auth",
 		"src": "auth.js"
 	}],
+	"crud": {
+		"get": ["admin"],
+		"updatesAll": [{
+			"keys": ["gender","name","birth","skills","followings","followers","data"],
+			"name": ""
+		}],
+		"updates": [],
+		"deletes": ["admin"],
+		"unique_field": [{
+			"key": "email",
+			"name": "email"
+		}]
+	},
 	"dependencies": {
 		"passport-local": "*",
 		"bcrypt-nodejs": "*",
-		"mongoose": "*",
-		"async": "*"
+		"mongoose": "*"
 	}
 }

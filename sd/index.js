@@ -41,6 +41,9 @@ module.exports = function(sd){
 			if(req.user) next();
 			else res.json(false);
 		}
+		sd._ensure_block = function(req, res, next){
+			res.json(false);
+		}
 		sd._ensureAdmin = function(req, res, next){
 			if(req.user&&req.user.isAdmin) next();
 			else res.json(false);
@@ -223,7 +226,8 @@ module.exports = function(sd){
 	*/
 		var git = require('gitty');
 		sd._initRepo = function(opts, cb){
-			if(!opts.root||!opts.repo) return cb&&cb();
+			if(!cb) cb=function(){};
+			if(!opts.root||!opts.repo) return cb();
 			sd._fse.mkdirs(opts.root);
 			git.clone(opts.root, opts.repo, {}, cb);
 		}

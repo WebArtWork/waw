@@ -1,33 +1,18 @@
 // import Vue from 'vue'
-import Vue from 'vue/dist/vue.js'
-import App from './components/App.vue'
+import Vue from 'vue'
 import Start from './Start.vue'
-import HelloWorld from './components/HelloWorld.vue'
-import VueRouter from 'vue-router'
-import wcom from 'vue-router'
+import router from './router'
+import wvcom from 'wvcom/mongo.js'
 
+Vue.use(wvcom)
 Vue.config.productionTip = false
-
-Vue.use(VueRouter);
-
-const router = new VueRouter({
-	routes: [
-	{ 
-		path: '/App',
-		name: "pageOne",
-		component: App
-	},
-	{ 
-		path: '/Helloworld',
-		name: "pageTwo",
-		component: HelloWorld
-	}
-	],
-	mode: 'history'
-})
 
 new Vue({
   el: "#app",
   render: h => h(Start),
-  router
+  router,
+  created: function() {
+   this.$mongoMethod();
+   this.$newMongoMethod();
+  }
 })

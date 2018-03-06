@@ -1,16 +1,16 @@
-directives.topbar=function(){
-	"ngInject";
-	return {
-		restrict: 'EA',
-		templateUrl: '/html/user/_topbar.html'
-	}
-};
 var ctrl = function($scope, User){
 	var u = $scope.u = User;
 }
+directives.topbar=function(){
+	"ngInject";
+	return {
+		restrict: 'EA', controller: ctrl,
+		templateUrl: '/html/user/_topbar.html'
+	}
+};
 app.config(function($stateProvider, $locationProvider, $urlRouterProvider) {
 	var root = '/';
-	$urlRouterProvider.otherwise(root);
+	$urlRouterProvider.otherwise(root+'MyProfile');
 	$stateProvider.state({
 		name: 'Explore',
 		url: root, controller: ctrl,

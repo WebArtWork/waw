@@ -1,10 +1,11 @@
-<template>
-<div id="app">
+<template v-mydirective>
+<div id="start">
 	<header>
 		<div class="wrapeer_header">
 			<nav class="bu">
 				<router-link to="/App"> To App page</router-link>
 				<router-link to="/HelloWorld"> To HelloWorld page</router-link>
+				<button class="border-b p2">Test</button>
 			</nav>
 		</div>
 	</header>
@@ -17,4 +18,8 @@
 	export default {
   name: 'Start'
 }
+
 </script>
+<style lang="scss">
+	
+</style>

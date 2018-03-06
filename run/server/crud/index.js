@@ -8,55 +8,10 @@ module.exports = function(sd, partJson) {
 			if(partJson.schema) Schema=Schema[partJson.schema];
 			sd[cname] = Schema;
 		}else return;
-	// SOLR
-		if(partJson.solr){
-			/*
-			var solr = require('solr');
-			var client = solr.createClient();
-			Schema.find({}, function(err, docs){
-				var docsArr = [];
-				var addDocToArr = function(doc){
-					docsArr.push(function(n){
-						client.add(doc, n);
-					});
-				}
-				for (var i = 0; i < docs.length; i++) {
-					addDocToArr(docs[i]);
-				}
-				sd._parallel(docsArr, function(){
-					client.commit(function(err) {});
-				});
-			});
-			sd['_solr_'+cname] = {
-				add: function(doc, next){
-					client.add(doc, function(){
-						client.commit(next);
-					});
-				},
-				remove: function(doc, next){
-					client.del(null, {
-						_id: doc._id
-					}, function(err, response) {
-						client.commit(next);
-					});
-				},
-				update: function(doc){
-					client.del(null, {
-						_id: doc._id
-					}, function(err, response) {
-						client.add(doc, function(){
-							client.commit(next);
-						});
-					});
-				},
-				query: function(query, cb){
-					client.query(query, function(err, response) {
-						var responseObj = JSON.parse(response);
-						cb(responseObj.response.docs);
-					});
-				},
-			}
-			//*/
+	// Search WAW
+		if(!sd._sw) sd._sw={};
+		if(partJson.sw){
+			
 		}
 	// Routes
 		if(partJson.crud){
@@ -95,7 +50,7 @@ module.exports = function(sd, partJson) {
 				var getRoute = function(get_name){
 					let final_name = '_get_'+name;
 					if(get_name) final_name += '_'+get_name;
-					router.get("/get", sd['ensure'+final_name]||sd._next, function(req, res) {
+					router.get("/get"+get_name, sd['ensure'+final_name]||sd._next, function(req, res) {
 						let query = sd['query'+final_name]&&sd['query'+final_name](req, res)||{
 							moderators: req.user._id
 						};
@@ -162,7 +117,7 @@ module.exports = function(sd, partJson) {
 				}
 				var updateRouteAll = function(update){
 					let final_name = '_update_all_'+name;
-					if(update) final_name += '_'+update.name;
+					if(update.name) final_name += '_'+update.name;
 					router.post("/update/all"+update.name, sd['ensure'+final_name]||sd._ensure, function(req, res) {
 						Schema.findOne(sd['query'+final_name]&&sd['query'+final_name](req, res)||{
 							_id: req.body._id,
@@ -215,19 +170,32 @@ module.exports = function(sd, partJson) {
 			/*
 			*	Delete Route
 			*/
-				router.post("/delete", sd['ensure_delete_'+name]||sd._ensure, function(req, res) {
-					Schema.remove(sd['delete_'+name]&&sd['delete_'+name](req, res)||{
-						_id: req.body._id,
-						author: req.user._id
-					}, function(err){
-						if(err) res.json(false);
-						else{
-							sd._fse.remove(process.cwd()+'/server/'+name+'/client/files/'+req.body._id);
-							sd._io.in(req.body._id).emit(cname+"Delete", req.body);
-							res.json(true);
-						}
+				var deletes = function(del){
+					let final_name = '_delete_'+name;
+					if(del) final_name += '_'+del;
+					router.post("/delete"+del, sd['ensure' + final_name] || sd._ensure, function(req, res) {
+						Schema.remove(sd['query' + final_name] && sd['query' + final_name](req, res) || {
+							_id: req.body._id,
+							author: req.user._id
+						}, function(err) {
+							if (err) res.json(false);
+							else {
+								let ftr = process.cwd()+'/server/'+name+'/files/'+req.body._id;
+								if(typeof sd['files_to_remove'+del] == 'function'){
+									ftr = sd['files_to_remove'+del](req, res);
+								}
+								sd._fse.remove(ftr);
+								res.json(true);
+							}
+						});
 					});
-				});
+				}
+				deletes('');
+				if(partJson.crud.deletes){
+					for (var i = 0; i < partJson.crud.deletes.length; i++) {
+						partJson.crud.deletes[i]&&deletes(partJson.crud.deletes[i]);
+					}
+				}
 			/*
 			*	End of waw crud
 			*/

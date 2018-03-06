@@ -58,6 +58,9 @@ module.exports = function(sd) {
 					if (user) return done(null, false);
 					else {
 						var newUser = new User();
+						newUser.is = {
+							admin: false
+						};
 						newUser.email = username.toLowerCase();
 						newUser.password = newUser.generateHash(password);
 						newUser.save(function(err) {

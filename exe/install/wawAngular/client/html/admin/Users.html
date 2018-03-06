@@ -5,6 +5,7 @@
 			<cel>email</cel>
 			<cel>name</cel>
 			<cel>admin</cel>
+			<cel>delete</cel>
 		</row>
 		<row ng-repeat="user in u.allUsers">
 			<cel><img ng-src="{{user.avatarUrl}}" alt=""></cel>
@@ -12,7 +13,10 @@
 			<cel ui-sref="Profile({_id: user._id})">{{user.name}}</cel>
 			<cel>
 				<button ng-click="user.isAdmin=!user.isAdmin; u.update(user);"><span ng-if="!user.isAdmin">Make</span><span ng-if="user.isAdmin">Remove</span> Admin</button>
-			</cel>	
+			</cel>
+			<cel>
+				<button ng-click="u.delete(user)" ng-if="u._id != user._id">Delete</button>
+			</cel>
 		</row>
 	</box>
 </scroll>
