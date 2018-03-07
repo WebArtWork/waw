@@ -66,7 +66,11 @@ module.exports = function(sd){
 /*
 *	waw clients
 */
-	if(sd._config.angular){
+	if(sd._config.react){
+
+	}else if(sd._config.vue){
+		
+	}else if(sd._config.angular){
 		sd._app.use(function(req, res, next){
 			var islocal = req.get('host').toLowerCase().indexOf('localhost')==0;
 			var url = req.originalUrl.toLowerCase();
