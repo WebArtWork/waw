@@ -55,6 +55,18 @@ if(sd._config.mongo){
 	}
 	sd._mongoUrl = 'mongodb://'+mongoAuth+(sd._config.mongo.host||'localhost')+':'+(sd._config.mongo.port||'27017')+'/'+(sd._config.mongo.db||'test');
 }
+let redirect = function(redirect){
+	sd._app.use(function(req, res, next) {
+		if (req.get('host').toLowerCase() == redirect.from.toLowerCase()) {
+			res.redirect(redirect.to);
+		} else next();
+	});
+}
+if(Array.isArray(sd._config.redirects)){
+	for (var i = 0; i < sd._config.redirects.length; i++) {
+		redirect(sd._config.redirects[i]);
+	}
+}
 
 var cookieParser = require('cookie-parser');
 sd._app.use(cookieParser());
