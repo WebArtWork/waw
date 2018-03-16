@@ -76,6 +76,7 @@ module.exports = function(sd, partJson) {
 							query.populate(populate);
 						}
 						query.exec(function(err, docs) {
+							err&&console.trace(err);
 							res.json(docs || []);
 						});
 					});					

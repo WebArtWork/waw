@@ -63,6 +63,23 @@ module.exports = function(sd){
 			next();
 		});
 	}, renderDocs);
+	sd._app.get("/sitemap.xml", function(req, res, next) {
+		let sitemap='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.google.com/schemas/sitemap/0.90">';
+		if(sd._config.sitemap&&sd._config.sitemap[req.get('host')]){
+			let arr = sd._config.sitemap[req.get('host')];
+			for (var i = 0; i < arr.length; i++) {
+				sitemap+='<url><loc>http';
+				if(arr[i].secure) sitemap+='s';
+				sitemap+='://'+req.get('host')+arr[i].url+'</loc>';
+				sitemap+='<lastmod>'+sd._fs.statSync(process.cwd()+'/client'+arr[i].file).mtime+'</lastmod>';
+				sitemap+='<changefreq>'+arr[i].changefreq+'</changefreq>';
+				sitemap+='<priority>'+arr[i].priority+'</priority>';
+				sitemap+='</url>';
+			}
+		}
+		sitemap+='</urlset>';
+		res.send(sitemap);
+	});
 /*
 *	waw clients
 */
