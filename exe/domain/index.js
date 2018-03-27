@@ -126,10 +126,14 @@ module.exports.set = function(sd, config, cb){
 	remove(sd, config.domain);
 	if(config.secure){
 		set_secure(sd, config, function(){
-			sd._cmd.get('sudo service nginx restart', cb);
+			sd._cmd.get('sudo service nginx restart', ()=>{
+				sd._cmd.get('sudo service nginx start', cb);
+			});
 		});
 	} else {
 		add_simple(sd, config);
-		sd._cmd.get('sudo service nginx restart', cb);
+		sd._cmd.get('sudo service nginx restart', ()=>{
+			sd._cmd.get('sudo service nginx start', cb);
+		});
 	}
 }
