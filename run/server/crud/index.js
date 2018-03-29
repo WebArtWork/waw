@@ -149,15 +149,15 @@ module.exports = function(sd, partJson) {
 							query[update.key] = req.body[update.key];
 						}
 						Schema.findOne(query, function(err, sdoc){
-							if(sdoc) return res.json(false);
 							Schema.findOne(sd['query'+final_name]&&sd['query'+final_name](req, res)||{
 								_id: req.body._id,
 								moderators: req.user._id
 							}, function(err, doc){
 								if(err||!doc) return res.json(false);
+								if(sdoc) return res.json(doc[update.key]);
 								doc[update.key] = req.body[update.key];
-								doc.save(function(){
-									res.json(doc);
+								doc.save(function(err){
+									res.json(doc[update.key]);
 								});
 							});
 						});

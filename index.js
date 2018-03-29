@@ -57,7 +57,7 @@ var run = function(){
 		}
 		if(Array.isArray(info.plugins)){			
 			for (var j = 0; j < info.plugins.length; j++) {
-				let pluginLoc = clientRoot + '/js/' + info.plugins[j];
+				var pluginLoc = clientRoot + '/js/' + info.plugins[j];
 				//fse.mkdirsSync(pluginLoc);
 				obj.ignore.push(pluginLoc+'/'+info.plugins[j]+'.js');
 				obj.ignore.push(pluginLoc+'/'+info.plugins[j]+'-min.js');
@@ -145,6 +145,9 @@ var restart = function(){
 				max_memory_restart: '200M'
 			}, function(err, apps) {
 				exeCode.disconnect();
+				sd._cmd.get('sudo service nginx restart', () => {
+					sd._cmd.get('sudo service nginx start', cb);
+				});
 				process.exit(2);
 			});
 		});

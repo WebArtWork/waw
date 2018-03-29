@@ -179,10 +179,10 @@ module.exports = function(sd){
 				});
 			}
 		}
-		sd._strToArr = function(str, div){
+		sd._strToArr = (str, div='') => {
 			if (!str) return [];
-			str = str.split((div || ',') + ' ').join(',');
-			var arr = str.split(div || ',');
+			str = str.split(div + ' ').join(',');
+			var arr = str.split(div);
 			for (var i = arr.length - 1; i >= 0; i--) {
 				if (!arr[i]) arr.splice(i, 1);
 			}
