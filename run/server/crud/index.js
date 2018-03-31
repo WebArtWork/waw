@@ -141,7 +141,7 @@ module.exports = function(sd, partJson) {
 				}
 				var unique_field = function(update){
 					let final_name = '_unique_field_'+name;
-					if(update) final_name += '_'+update.name;
+					if(update.name) final_name += '_'+update.name;
 					router.post("/unique/field"+update.name, sd['ensure'+final_name]||sd._ensure, function(req, res) {
 						let query = sd['search_query'+final_name]&&sd['search_query'+final_name](req, res, update);
 						if(!query){

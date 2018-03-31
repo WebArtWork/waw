@@ -145,9 +145,6 @@ var restart = function(){
 				max_memory_restart: '200M'
 			}, function(err, apps) {
 				exeCode.disconnect();
-				sd._cmd.get('sudo service nginx restart', () => {
-					sd._cmd.get('sudo service nginx start', cb);
-				});
 				process.exit(2);
 			});
 		});
