@@ -286,6 +286,8 @@ module.exports = function(sd){
 					}
 				}
 				obj.user = req.user;
+				obj.originalUrl = req.originalUrl;
+				obj.url = req.originalUrl.toLowerCase();
 				return obj;
 			}
 			for (var i = 0; i < ff.length; i++) {
