@@ -145,8 +145,11 @@ module.exports = function(sd) {
 				author: req.user._id
 			}
 		}
-		sd['files_to_remove_delete_NAME'] = sd['files_to_remove_delete_NAME_admin'] = function(req, res){
-			return __dirname+'/files/'+req.body._id;
+		sd['populate_delete_NAME'] = sd['populate_delete_NAME_admin'] = function(req, res){
+			return false;
+		}
+		sd['on_delete_NAME'] = sd['on_delete_NAME_admin'] = function(doc, req, res){
+			// actions to do
 		}
 	*/
 
