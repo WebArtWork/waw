@@ -175,19 +175,28 @@ module.exports = function(sd, partJson) {
 					let final_name = '_delete_'+name;
 					if(del) final_name += '_'+del;
 					router.post("/delete"+del, sd['ensure' + final_name] || sd._ensure, function(req, res) {
-						Schema.remove(sd['query' + final_name] && sd['query' + final_name](req, res) || {
+						let q = Schema.findOne(sd['query' + final_name] && sd['query' + final_name](req, res) || {
 							_id: req.body._id,
 							author: req.user._id
-						}, function(err) {
-							if (err) res.json(false);
-							else {
-								let ftr = process.cwd()+'/server/'+name+'/files/'+req.body._id;
-								if(typeof sd['files_to_remove'+del] == 'function'){
-									ftr = sd['files_to_remove'+del](req, res);
+						})
+						let populate = sd['populate'+final_name]&&sd['populate'+final_name](req, res)||false;
+						if(populate){
+							q.populate(populate);
+						}
+						q.exec(function(err, doc) {
+							if(err||!doc) return res.json(false);
+							Schema.remove(sd['query' + final_name] && sd['query' + final_name](req, res) || {
+								_id: req.body._id,
+								author: req.user._id
+							}, function(err) {
+								if (err) res.json(false);
+								else {
+									if(typeof sd['on'+del] == 'function'){
+										sd['on'+del](doc, req, res);
+									}
+									res.json(true);
 								}
-								sd._fse.remove(ftr);
-								res.json(true);
-							}
+							});
 						});
 					});
 				}

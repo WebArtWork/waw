@@ -98,7 +98,8 @@ var sessionMiddleware = session({
 	resave: false,
 	saveUninitialized: true,
 	cookie: {
-		maxAge: sessionMaxAge
+		maxAge: sessionMaxAge,
+		domain: sd._config.domain||undefined
 	},
 	rolling: true,
 	store: store

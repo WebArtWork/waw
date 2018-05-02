@@ -416,6 +416,15 @@ module.exports = function(sd){
 			},{
 				name: 'wedit',
 				repo: 'git@github.com:WebArtWork/wedit.git'
+			},{
+				name: 'wcanvas',
+				repo: 'git@github.com:WebArtWork/wcanvas.git'
+			},{
+				name: 'wpicker',
+				repo: 'git@github.com:WebArtWork/wpicker.git'
+			},{
+				name: 'wmap',
+				repo: 'git@github.com:WebArtWork/wmap.git'
 			}];
 			var compareCssFiles = function(injsfile, incssfile){
 				var mtjs, mtcss;
