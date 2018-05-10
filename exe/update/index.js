@@ -22,3 +22,17 @@ module.exports.framework = function(cb){
 		});
 	});
 }
+module.exports.install = function(name, repo){
+	sd._fse.mkdirs(process.cwd() + '/' + name);
+	var myRepo = sd._git(process.cwd() + '/' + name);
+	myRepo.init(function(){
+		myRepo.addRemote('origin', repo, function(err){
+			myRepo.fetch('--all',function(err){
+				myRepo.reset('origin/master', function(){
+					sd._fse.removeSync(process.cwd() + '/' + name + '/.git');
+					sd._close('Project successfully created.');
+				});
+			});
+		});
+	});
+}
