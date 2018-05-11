@@ -175,9 +175,13 @@ module.exports = function(sd){
 						});
 					}
 				}
-				var generateLibsWithList = function(dest, files, name){
+				var generateLibsWithList = function(dest, files, name, prod_files){
 					if (sd._fs.existsSync(dest+'/lab')) {
-						console.log('generating!!!: ', name);
+						if(sd._config.production){
+							for (var i = 0; i < prod_files.length; i++) {
+								files.push(prod_files[i]);
+							}
+						}
 						minifier({
 							files: files,
 							way: dest + '/gen/',
@@ -288,6 +292,7 @@ module.exports = function(sd){
 				obj.user = req.user;
 				obj.originalUrl = req.originalUrl;
 				obj.url = req.originalUrl.toLowerCase();
+				obj._config = sd._config;
 				return obj;
 			}
 			for (var i = 0; i < ff.length; i++) {
@@ -386,7 +391,12 @@ module.exports = function(sd){
 						for (var j = 0; j < info.lab[i].files.length; j++) {
 							info.lab[i].files[j] = clientRoot + '/lab/' + info.lab[i].files[j];
 						}
-						generateLibsWithList(clientRoot, info.lab[i].files, info.lab[i].name);
+						if(info.lab[i].prod){
+							for (var j = 0; j < info.lab[i].prod.length; j++) {
+								info.lab[i].prod[j] = clientRoot + '/js/' + info.lab[i].prod[j];
+							}
+						}
+						generateLibsWithList(clientRoot, info.lab[i].files, info.lab[i].name, info.lab[i].prod);
 					}
 				}
 			}
