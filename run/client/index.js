@@ -352,7 +352,7 @@ module.exports = function(sd){
 					}
 				}
 			}
-			sd._derer.setFilter('tr', function(word, file){
+			sd._tr = function(word, file){
 				word = word.replace('"',"'");
 				if(df[file]&&df[file][word])
 					return df[file][word];
@@ -360,7 +360,9 @@ module.exports = function(sd){
 					if(df[file]&&typeof df[file][word] != 'string') checkFiles(word, file);
 					return word;
 				}
-			});
+			}
+			sd._derer.setFilter('tr', sd._tr);
+			sd._derer.setFilter('translate', sd._tr);
 			sd._app.post("/waw/translate", function(req, res, next){
 				if(req.hostname=='localhost') next();
 				else res.json(false);
