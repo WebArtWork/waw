@@ -276,6 +276,16 @@ module.exports = function(sd){
 				if(req.user&&req.user.lang) obj.lang = req.user.lang;
 				else if(req.session.lang) obj.lang = req.session.lang;
 				else obj.lang = ff[0];
+				if(obj._on_lang&&obj._on_lang[obj.lang]){
+					for(var key in obj._on_lang[obj.lang]){
+						obj[key] = obj._on_lang[obj.lang][key];
+					}
+				}
+				if(obj._translate){
+					for(var key in obj._translate){
+						obj[key] = sd._tr(obj._translate[key], obj.lang);
+					}
+				}
 				if(req.originalUrl=='/'){
 					for (var i = 0; i < ff.length; i++) {
 						obj[ff[i]+'Url'] = '/'+ff[i];
