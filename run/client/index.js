@@ -249,143 +249,176 @@ module.exports = function(sd){
 		/*
 		*	Translates
 		*/
-			var translateFolder = clientRoot + '/lang';
-			var df = sd._df = {};
-			var ff = {};
-			ff = sd._getFiles(translateFolder);
-			var addSetLang = function(lang){
-				sd['_set_' + lang] = function(req, res, next) {
-					if (req.user) {
-						req.user.lang = lang;
-						req.user.save();
-					} else req.session.lang = lang;
-					next();
-				};
-			}
-			for (var i = 0; i < ff.length; i++) {
-				var previousFileName = ff[i];
-				ff[i] = ff[i].replace('.js','');
-				addSetLang(ff[i]);
-				if(ff[i].indexOf('.')>=0){
-					ff[i] = sd._rpl(ff[i], '.', '');
-					sd._fs.writeFileSync(translateFolder+'/'+ff[i]+'.js', sd._fs.readFileSync(translateFolder+'/'+previousFileName, 'utf8'), 'utf8');
-					sd._fs.unlinkSync(translateFolder+'/'+previousFileName);
-				}
-			}
-			sd._ro = function(req, res, obj){
-				if(req.user&&req.user.lang) obj.lang = req.user.lang;
-				else if(req.session.lang) obj.lang = req.session.lang;
-				else obj.lang = ff[0];
-				if(obj._on_lang&&obj._on_lang[obj.lang]){
-					for(var key in obj._on_lang[obj.lang]){
-						obj[key] = obj._on_lang[obj.lang][key];
-					}
-				}
-				if(obj._translate){
-					for(var key in obj._translate){
-						obj[key] = sd._tr(obj._translate[key], obj.lang);
-					}
-				}
-				if(req.originalUrl=='/'){
-					for (var i = 0; i < ff.length; i++) {
-						obj[ff[i]+'Url'] = '/'+ff[i];
-					}
-				}else{
-					for (var i = 0; i < ff.length; i++) {
-						obj[ff[i]+'Url'] = req.originalUrl;
-						for (var j = 0; j < ff.length; j++) {
-							obj[ff[i]+'Url'] = obj[ff[i]+'Url'].replace('/'+ff[j],'');
-						}
-						obj[ff[i]+'Url'] += '/' + ff[i];
-					}
-				}
-				obj.user = req.user;
-				obj.originalUrl = req.originalUrl;
-				obj.url = req.originalUrl.toLowerCase();
-				obj._config = sd._config;
-				return obj;
-			}
-			for (var i = 0; i < ff.length; i++) {
-				var words = require(translateFolder+'/'+ff[i]+'.js');
-				if(!df[ff[i]]) df[ff[i]]={};
-				for(key in words){
-					df[ff[i]][key] = words[key];
-				}
-			}
-			sd._generate_translate_file = function(){
-				var data = sd._fs.readFileSync(__dirname+'/js/translate.js', 'utf8');
-				data=data.replace('LANG_ARR', JSON.stringify(ff)).replace('INNER_DF', JSON.stringify(df));
-				sd._fs.writeFileSync(clientRoot + '/gen/translate.js', data, 'utf8');
-			}
-			if(info.translate){
-				sd._generate_translate_file();
-			}
 			/*
-			*	Below we make content accessible by working project
+			*	Initialize
 			*/
-			var addWordToIdea = function(word){
-				return console.log(word);
-				// sd._wait(function(){
-				// 	sd._request.post({
-				// 		uri: 'http://pagefly.webart.work/api/idea/addWord',
-				// 		form: {
-				// 			_id: sd._config.waw_idea,
-				// 			langs: ff,
-				// 			word: word,
-				// 			token: devConfig.user
-				// 		}
-				// 	}, sd._wait_next);
-				// });
-			}
-			var fillFiles = function(word){
-				var _generate_translate_file = false;
+				var translateFolder = clientRoot + '/lang';
+				var df = sd._df = {};
+				var ff = {};
+				ff = sd._getFiles(translateFolder);
+			/*
+			*	sd scripts
+			*/
+				var addSetLang = function(lang){
+					sd['_set_' + lang] = function(req, res, next) {
+						if (req.user) {
+							req.user.lang = lang;
+							req.user.save();
+						} else req.session.lang = lang;
+						next();
+					};
+				}
+				sd._ro = function(req, res, obj){
+					if(req.user&&req.user.lang) obj.lang = req.user.lang;
+					else if(req.session.lang) obj.lang = req.session.lang;
+					else obj.lang = ff[0];
+
+					if(obj._translate){
+						for(var key in obj._translate){
+							obj[key] = sd._tr(obj._translate[key], obj.lang);
+						}
+					}
+					delete obj._translate;
+					if(obj._delete){
+						for (var i = 0; i < obj._delete.length; i++) {
+							delete obj[obj._delete[i]]
+						}
+					}
+					delete obj._delete;
+
+					if(obj._on_lang&&obj._on_lang[obj.lang]){
+						for(var key in obj._on_lang[obj.lang]){
+							obj[key] = obj._on_lang[obj.lang][key];
+						}
+					}
+					delete obj._on_lang;
+					if(obj._translate){
+						for(var key in obj._translate){
+							obj[key] = sd._tr(obj._translate[key], obj.lang);
+						}
+					}
+					delete obj._translate;
+					if(obj._delete){
+						for (var i = 0; i < obj._delete.length; i++) {
+							delete obj[obj._delete[i]]
+						}
+					}
+					delete obj._delete;
+
+					if(req.originalUrl=='/'){
+						for (var i = 0; i < ff.length; i++) {
+							obj[ff[i]+'Url'] = '/'+ff[i];
+						}
+					}else{
+						for (var i = 0; i < ff.length; i++) {
+							obj[ff[i]+'Url'] = req.originalUrl;
+							for (var j = 0; j < ff.length; j++) {
+								obj[ff[i]+'Url'] = obj[ff[i]+'Url'].replace('/'+ff[j],'');
+							}
+							obj[ff[i]+'Url'] += '/' + ff[i];
+						}
+					}
+					obj.user = req.user;
+					obj.originalUrl = req.originalUrl;
+					obj.url = req.originalUrl.toLowerCase();
+					obj._config = sd._config;
+					return obj;
+				}
+				sd._tr = function(word, file){
+					word = word.replace('"',"'");
+					if(df[file]&&df[file][word])
+						return df[file][word];
+					else{
+						if(df[file]&&typeof df[file][word] != 'string') checkFiles(word, file);
+						return word;
+					}
+				}
+				sd._derer.setFilter('tr', sd._tr);
+				sd._derer.setFilter('translate', sd._tr);
+				sd._generate_translate_file = function(){
+					var data = sd._fs.readFileSync(__dirname+'/js/translate.js', 'utf8');
+					data=data.replace('LANG_ARR', JSON.stringify(ff)).replace('INNER_DF', JSON.stringify(df));
+					sd._fs.writeFileSync(clientRoot + '/gen/translate.js', data, 'utf8');
+				}
+			/*
+			*	Translate Tool
+			*/
+				var addWordToTranslateTool = function(word){
+					return console.log(word);
+					// sd._wait(function(){
+					// 	sd._request.post({
+					// 		uri: 'http://pagefly.webart.work/api/idea/addWord',
+					// 		form: {
+					// 			_id: sd._config.waw_idea,
+					// 			langs: ff,
+					// 			word: word,
+					// 			token: devConfig.user
+					// 		}
+					// 	}, sd._wait_next);
+					// });
+				}
+				var fillFiles = function(word){
+					var _generate_translate_file = false;
+					for (var i = 0; i < ff.length; i++) {
+						var words = require(translateFolder+'/'+ff[i]+'.js');
+						if(!words[word]){
+							words[word] = '';
+							_generate_translate_file = true;
+							df[ff[i]] = words;
+							sd._fs.writeFileSync(translateFolder+'/'+ff[i]+'.js', 'module.exports = '+JSON.stringify(words), 'utf-8');
+						}
+					}
+					if(info.translate&&_generate_translate_file) sd._generate_translate_file();
+					if(_generate_translate_file&&sd._config.waw_idea&&devConfig.user){
+						addWordToTranslateTool(word);
+					}
+				}
+				var checkFiles = function(word, file){
+					for(var folder in ff){
+						for (var i = 0; i < ff.length; i++) {
+							if(ff[i]==file){
+								return fillFiles(word);
+							}
+						}
+					}
+				}
+				sd._app.post("/waw/translate", function(req, res, next){
+					if(req.hostname=='localhost') next();
+					else res.json(false);
+				}, function(req, res) {
+					req.body.word = req.body.word.replace('"',"'");
+					if(df[req.body.lang]&&df[req.body.lang][req.body.word])
+						return res.json(df[req.body.lang][req.body.word]);
+					else{
+						if(df[req.body.lang]&&typeof df[req.body.lang][req.body.word] != 'string')
+							checkFiles(req.body.word, req.body.lang);
+						res.json(true);
+					}
+				});
+			/*
+			*	Boot
+			*/
+				for (var i = 0; i < ff.length; i++) {
+					var previousFileName = ff[i];
+					ff[i] = ff[i].replace('.js','');
+					addSetLang(ff[i]);
+					if(ff[i].indexOf('.')>=0){
+						ff[i] = sd._rpl(ff[i], '.', '');
+						sd._fs.writeFileSync(translateFolder+'/'+ff[i]+'.js', sd._fs.readFileSync(translateFolder+'/'+previousFileName, 'utf8'), 'utf8');
+						sd._fs.unlinkSync(translateFolder+'/'+previousFileName);
+					}
+				}
 				for (var i = 0; i < ff.length; i++) {
 					var words = require(translateFolder+'/'+ff[i]+'.js');
-					if(!words[word]){
-						words[word] = '';
-						_generate_translate_file = true;
-						df[ff[i]] = words;
-						sd._fs.writeFileSync(translateFolder+'/'+ff[i]+'.js', 'module.exports = '+JSON.stringify(words), 'utf-8');
+					if(!df[ff[i]]) df[ff[i]]={};
+					for(key in words){
+						df[ff[i]][key] = words[key];
 					}
 				}
-				if(info.translate&&_generate_translate_file) sd._generate_translate_file();
-				if(_generate_translate_file&&sd._config.waw_idea&&devConfig.user){
-					addWordToIdea(word);
+				if(info.translate){
+					sd._generate_translate_file();
 				}
-			}
-			var checkFiles = function(word, file){
-				for(var folder in ff){
-					for (var i = 0; i < ff.length; i++) {
-						if(ff[i]==file){
-							return fillFiles(word);
-						}
-					}
-				}
-			}
-			sd._tr = function(word, file){
-				word = word.replace('"',"'");
-				if(df[file]&&df[file][word])
-					return df[file][word];
-				else{
-					if(df[file]&&typeof df[file][word] != 'string') checkFiles(word, file);
-					return word;
-				}
-			}
-			sd._derer.setFilter('tr', sd._tr);
-			sd._derer.setFilter('translate', sd._tr);
-			sd._app.post("/waw/translate", function(req, res, next){
-				if(req.hostname=='localhost') next();
-				else res.json(false);
-			}, function(req, res) {
-				req.body.word = req.body.word.replace('"',"'");
-				if(df[req.body.lang]&&df[req.body.lang][req.body.word])
-					return res.json(df[req.body.lang][req.body.word]);
-				else{
-					if(df[req.body.lang]&&typeof df[req.body.lang][req.body.word] != 'string')
-						checkFiles(req.body.word, req.body.lang);
-					res.json(true);
-				}
-			});
+			// End of Translation
 		/*
 		*	Managing Pages
 		*/
