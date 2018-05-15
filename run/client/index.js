@@ -271,7 +271,7 @@ module.exports = function(sd){
 				sd._ro = function(req, res, obj){
 					if(req.user&&req.user.lang) obj.lang = req.user.lang;
 					else if(req.session.lang) obj.lang = req.session.lang;
-					else obj.lang = ff[0];
+					else obj.lang = sd._config.lang||ff[0];
 
 					if(obj._translate){
 						for(var key in obj._translate){

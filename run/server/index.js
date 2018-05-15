@@ -10,8 +10,8 @@ module.exports = function(sd, cb){
 		});
 		if(sd._config.update&&sd._config.update.key){
 			var update = function(req, res) {
-				res.send(true);
 				if(sd._config.update.key!=req.params.key) return res.send(false);
+				else res.send(true);
 				var git = require('gitty');
 				var myRepo = git(process.cwd());
 				myRepo.fetch('--all',function(err){
