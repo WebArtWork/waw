@@ -150,8 +150,17 @@ sd._io.use(passportSocketIo.authorize({
 	}
 }));
 
-require(__dirname + '/server')(sd, function(){
-	require(__dirname + '/client')(sd);
-	server.listen(sd._config.port || 8080);
-	console.log("App listening on port " + (sd._config.port || 8080));
-});
+
+if(sd._config.wawApp){
+	require(__dirname + '/waw_server')(sd, function(){
+		require(__dirname + '/client')(sd);
+		server.listen(sd._config.port || 8080);
+		console.log("App listening on port " + (sd._config.port || 8080));
+	});
+}else{
+	require(__dirname + '/server')(sd, function(){
+		require(__dirname + '/client')(sd);
+		server.listen(sd._config.port || 8080);
+		console.log("App listening on port " + (sd._config.port || 8080));
+	});
+}

@@ -3,8 +3,9 @@ var ext = ['.css','.ttf','.woff','.woff2','.svg','.otf','.js','.html','.gif','.j
 module.exports = function(sd){
 	console.log('READING CLIENT SIDE');
 	var clientRoot = process.cwd()+'/client';
+	if(sd._config.wawApp) clientRoot = process.cwd();
 /*
-*	Docs
+*	waw support
 */
 	var showdown  = require('showdown');
 	var converter = new showdown.Converter();
@@ -80,13 +81,44 @@ module.exports = function(sd){
 		sitemap+='</urlset>';
 		res.send(sitemap);
 	});
+	sd._app.get("/waw/newId", sd._ensure, function(req, res) {
+		res.json(sd._mongoose.Types.ObjectId());
+	});
+	sd._app.get("/waw/dateNow", sd._ensure, function(req, res) {
+		res.json(new Date());
+	});
+	if(sd._config.update&&sd._config.update.key){
+		var update = function(req, res) {
+			if(sd._config.update.key!=req.params.key) return res.send(false);
+			else res.send(true);
+			var git = require('gitty');
+			var myRepo = git(process.cwd());
+			myRepo.fetch('--all',function(err){
+				myRepo.reset('origin/'+(req.params.branch||'master'),function(err){
+					var pm2 = require('pm2');
+					pm2.connect(function(err) {
+						if (err) {
+							console.error(err);
+							process.exit(2);
+						}
+						pm2.restart({
+							name: sd._config.name
+						}, function(err, apps) {
+							pm2.disconnect();
+							process.exit(2);
+						});
+					});
+				});
+			});
+		}
+		sd._app.get("/waw/update/:key/:branch", update);
+		sd._app.post("/waw/update/:key/:branch", update);
+	}
 /*
 *	waw clients
 */
 	if(sd._config.react){
-
 	}else if(sd._config.vue){
-		
 	}else if(sd._config.angular){
 		sd._app.use(function(req, res, next){
 			var islocal = req.get('host').toLowerCase().indexOf('localhost')==0;
@@ -98,19 +130,14 @@ module.exports = function(sd){
 				if( sd._isEndOfStr(req.originalUrl.split('?')[0], ext[i]) ) {
 					for (var j = 0; j < folders.length; j++) {
 						if(req.originalUrl.indexOf(folders[j])>-1){
-							return res.sendFile(clientRoot + '/dist/client/' + req.originalUrl.split('?')[0]);
+							return res.sendFile(clientRoot + '/dist/client/client/' + req.originalUrl.split('?')[0]);
 						}
 					}
 				}
 			}
-			res.sendFile(clientRoot+'/dist/index.html');
+			res.sendFile(clientRoot+'/dist/client/index.html');
 		});
 	}else{
-		// if (sd._fs.existsSync(__dirname+'/../config.json')) {
-		// 	var devConfig = sd._fse.readJsonSync(__dirname+'/../config.json', {
-		// 		throws: false
-		// 	});
-		// }else var devConfig = {};
 		if(sd._fs.existsSync(clientRoot+'/config.json')){		
 			var info = sd._fse.readJsonSync(clientRoot+'/config.json', {throws: false});
 		}else{
@@ -447,6 +474,7 @@ module.exports = function(sd){
 			}
 
 			for (var j = 0; j < info.router.length; j++) {
+				console.log(clientRoot + '/' + info.router[j].src);
 				require(clientRoot + '/' + info.router[j].src)(sd._app, sd);
 			}
 			sd._app.set('views', engines);
