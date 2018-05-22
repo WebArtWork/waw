@@ -98,7 +98,7 @@ module.exports = function(sd){
 				if( sd._isEndOfStr(req.originalUrl.split('?')[0], ext[i]) ) {
 					for (var j = 0; j < folders.length; j++) {
 						if(req.originalUrl.indexOf(folders[j])>-1){
-							return res.sendFile(clientRoot + '/dist/' + req.originalUrl.split('?')[0]);
+							return res.sendFile(clientRoot + '/dist/client/' + req.originalUrl.split('?')[0]);
 						}
 					}
 				}
