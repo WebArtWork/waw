@@ -302,9 +302,6 @@ module.exports = function(sd){
 					if(req.user&&req.user.lang) obj.lang = req.user.lang;
 					else if(req.session.lang) obj.lang = req.session.lang;
 					else obj.lang = sd._config.lang||ff[0];
-					if(req.user&&req.user.lang) console.log('FROM USER');
-					else if(req.session.lang) console.log('FROM SESSION');
-					else console.log('FROM SOMETHING ELSE');
 
 					if(obj._translate){
 						for(var key in obj._translate){
