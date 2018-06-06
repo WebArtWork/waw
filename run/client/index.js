@@ -474,7 +474,6 @@ module.exports = function(sd){
 			}
 
 			for (var j = 0; j < info.router.length; j++) {
-				console.log(clientRoot + '/' + info.router[j].src);
 				require(clientRoot + '/' + info.router[j].src)(sd._app, sd);
 			}
 			sd._app.set('views', engines);
