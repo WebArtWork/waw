@@ -127,6 +127,12 @@ sd._app.set('view cache', true);
 sd._io = require('socket.io')(server, { origins: '*:*'});
 sd._io_connections = [];
 sd._io.on('connection', function (socket) {
+	if (socket.request.user) {
+		socket.join(socket.request.user._id);
+	}
+	// socket.on('message', function(msg) {
+	// 	socket.broadcast.emit('message', msg);
+	// });
 	for (var i = 0; i < sd._io_connections.length; i++) {
 		if(typeof sd._io_connections[i] == 'function'){
 			sd._io_connections[i](socket);
@@ -151,16 +157,8 @@ sd._io.use(passportSocketIo.authorize({
 }));
 
 
-if(sd._config.wawApp){
-	require(__dirname + '/waw_server')(sd, function(){
-		require(__dirname + '/client')(sd);
-		server.listen(sd._config.port || 8080);
-		console.log("App listening on port " + (sd._config.port || 8080));
-	});
-}else{
-	require(__dirname + '/server')(sd, function(){
-		require(__dirname + '/client')(sd);
-		server.listen(sd._config.port || 8080);
-		console.log("App listening on port " + (sd._config.port || 8080));
-	});
-}
+require(__dirname + '/server')(sd, function(){
+	require(__dirname + '/client')(sd);
+	server.listen(sd._config.port || 8080);
+	console.log("App listening on port " + (sd._config.port || 8080));
+});

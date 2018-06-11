@@ -303,6 +303,11 @@ module.exports = function(sd){
 					else if(req.session.lang) obj.lang = req.session.lang;
 					else obj.lang = sd._config.lang||ff[0];
 
+					obj.host = req.get('host');
+					obj.host_no_port = req.get('host').split(':')[0];
+
+					console.log();
+
 					if(obj._translate){
 						for(var key in obj._translate){
 							obj[key] = sd._tr(obj._translate[key], obj.lang);

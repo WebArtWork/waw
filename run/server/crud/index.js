@@ -213,23 +213,21 @@ module.exports = function(sd, partJson) {
 	/*
 	*	Socket Register
 	*/
-	// sd._io_connections.push(function(socket){
-	// 	if (socket.request.user) {
-	// 		Schema.find(sd['socket' + cname + 'q'] || {
-	// 			moderators: socket.request.user._id
-	// 		}, function(err, docs) {
-	// 			if (!err && docs) {
-	// 				docs.forEach(function(doc) {
-	// 					socket.join(doc._id);
-	// 				});
-	// 			}
-	// 		});
-	// 		if (!socket.request.user.__userJoinedRoom) {
-	// 			socket.request.user.__userJoinedRoom = true;
-	// 			socket.join(socket.request.user._id);
-	// 		}
-	// 	}
-	// });
+		if(partJson.socket){
+			sd._io_connections.push(function(socket){
+				if (socket.request.user) {
+					Schema.find(sd['query_socket_' + name] || {
+						moderators: socket.request.user._id
+					}, function(err, docs) {
+						if (!err && docs) {
+							docs.forEach(function(doc) {
+								socket.join(doc._id);
+							});
+						}
+					});
+				}
+			});
+		}
 	// End of Crud
 };
 // General prototypes
