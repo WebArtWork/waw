@@ -130,9 +130,6 @@ sd._io.on('connection', function (socket) {
 	if (socket.request.user) {
 		socket.join(socket.request.user._id);
 	}
-	// socket.on('message', function(msg) {
-	// 	socket.broadcast.emit('message', msg);
-	// });
 	for (var i = 0; i < sd._io_connections.length; i++) {
 		if(typeof sd._io_connections[i] == 'function'){
 			sd._io_connections[i](socket);
@@ -147,11 +144,9 @@ sd._io.use(passportSocketIo.authorize({
 	secret: 'thisIsCoolSecretFromWaWFramework'+sd._config.prefix,
 	store: store,
 	success: function(data, accept) {
-		console.log('passport.socketio has successfully connected to socket.io');
 		accept();
 	},
 	fail: function(data, message, error, accept) {
-		console.log('passport.socketio has failed to connect with socket.io, with error: ', error, ' and meesage: ', message);
 		accept();
 	}
 }));
