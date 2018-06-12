@@ -130,7 +130,7 @@ module.exports = function(sd){
 				if( sd._isEndOfStr(req.originalUrl.split('?')[0], ext[i]) ) {
 					for (var j = 0; j < folders.length; j++) {
 						if(req.originalUrl.indexOf(folders[j])>-1){
-							return res.sendFile(clientRoot + '/dist/client/client/' + req.originalUrl.split('?')[0]);
+							return res.sendFile(clientRoot + '/dist/client/' + req.originalUrl.split('?')[0]);
 						}
 					}
 				}
@@ -302,12 +302,8 @@ module.exports = function(sd){
 					if(req.user&&req.user.lang) obj.lang = req.user.lang;
 					else if(req.session.lang) obj.lang = req.session.lang;
 					else obj.lang = sd._config.lang||ff[0];
-
 					obj.host = req.get('host');
 					obj.host_no_port = req.get('host').split(':')[0];
-
-					console.log();
-
 					if(obj._translate){
 						for(var key in obj._translate){
 							obj[key] = sd._tr(obj._translate[key], obj.lang);
