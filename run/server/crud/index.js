@@ -64,7 +64,7 @@ module.exports = function(sd, partJson) {
 					if(get_name) final_name += '_'+get_name;
 					router.get("/get"+get_name, sd['ensure'+final_name]||sd._next, function(req, res) {
 						let query = sd['query'+final_name]&&sd['query'+final_name](req, res)||{
-							moderators: req.user._id
+							moderators: req.user&&req.user._id
 						};
 						query = Schema.find(query);
 						let sort = sd['sort'+final_name]&&sd['sort'+final_name](req, res)||false;
@@ -108,7 +108,7 @@ module.exports = function(sd, partJson) {
 					router.post("/update"+update.name, sd['ensure'+final_name]||sd._ensure, sd._ensureUpdateObject, function(req, res) {
 						Schema.findOne(sd['query'+final_name]&&sd['query'+final_name](req, res)||{
 							_id: req.body._id,
-							moderators: req.user._id
+							moderators: req.user&&req.user._id
 						}, function(err, doc){
 							if(err||!doc) return res.json(false);
 							sd._searchInObject(doc, req.body, update.keys);
@@ -134,7 +134,7 @@ module.exports = function(sd, partJson) {
 					router.post("/update/all"+update.name, sd['ensure'+final_name]||sd._ensure, function(req, res) {
 						Schema.findOne(sd['query'+final_name]&&sd['query'+final_name](req, res)||{
 							_id: req.body._id,
-							moderators: req.user._id
+							moderators: req.user&&req.user._id
 						}, function(err, doc){
 							if(err||!doc) return res.json(false);
 							for (var i = 0; i < update.keys.length; i++) {
@@ -163,7 +163,7 @@ module.exports = function(sd, partJson) {
 						Schema.findOne(query, function(err, sdoc){
 							Schema.findOne(sd['query'+final_name]&&sd['query'+final_name](req, res)||{
 								_id: req.body._id,
-								moderators: req.user._id
+								moderators: req.user&&req.user._id
 							}, function(err, doc){
 								if(err||!doc) return res.json(false);
 								if(sdoc) return res.json(doc[update.key]);
@@ -227,8 +227,8 @@ module.exports = function(sd, partJson) {
 	*/
 		if(partJson.socket){
 			sd._io_connections.push(function(socket){
-				if (socket.request.user) {
-					Schema.find(sd['query_socket_' + name] || {
+				var add_rooms = function(user){
+					Schema.find(sd['query_socket_'+name]&&sd['query_socket_'+name](user)||{
 						moderators: socket.request.user._id
 					}, function(err, docs) {
 						if (!err && docs) {
@@ -240,6 +240,11 @@ module.exports = function(sd, partJson) {
 							});
 						}
 					});
+				}
+				if(sd['ensure_socket_'+name]){
+					sd['ensure_socket_'+name](socket.request.user, add_rooms);
+				} else if (socket.request.user) {
+					add_rooms(socket.request.user);
 				}
 			});
 		}

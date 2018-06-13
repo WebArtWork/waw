@@ -20,6 +20,32 @@ module.exports = function(sd){
 	/*
 	*	Framework Support
 	*/
+		sd._copy_doc = function(doc, flds) {
+			new_doc = {};
+			if(typeof flds == 'string'){
+				flds = flds.split(' ');
+			}
+			for (var i = 0; i < flds.length; i++) {
+				new_doc[flds[i]] = doc[flds[i]];
+			}
+			return new_doc;
+		}
+		sd._copy_doc_exclude = function(doc, Schema, rmFlds) {
+			new_doc = {};
+			if(typeof rmFlds == 'string'){
+				rmFlds = rmFlds.split(' ');
+			}
+			Schema.schema.eachPath(function(path) {
+				if(!path) return;
+				path = path.split('.')[0];
+				if (new_doc[path]) return;
+				for (var i = 0; i < rmFlds.length; i++) {
+					if (path == rmFlds[i]) return;
+				}
+				new_doc[path] = doc[path];
+			});
+			return new_doc;
+		}
 		sd._getDirectories = function(srcpath) {
 			return sd._fs.readdirSync(srcpath).filter(function(file) {
 				return sd._fs.statSync(sd._path.join(srcpath, file)).isDirectory();
