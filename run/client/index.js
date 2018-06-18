@@ -356,7 +356,7 @@ module.exports = function(sd){
 					return obj;
 				}
 				sd._tr = function(word, file){
-					word = word.replace('"',"'");
+					word = word&&word.replace('"',"'")||'';
 					if(df[file]&&df[file][word])
 						return df[file][word];
 					else{
