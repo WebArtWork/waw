@@ -40,7 +40,8 @@ if (sd._fs.existsSync(process.cwd()+'/server.json')) {
 */
 
 
-sd._app = sd._express();
+var app = sd._app = sd._express();
+require('express-zip');
 
 var server = require('http').Server(sd._app);
 var session = require('express-session');

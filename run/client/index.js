@@ -7,4 +7,4 @@ module.exports = function(sd){
 	else if(sd._config.vue) require(__dirname+'/vue.js')(sd);
 	else if(sd._config.angular) require(__dirname+'/ngx.js')(sd);
 	else require(__dirname+'/angular.js')(sd);
-} 
+}
