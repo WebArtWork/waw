@@ -38,7 +38,7 @@ var run = function(){
 	var path = require('path');
 	fse.mkdirsSync(process.cwd()+'/server');
 	fse.mkdirsSync(process.cwd()+'/client');
-	// add check if this is waw project
+	// add check if this is waw project 
 	var obj = {
 		script: __dirname+'/run/index.js',
 		ext: 'js json html css'
@@ -82,6 +82,8 @@ var run = function(){
 		}
 	}
 	obj.watch.push(process.cwd()+'/config.json');
+	console.log('obj.ignore: ', obj.ignore);
+	console.log('obj.watch: ', obj.watch);
 	exeCode(obj);
 }
 var should_have_pm2 = function(){

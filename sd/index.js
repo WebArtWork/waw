@@ -100,7 +100,7 @@ module.exports = function(sd){
 			return router;
 		}
 		sd._ensureLocalhost = function(req, res, next){
-			if(req.host.toLowerCase()=='localhost') next();
+			if(req.hostname.toLowerCase()=='localhost') next();
 			else res.redirect('/');
 		}
 	/*

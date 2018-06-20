@@ -1,0 +1,14 @@
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+node_modules
+bower_components
+.idea
+*.git
+
+*index.css
+*server.json
