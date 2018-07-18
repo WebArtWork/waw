@@ -22,29 +22,15 @@ module.exports = function(sd){
 		// 	]
 		// }));
 	/*
-	*	Derer
-	*/
-		var dererOpts = {
-			varControls: ['{{{', '}}}']
-		}
-		if(!sd._config.production){
-			dererOpts.cache = false;
-		}
-		sd._derer.setDefaults(dererOpts);
-		sd._app.engine('html', sd._derer.renderFile);
-		sd._app.set('view engine', 'html');
-		sd._app.set('view cache', true);
-		sd._derer.setFilter('string',function(input){
-			return input&&input.toString()||'';
-		});		
-		sd._derer.setFilter('fixlink',function(link){
-			if(link.indexOf('//')>0) return link;
-			else return 'http://'+link;
-		});
-		sd._app.set('views', [sd._clientRoot + '/html']);
-	/*
 	*	Translates
 	*/
+		var languages = ['en', 'se', 'ua', 'ru'];
+		var _languages = {
+			en: true,
+			se: true,
+			ua: true,
+			ru: true
+		};
 		/*
 		*	Initialize
 		*/
@@ -251,6 +237,8 @@ module.exports = function(sd){
 	*	Javascript Plugins and minify management
 	*/
 		var plugins = sd._getDirectories(__dirname + '/angular');
+		var jsRoot = sd._clientRoot + '/js';
+		var cssRoot = sd._clientRoot + '/css';
 		if(!sd._config.ignoreGenerateLibs){
 			var minifier = require('js-minify');
 			var rpl_plugs = function(file, folder) {
@@ -284,7 +272,7 @@ module.exports = function(sd){
 				}
 			}
 		}
-		sd._app.get("/waw/:file", function(req, res, next) {
+		sd._app.get("/waw/p/:file", function(req, res, next) {
 			var p = req.params.file.toLowerCase().replace('.js',''), send = false;;
 			for (var i = 0; i < plugins.length; i++) {
 				if(plugins[i] == p){
@@ -295,9 +283,6 @@ module.exports = function(sd){
 			if(send) res.sendFile(__dirname + '/angular/' + p + '/' + req.params.file);
 			else res.send('// This is not plugin');
 		});
-		var jsRoot = sd._clientRoot + '/js';
-		var cssRoot = sd._clientRoot + '/css';
-		sd._fse.mkdirs(cssRoot+'/plugins');
 		var compareCssFiles = function(injsfile, incssfile){
 			var mtjs, mtcss;
 			if (sd._fs.existsSync(injsfile)) {
@@ -321,56 +306,91 @@ module.exports = function(sd){
 				sd._fs.writeFileSync(injsfile, sd._fs.readFileSync(incssfile,'utf8'), 'utf8');
 			}
 		}
+		var fill_plugin = function(folder, plugin){
+			if(!sd._fs.existsSync(folder+'config.json')) return;
+			return console.log('THIS IS plugin: ', plugin);
+			if(!sd._fs.existsSync(folder)){
+				return s 
+				d._fse.copySync(__dirname+'/angular/'+plugin, folder+plugin);
+			}
+			includeCss+='@import "plugins/'+plugin+'";\r\n';
+			compareCssFiles(folder+plugin+'.scss', cssRoot+'/plugins/'+plugin+'.scss');
+			sd._fse.removeSync(folder+plugin+'.js');
+			sd._fse.removeSync(folder+plugin+'-min.js');
+			var files = sd._getFiles(jsRoot+'/'+plugin);
+			let p_obj = {
+				name: plugin,
+				html: [],
+				dep: '',
+				js: []
+			}
+			for (var j = files.length - 1; j >= 0; j--) {
+				if(sd._isEndOfStr(files[j], '.js')){
+					let file = files[j].slice(0, files[j].length-3);
+					p_obj.dep+=(p_obj.dep&&', '||'')+'"'+file+'"';
+					p_obj.js.push(file);
+				}else if(sd._isEndOfStr(files[j], '.html')){
+					let file = files[j].slice(0, files[j].length-5);
+					p_obj.dep+=(p_obj.dep&&', '||'')+'"'+file+'.html"';
+					p_obj.html.push(file);
+				}
+			}
+			let data = sd._fs.readFileSync(__dirname+'/js/plugin.js.js', 'utf8');
+			data=data.replace('NAME', p_obj.name);
+			data=data.replace('MODULES', p_obj.dep);
+			for (var j = 0; j < p_obj.html.length; j++) {
+				let html = sd._fs.readFileSync(__dirname+'/js/plugin.html.js', 'utf8');
+				let htmlReplace = sd._fs.readFileSync(folder+p_obj.html[j]+'.html', 'utf8');
+				htmlReplace = sd._rpl(htmlReplace, '"', '\\"');
+				htmlReplace = htmlReplace.replace(/(\r|\t|\n)/gm,"");
+				html=html.replace('HTML', htmlReplace);
+				html=html.replace('FILE', p_obj.html[j]);
+				html=html.replace('FILE', p_obj.html[j]);
+				data+='\n'+html;
+			}
+			for (var j = 0; j < p_obj.js.length; j++) {
+				let jsdata = sd._fs.readFileSync(folder+p_obj.js[j]+'.js', 'utf8');
+				data+='\n'+jsdata;
+			}
+			sd._fs.writeFileSync(folder+plugin+'.js', data, 'utf8');
+		}
+		var watch_plugin = function(folder, plugin){
+			fill_plugin(folder, plugin);
+			sd._fs.watch(folder, function(event, filename) {
+				if(filename==plugin+'.js'||filename==plugin+'-min.js') return;
+				fill_plugin(folder, plugin);
+			});
+		}
 		if(Array.isArray(info.plugins)&&info.plugins.length>0){
+			sd._fse.mkdirs(cssRoot+'/plugins');
 			var includeCss = '';
 			for (var i = 0; i < info.plugins.length; i++) {
-				if(!sd._fs.existsSync(jsRoot+'/'+info.plugins[i])){
-					sd._fse.copySync(__dirname+'/angular/'+info.plugins[i], jsRoot+'/'+info.plugins[i]);
-					continue;
-				}
-				includeCss+='@import "plugins/'+info.plugins[i]+'";\r\n';
-				compareCssFiles(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'.scss', cssRoot+'/plugins/'+info.plugins[i]+'.scss');
-				sd._fse.removeSync(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'.js');
-				sd._fse.removeSync(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'-min.js');
-				var files = sd._getFiles(jsRoot+'/'+info.plugins[i]);
-				let plugin = {
-					name: info.plugins[i],
-					html: [],
-					dep: '',
-					js: []
-				}
-				for (var j = files.length - 1; j >= 0; j--) {
-					if(sd._isEndOfStr(files[j], '.js')){
-						let file = files[j].slice(0, files[j].length-3);
-						plugin.dep+=(plugin.dep&&', '||'')+'"'+file+'"';
-						plugin.js.push(file);
-					}else if(sd._isEndOfStr(files[j], '.html')){
-						let file = files[j].slice(0, files[j].length-5);
-						plugin.dep+=(plugin.dep&&', '||'')+'"'+file+'.html"';
-						plugin.html.push(file);
-					}
-				}
-				let data = sd._fs.readFileSync(__dirname+'/js/plugin.js.js', 'utf8');
-				data=data.replace('NAME', plugin.name);
-				data=data.replace('MODULES', plugin.dep);
-				for (var j = 0; j < plugin.html.length; j++) {
-					let html = sd._fs.readFileSync(__dirname+'/js/plugin.html.js', 'utf8');
-					let htmlReplace = sd._fs.readFileSync(jsRoot+'/'+info.plugins[i]+'/'+plugin.html[j]+'.html', 'utf8');
-					htmlReplace = sd._rpl(htmlReplace, '"', '\\"');
-					htmlReplace = htmlReplace.replace(/(\r|\t|\n)/gm,"");
-					html=html.replace('HTML', htmlReplace);
-					html=html.replace('FILE', plugin.html[j]);
-					html=html.replace('FILE', plugin.html[j]);
-					data+='\n'+html;
-				}
-				for (var j = 0; j < plugin.js.length; j++) {
-					let jsdata = sd._fs.readFileSync(jsRoot+'/'+info.plugins[i]+'/'+plugin.js[j]+'.js', 'utf8');
-					data+='\n'+jsdata;
-				}
-				sd._fs.writeFileSync(jsRoot+'/'+info.plugins[i]+'/'+info.plugins[i]+'.js', data, 'utf8');
+				watch_plugin(jsRoot+'/'+info.plugins[i]+'/', info.plugins[i]);
 			}
 			sd._fs.writeFileSync(cssRoot+'/plugins.scss', includeCss, 'utf8');
 		}
+		for (var i = 0; i < plugins.length; i++) {
+			var p = plugins[i].toLowerCase();
+			watch_plugin(__dirname + '/angular/' + p + '/', p);
+		}
+	/*
+	*	Live Reload
+	*/
+		// var update = Date.now();
+		// var folder_on_update = function(folder){
+		// 	sd._fs.watch(folder, function(event, filename) {
+		// 		update = Date.now();
+		// 	});
+		// 	var folders = sd._getDirectories(folder);
+		// 	for (var i = 0; i < folders.length; i++) {
+		// 		folder_on_update(folder+'/'+folders[i]);
+		// 	}
+		// }
+		// folder_on_update(__dirname + '/angular');
+		// folder_on_update(sd._clientRoot);
+		// sd._app.get("/waw/last_update", function(req, res, next) {
+		// 	res.send(update);
+		// });
 	/*
 	*	Files Serving / require serve files in client
 	*	Basically this is only for localhost,

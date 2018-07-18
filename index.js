@@ -34,56 +34,34 @@ var should_have_nodemon = function(){
 		process.exit(0);
 	}
 }
+var rr = function(event, filename) {
+	exeCode.emit('restart');
+}
 var run = function(){
-	var path = require('path');
+	fs.watch(__dirname+'/run/server', rr);
+	fs.watch(__dirname+'/run/server/crud', rr);
+	fs.watch(__dirname+'/run/server/modules', rr);
+	fs.watch(__dirname+'/run/server/parts', rr);
+	fs.watch(__dirname+'/run/client', rr);
+	fs.watch(__dirname+'/run', rr);
 	fse.mkdirsSync(process.cwd()+'/server');
 	fse.mkdirsSync(process.cwd()+'/client');
-	// add check if this is waw project 
 	var obj = {
 		script: __dirname+'/run/index.js',
-		ext: 'js json html css'
+		ext: 'js json'
 	}
 	obj.watch = [process.cwd()+'/server'];
-	var clientRoot = process.cwd()+'/client';
-	fse.mkdirsSync(clientRoot);
-	fse.mkdirsSync(process.cwd()+'/client');
-	obj.ignore = projectConfig.dererIgnore||[];
-	if (fs.existsSync(clientRoot + '/config.json')) {
-		var info = fse.readJsonSync(clientRoot + '/config.json', {
+	var clientRoot = process.cwd()+'/client/';
+	if (fs.existsSync(clientRoot + 'config.json')) {
+		obj.watch.push(clientRoot + 'config.json');
+		var info = fse.readJsonSync(clientRoot + 'config.json', {
 			throws: false
-		});
+		}); 
 		for (var j = 0; j < info.router.length; j++) {
-			obj.watch.push(clientRoot + '/' + info.router[j].src);
-		}
-		if(Array.isArray(info.plugins)){			
-			for (var j = 0; j < info.plugins.length; j++) {
-				var pluginLoc = clientRoot + '/js/' + info.plugins[j];
-				//fse.mkdirsSync(pluginLoc);
-				obj.ignore.push(pluginLoc+'/'+info.plugins[j]+'.js');
-				obj.ignore.push(pluginLoc+'/'+info.plugins[j]+'-min.js');
-				obj.watch.push(pluginLoc);
-			}
-		}
-	} else {
-		var pages = fs.readdirSync(process.cwd() + '/client').filter(function(file) {
-			return fs.statSync(path.join(process.cwd() + '/client', file)).isDirectory();
-		});
-		for (var i = 0; i < pages.length; i++) {
-			var pageUrl = clientRoot + '/' + pages[i];
-			if (fs.existsSync(pageUrl + '/config.json')) var info = fse
-				.readJsonSync(pageUrl + '/config.json', {
-					throws: false
-				});
-			else var info = false;
-			if (!info) continue;
-			for (var j = 0; j < info.router.length; j++) {
-				obj.watch.push(pageUrl + '/' + info.router[j].src);
-			}
+			obj.watch.push(clientRoot + info.router[j].src);
 		}
 	}
 	obj.watch.push(process.cwd()+'/config.json');
-	console.log('obj.ignore: ', obj.ignore);
-	console.log('obj.watch: ', obj.watch);
 	exeCode(obj);
 }
 var should_have_pm2 = function(){
