@@ -21,12 +21,12 @@ module.exports = function(sd, partJson) {
 			*/
 				router.post("/create", sd['ensure_create_'+name]||sd._ensure, function(req, res) {
 					var doc = new Schema();
-					if(partJson.socket){
-						socket.join(doc._id);
-						socket.on('to_'+doc._id, function(content){
-							socket.broadcast.to(doc._id).emit('from_'+doc._id, content);
-						});
-					}
+					// if(partJson.socket){
+					// 	socket.join(doc._id);
+					// 	socket.on('to_'+doc._id, function(content){
+					// 		socket.broadcast.to(doc._id).emit('from_'+doc._id, content);
+					// 	});
+					// }
 					if(typeof doc.create !== 'function'){
 						return res.json(false);
 					}
