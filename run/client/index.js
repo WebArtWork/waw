@@ -121,21 +121,22 @@ module.exports = function(sd){
 	}else if(sd._config.vue){
 	}else if(sd._config.angular){
 		sd._app.use(function(req, res, next){
-			var islocal = req.get('host').toLowerCase().indexOf('localhost')==0;
+				var islocal = req.get('host').toLowerCase().indexOf('localhost')==0;
+				if(islocal) return next();
 			var url = req.originalUrl.toLowerCase();
-			if(islocal) return next();
 			if(url.indexOf('/api/')>-1) return next();
 			if(url.indexOf('/waw/')>-1) return next();
 			for (var i = 0; i < ext.length; i++) {
 				if( sd._isEndOfStr(req.originalUrl.split('?')[0], ext[i]) ) {
-					for (var j = 0; j < folders.length; j++) {
-						if(req.originalUrl.indexOf(folders[j])>-1){
-							return res.sendFile(clientRoot + '/dist/client/' + req.originalUrl.split('?')[0]);
-						}
-					}
+					return res.sendFile(clientRoot + '/dist/client/' + req.originalUrl.split('?')[0]);
 				}
 			}
-			res.sendFile(clientRoot+'/dist/client/index.html');
+			var serve = function(){
+				res.sendFile(clientRoot+'/dist/client/index.html');
+			}
+			if(typeof sd['ensure_angular'] == 'function'){
+				sd['ensure_angular'](req, res, serve);
+			}else serve();
 		});
 	}else{
 		if(sd._fs.existsSync(clientRoot+'/config.json')){		
@@ -356,8 +357,6 @@ module.exports = function(sd){
 					return obj;
 				}
 				sd._tr = function(word, file){
-					console.log('word');
-					console.log(word);
 					word = word&&word.replace('"',"'")||'';
 					if(df[file]&&df[file][word])
 						return df[file][word];

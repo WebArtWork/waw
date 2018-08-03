@@ -32,6 +32,7 @@ module.exports = function(sd, partJson) {
 					}
 					doc.create(req.body, req.user, sd);
 					doc.save(function(err){
+						if(err) console.log(err);
 						if(err) return res.json(false);
 						res.json(doc);
 					});

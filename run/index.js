@@ -126,7 +126,11 @@ sd._app.set('view cache', true);
 
 // Socket Management
 sd._io = require('socket.io')(server, { origins: '*:*'});
-sd._io_connections = [];
+sd._io_connections = [function(socket){
+	socket.on('public', function(content){
+		socket.broadcast.emit('public', content);
+	});
+}];
 sd._io.on('connection', function (socket) {
 	if (socket.request.user) {
 		socket.join(socket.request.user._id);
