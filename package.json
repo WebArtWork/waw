@@ -13,18 +13,7 @@
 		"email": "crackeraki@gmail.com",
 		"url": "https://github.com/CrackerakiUA"
 	},
-	"contributors": [
-		{
-			"name": "Sikora Serg",
-			"email": "sikorasergii@gmail.com",
-			"url": "https://github.com/SikoraSergii"
-		},
-		{
-			"name": "Andriy Momot",
-			"email": "Anrehecil@gmail.com",
-			"url": "https://github.com/Anrehecil"
-		}
-	],
+	"contributors": [],
 	"engines": {
 		"node": ">=6.10.0"
 	},

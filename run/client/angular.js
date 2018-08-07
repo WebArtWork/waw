@@ -236,76 +236,10 @@ module.exports = function(sd){
 	/*
 	*	Javascript Plugins and minify management
 	*/
-		var plugins = sd._getDirectories(__dirname + '/angular');
 		var jsRoot = sd._clientRoot + '/js';
 		var cssRoot = sd._clientRoot + '/css';
-		if(!sd._config.ignoreGenerateLibs){
-			var minifier = require('js-minify');
-			var rpl_plugs = function(file, folder) {
-				if(file.indexOf('.js')>-1){
-					return sd._clientRoot+folder+file;
-				}else{
-					return __dirname+'/angular/'+file+'/'+file+'.js';
-				}
-			}
-			var gen_plugs = function(dest, files, name, prod_files){
-				for (var i = 0; i < files.length; i++) {
-					files[i] = rpl_plugs(files[i], '/js/');
-				}
-				if(sd._config.production){
-					for (var i = 0; i < prod_files.length; i++) {
-						prod_files[i] = rpl_plugs(prod_files[i], '/lab/');
-						files.push(prod_files[i]);
-					}
-				}
-				minifier({
-					files: files,
-					way: dest + '/gen/',
-					prefix: sd._config.prefix,
-					production: false,
-					name: name
-				});
-			}
-			if(info.lab){
-				for (var i = 0; i < info.lab.length; i++) {
-					gen_plugs(sd._clientRoot, info.lab[i].files, info.lab[i].name, info.lab[i].prod);
-				}
-			}
-		}
-		sd._app.get("/waw/p/:file", function(req, res, next) {
-			var p = req.params.file.toLowerCase().replace('.js',''), send = false;;
-			for (var i = 0; i < plugins.length; i++) {
-				if(plugins[i] == p){
-					send = true;
-					break;
-				}
-			}
-			if(send) res.sendFile(__dirname + '/angular/' + p + '/' + req.params.file);
-			else res.send('// This is not plugin');
-		});
-		var compareCssFiles = function(injsfile, incssfile){
-			var mtjs, mtcss;
-			if (sd._fs.existsSync(injsfile)) {
-				mtjs = sd._fs.statSync(injsfile).mtime;
-				mtjs = new Date(mtjs).getTime();
-			}
-			if (sd._fs.existsSync(incssfile)) {
-				mtcss = sd._fs.statSync(incssfile).mtime;
-				mtcss = new Date(mtcss).getTime();
-			}
-			if(!mtjs&&!mtcss){
-				sd._fs.writeFileSync(injsfile, '', 'utf8');
-				sd._fs.writeFileSync(incssfile, '', 'utf8');
-			}else if(!mtjs){
-				sd._fs.writeFileSync(injsfile, sd._fs.readFileSync(incssfile,'utf8'), 'utf8');
-			}else if(!mtcss){
-				sd._fs.writeFileSync(incssfile, sd._fs.readFileSync(injsfile,'utf8'), 'utf8');
-			}else if(mtjs>mtcss){
-				sd._fs.writeFileSync(incssfile, sd._fs.readFileSync(injsfile,'utf8'), 'utf8');
-			}else if(mtjs<mtcss){
-				sd._fs.writeFileSync(injsfile, sd._fs.readFileSync(incssfile,'utf8'), 'utf8');
-			}
-		}
+		info.plugins = info.plugins || [];
+		// plugins management
 		var fill_plugin = function(folder, plugin){
 			if(!sd._fs.existsSync(folder+'config.json')) return;
 			return console.log('THIS IS plugin: ', plugin);
@@ -361,17 +295,89 @@ module.exports = function(sd){
 				fill_plugin(folder, plugin);
 			});
 		}
-		if(Array.isArray(info.plugins)&&info.plugins.length>0){
-			sd._fse.mkdirs(cssRoot+'/plugins');
-			var includeCss = '';
-			for (var i = 0; i < info.plugins.length; i++) {
-				watch_plugin(jsRoot+'/'+info.plugins[i]+'/', info.plugins[i]);
-			}
-			sd._fs.writeFileSync(cssRoot+'/plugins.scss', includeCss, 'utf8');
-		}
+		// waw plugins
+		var plugins = sd._getDirectories(__dirname + '/angular');
 		for (var i = 0; i < plugins.length; i++) {
 			var p = plugins[i].toLowerCase();
 			watch_plugin(__dirname + '/angular/' + p + '/', p);
+		}
+		sd._app.get("/waw/p/:file", function(req, res, next) {
+			var p = req.params.file.toLowerCase().replace('.js',''), send = false;;
+			for (var i = 0; i < plugins.length; i++) {
+				if(plugins[i] == p){
+					send = true;
+					break;
+				}
+			}
+			if(send) res.sendFile(__dirname + '/angular/' + p + '/' + req.params.file);
+			else res.send('// This is not plugin');
+		});
+		// generation
+		if(!sd._config.ignoreGenerateLibs){
+			var minifier = require('js-minify');
+			var rpl_plugs = function(file, folder) {
+				if(file.indexOf('.js')>-1){
+					return sd._clientRoot+folder+file;
+				}else{
+					return __dirname+'/angular/'+file+'/'+file+'.js';
+				}
+			}
+			var gen_plugs = function(dest, files, name, prod_files){
+				for (var i = 0; i < files.length; i++) {
+					files[i] = rpl_plugs(files[i], '/lab/');
+				}
+				if(sd._config.production){
+					for (var i = 0; i < prod_files.length; i++) {
+						prod_files[i] = rpl_plugs(prod_files[i], '/js/');
+						files.push(prod_files[i]);
+					}
+				}
+				minifier({
+					files: files,
+					way: dest + '/gen/',
+					prefix: sd._config.prefix,
+					production: !!sd._config.production,
+					name: name
+				});
+			}
+			if(info.lab){
+				for (var i = 0; i < info.lab.length; i++) {
+					gen_plugs(sd._clientRoot, info.lab[i].files, info.lab[i].name, info.lab[i].prod);
+				}
+			}
+		}
+		// css of plugins
+		var compareCssFiles = function(injsfile, incssfile){
+			var mtjs, mtcss;
+			if (sd._fs.existsSync(injsfile)) {
+				mtjs = sd._fs.statSync(injsfile).mtime;
+				mtjs = new Date(mtjs).getTime();
+			}
+			if (sd._fs.existsSync(incssfile)) {
+				mtcss = sd._fs.statSync(incssfile).mtime;
+				mtcss = new Date(mtcss).getTime();
+			}
+			if(!mtjs&&!mtcss){
+				sd._fs.writeFileSync(injsfile, '', 'utf8');
+				sd._fs.writeFileSync(incssfile, '', 'utf8');
+			}else if(!mtjs){
+				sd._fs.writeFileSync(injsfile, sd._fs.readFileSync(incssfile,'utf8'), 'utf8');
+			}else if(!mtcss){
+				sd._fs.writeFileSync(incssfile, sd._fs.readFileSync(injsfile,'utf8'), 'utf8');
+			}else if(mtjs>mtcss){
+				sd._fs.writeFileSync(incssfile, sd._fs.readFileSync(injsfile,'utf8'), 'utf8');
+			}else if(mtjs<mtcss){
+				sd._fs.writeFileSync(injsfile, sd._fs.readFileSync(incssfile,'utf8'), 'utf8');
+			}
+		}
+		if(info.plugins.length){
+			sd._fse.mkdirs(cssRoot+'/plugins');
+			var includeCss = '';
+			for (var i = 0; i < info.plugins.length; i++) {
+				includeCss+='@import "plugins/'+info.plugins[i]+'";\r\n';
+				watch_plugin(jsRoot+'/'+info.plugins[i]+'/', info.plugins[i]);
+			}
+			sd._fs.writeFileSync(cssRoot+'/plugins.scss', includeCss, 'utf8');
 		}
 	/*
 	*	Live Reload

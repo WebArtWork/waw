@@ -38,31 +38,21 @@ var rr = function(event, filename) {
 	exeCode.emit('restart');
 }
 var run = function(){
+	fse.mkdirsSync(process.cwd()+'/server');
+	fse.mkdirsSync(process.cwd()+'/client');
 	fs.watch(__dirname+'/run/server', rr);
 	fs.watch(__dirname+'/run/server/crud', rr);
 	fs.watch(__dirname+'/run/server/modules', rr);
 	fs.watch(__dirname+'/run/server/parts', rr);
 	fs.watch(__dirname+'/run/client', rr);
 	fs.watch(__dirname+'/run', rr);
-	fse.mkdirsSync(process.cwd()+'/server');
-	fse.mkdirsSync(process.cwd()+'/client');
-	var obj = {
+	fs.watch(process.cwd(), rr);
+	fs.watch(process.cwd()+'/client', rr);
+	exeCode({
 		script: __dirname+'/run/index.js',
+		watch: [process.cwd()+'/server'],
 		ext: 'js json'
-	}
-	obj.watch = [process.cwd()+'/server'];
-	var clientRoot = process.cwd()+'/client/';
-	if (fs.existsSync(clientRoot + 'config.json')) {
-		obj.watch.push(clientRoot + 'config.json');
-		var info = fse.readJsonSync(clientRoot + 'config.json', {
-			throws: false
-		}); 
-		for (var j = 0; j < info.router.length; j++) {
-			obj.watch.push(clientRoot + info.router[j].src);
-		}
-	}
-	obj.watch.push(process.cwd()+'/config.json');
-	exeCode(obj);
+	});
 }
 var should_have_pm2 = function(){
 	if(!projectConfig){
