@@ -19,6 +19,7 @@ module.exports = function(sd, partJson) {
 			/*
 			*	Create Routes
 			*/
+			console.log('creating create', name);
 				router.post("/create", sd['ensure_create_'+name]||sd._ensure, function(req, res) {
 					var doc = new Schema();
 					// if(partJson.socket){
