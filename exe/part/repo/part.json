@@ -7,7 +7,6 @@
 	"dependencies": {
 	},
 	"crud": {
-		"get": ["all"],
 		"updatesAll": [{
 			"keys": ["name","description"],
 			"name": ""
@@ -15,14 +14,9 @@
 			"keys": ["moderators"],
 			"name": "author"
 		}],
-		"updates": [{
-			"keys": ["name","description"],
-			"name": ""
-		}],
 		"unique_field": [{
 			"key": "url",
-			"name": "url"
+			"name": ""
 		}],
-		"deletes": ["admin"]
 	}
 }
