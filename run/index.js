@@ -129,7 +129,7 @@
 		if(link.indexOf('//')>0) return link;
 		else return 'http://'+link;
 	});
-	sd._app.set('views', [sd._clientRoot + '/html']);
+	sd._app.set('views', [process.cwd()+'/client/html']);
 	sd._page = function(url, page, obj, trUrls) {
 		var render = function(req, res) {
 			if (typeof obj == 'function') {
