@@ -382,21 +382,21 @@ module.exports = function(sd){
 	/*
 	*	Live Reload
 	*/
-		// var update = Date.now();
-		// var folder_on_update = function(folder){
-		// 	sd._fs.watch(folder, function(event, filename) {
-		// 		update = Date.now();
-		// 	});
-		// 	var folders = sd._getDirectories(folder);
-		// 	for (var i = 0; i < folders.length; i++) {
-		// 		folder_on_update(folder+'/'+folders[i]);
-		// 	}
-		// }
-		// folder_on_update(__dirname + '/angular');
-		// folder_on_update(sd._clientRoot);
-		// sd._app.get("/waw/last_update", function(req, res, next) {
-		// 	res.send(update);
-		// });
+		var update = Date.now();
+		var folder_on_update = function(folder){
+			sd._fs.watch(folder, function(event, filename) {
+				update = Date.now();
+			});
+			var folders = sd._getDirectories(folder);
+			for (var i = 0; i < folders.length; i++) {
+				folder_on_update(folder+'/'+folders[i]);
+			}
+		}
+		folder_on_update(__dirname + '/angular');
+		folder_on_update(sd._clientRoot);
+		sd._app.get("/waw/last_update", function(req, res, next) {
+			res.send(update);
+		});
 	/*
 	*	Files Serving / require serve files in client
 	*	Basically this is only for localhost,
