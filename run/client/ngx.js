@@ -10,6 +10,11 @@ module.exports = function(sd){
 				return res.sendFile(sd._clientRoot + '/dist/client/' + req.originalUrl.split('?')[0]);
 			}
 		}
-		res.sendFile(sd._clientRoot+'/dist/client/index.html');
+		var serve = function() {
+			res.sendFile(clientRoot + '/dist/client/index.html');
+		}
+		if (typeof sd['ensure_angular'] == 'function') {
+			sd['ensure_angular'](req, res, serve);
+		} else serve();
 	});
 }

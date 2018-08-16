@@ -1,10 +1,6 @@
 {
 	"name": "waw",
-	"description": "Framework which provide layer over Mongodb, Node.js and Angular.js. Divide back-end into parts and provide awesome crud system.",
-	"keywords": [
-		"framework",
-		"waw"
-	],
+	"keywords": ["framework","waw"],
 	"version": "0.11.0",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
@@ -15,7 +11,7 @@
 	},
 	"contributors": [],
 	"engines": {
-		"node": ">=6.10.0"
+		"node": ">=8.11.3"
 	},
 	"main": "./index.js",
 	"bin": {

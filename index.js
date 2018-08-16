@@ -46,7 +46,6 @@ var run = function(){
 	fs.watch(__dirname+'/run/server/parts', rr);
 	fs.watch(__dirname+'/run/client', rr);
 	fs.watch(__dirname+'/run', rr);
-	fs.watch(process.cwd(), rr);
 	fs.watch(process.cwd()+'/client', rr);
 	exeCode({
 		script: __dirname+'/run/index.js',
