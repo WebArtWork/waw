@@ -5,6 +5,7 @@ module.exports = function(sd){
 		console.log("WAW Project looks to don't have client.");
 		process.exit();
 	}
+	sd.__derer_viewes.push(process.cwd() + '/client/html');
 	/*
 	*	scss
 	*/
