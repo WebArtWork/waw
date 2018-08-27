@@ -129,7 +129,7 @@
 		if(link.indexOf('//')>0) return link;
 		else return 'http://'+link;
 	});
-	sd.__derer_viewes = []
+	sd.__derer_viewes = [];
 	sd._app.set('views', sd.__derer_viewes);
 	sd._page = function(url, page, obj, trUrls) {
 		if(!obj) obj = {};

@@ -4,6 +4,7 @@
 		"name": "Basic",
 		"src": "router.js"
 	}],
+	"config": "config.js",
 	"dependencies": {
 	},
 	"crud": {

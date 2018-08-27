@@ -6,5 +6,5 @@ module.exports = function(sd){
 	if(sd._config.react) require(__dirname+'/react.js')(sd);
 	else if(sd._config.vue) require(__dirname+'/vue.js')(sd);
 	else if(sd._config.angular) require(__dirname+'/ngx.js')(sd);
-	else require(__dirname+'/angular.js')(sd);
+	else require(__dirname+'/angular.js')(sd, sd._clientRoot);
 }

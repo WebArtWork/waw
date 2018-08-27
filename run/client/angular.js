@@ -1,6 +1,6 @@
-module.exports = function(sd){
-	if(sd._fs.existsSync(sd._clientRoot+'/config.json')){		
-		var info = sd._fse.readJsonSync(sd._clientRoot+'/config.json', {throws: false});
+module.exports = function(sd, clientRoot){
+	if(sd._fs.existsSync(clientRoot+'/config.json')){		
+		var info = sd._fse.readJsonSync(clientRoot+'/config.json', {throws: false});
 	}else{
 		console.log("WAW Project looks to don't have client.");
 		process.exit();
@@ -24,6 +24,7 @@ module.exports = function(sd){
 		// }));
 	/*
 	*	Translates
+	*	need to be fixed
 	*/
 		var languages = ['en', 'se', 'ua', 'ru'];
 		var _languages = {
@@ -35,7 +36,7 @@ module.exports = function(sd){
 		/*
 		*	Initialize
 		*/
-			var translateFolder = sd._clientRoot + '/lang';
+			var translateFolder = clientRoot + '/lang';
 			var df = sd._df = {};
 			var ff = {};
 			ff = sd._getFiles(translateFolder);
@@ -125,7 +126,7 @@ module.exports = function(sd){
 			sd._generate_translate_file = function(){
 				var data = sd._fs.readFileSync(__dirname+'/js/translate.js', 'utf8');
 				data=data.replace('LANG_ARR', JSON.stringify(ff)).replace('INNER_DF', JSON.stringify(df));
-				sd._fs.writeFileSync(sd._clientRoot + '/gen/translate.js', data, 'utf8');
+				sd._fs.writeFileSync(clientRoot + '/gen/translate.js', data, 'utf8');
 			}
 		/*
 		*	Translate Tool
@@ -208,6 +209,8 @@ module.exports = function(sd){
 		// End of Translation
 	/*
 	*	SVG management
+	*	need to add stickers management, not only icons
+	*	need to be moved somehow inside wawCss, and on the others client branches also
 	*/
 		if(!sd._config.ignoreGenerateFonts){
 			var getListOfSvgs = function(dest){
@@ -223,13 +226,13 @@ module.exports = function(sd){
 				}
 				return svgs;
 			}
-			if (sd._fs.existsSync(sd._clientRoot+'/icons')) {
-				var icons = getListOfSvgs(sd._clientRoot+'/icons');
+			if (sd._fs.existsSync(clientRoot+'/icons')) {
+				var icons = getListOfSvgs(clientRoot+'/icons');
 				if(icons.length==0) return;
 				require('svg-fontify')({
 					name: 'public',
 					files: icons,
-					way: sd._clientRoot + '/gen/',
+					way: clientRoot + '/gen/',
 					prefix: sd._config.prefix
 				});
 			}
@@ -237,16 +240,17 @@ module.exports = function(sd){
 	/*
 	*	Javascript Plugins and minify management
 	*/
-		var jsRoot = sd._clientRoot + '/js';
-		var cssRoot = sd._clientRoot + '/css';
-		info.plugins = info.plugins || [];
+var jsRoot = clientRoot + '/js';
+var cssRoot = clientRoot + '/css';
 		// plugins management
 		var fill_plugin = function(folder, plugin){
+			return console.log(folder, ' | ', plugin);
+
+
 			if(!sd._fs.existsSync(folder+'config.json')) return;
 			return console.log('THIS IS plugin: ', plugin);
 			if(!sd._fs.existsSync(folder)){
-				return s 
-				d._fse.copySync(__dirname+'/angular/'+plugin, folder+plugin);
+				return sd._fse.copySync(__dirname+'/angular/'+plugin, folder+plugin);
 			}
 			includeCss+='@import "plugins/'+plugin+'";\r\n';
 			compareCssFiles(folder+plugin+'.scss', cssRoot+'/plugins/'+plugin+'.scss');
@@ -289,36 +293,37 @@ module.exports = function(sd){
 			}
 			sd._fs.writeFileSync(folder+plugin+'.js', data, 'utf8');
 		}
-		var watch_plugin = function(folder, plugin){
-			fill_plugin(folder, plugin);
-			sd._fs.watch(folder, function(event, filename) {
-				if(filename==plugin+'.js'||filename==plugin+'-min.js') return;
-				fill_plugin(folder, plugin);
-			});
-		}
+var watch_plugin = function(folder, plugin){
+	fill_plugin(folder, plugin);
+	sd._fs.watch(folder, function(event, filename) {
+		if(filename==plugin+'.js'||filename==plugin+'-min.js') return;
+		fill_plugin(folder, plugin);
+	});
+}
+
 		// waw plugins
-		var plugins = sd._getDirectories(__dirname + '/angular');
-		for (var i = 0; i < plugins.length; i++) {
-			var p = plugins[i].toLowerCase();
-			watch_plugin(__dirname + '/angular/' + p + '/', p);
+var plugins = sd._getDirectories(__dirname + '/angular');
+for (var i = 0; i < plugins.length; i++) {
+	var p = plugins[i].toLowerCase();
+	watch_plugin(__dirname + '/angular/' + p + '/', p);
+}
+sd._app.get("/waw/p/:file", function(req, res, next) {
+	var p = req.params.file.toLowerCase().replace('.js',''), send = false;;
+	for (var i = 0; i < plugins.length; i++) {
+		if(plugins[i] == p){
+			send = true;
+			break;
 		}
-		sd._app.get("/waw/p/:file", function(req, res, next) {
-			var p = req.params.file.toLowerCase().replace('.js',''), send = false;;
-			for (var i = 0; i < plugins.length; i++) {
-				if(plugins[i] == p){
-					send = true;
-					break;
-				}
-			}
-			if(send) res.sendFile(__dirname + '/angular/' + p + '/' + req.params.file);
-			else res.send('// This is not plugin');
-		});
+	}
+	if(send) res.sendFile(__dirname + '/angular/' + p + '/' + req.params.file);
+	else res.send('// This is not plugin');
+});
 		// generation
 		if(!sd._config.ignoreGenerateLibs){
 			var minifier = require('js-minify');
 			var rpl_plugs = function(file, folder) {
 				if(file.indexOf('.js')>-1){
-					return sd._clientRoot+folder+file;
+					return clientRoot+folder+file;
 				}else{
 					return __dirname+'/angular/'+file+'/'+file+'.js';
 				}
@@ -343,7 +348,7 @@ module.exports = function(sd){
 			}
 			if(info.lab){
 				for (var i = 0; i < info.lab.length; i++) {
-					gen_plugs(sd._clientRoot, info.lab[i].files, info.lab[i].name, info.lab[i].prod);
+					gen_plugs(clientRoot, info.lab[i].files, info.lab[i].name, info.lab[i].prod);
 				}
 			}
 		}
@@ -371,33 +376,35 @@ module.exports = function(sd){
 				sd._fs.writeFileSync(injsfile, sd._fs.readFileSync(incssfile,'utf8'), 'utf8');
 			}
 		}
-		if(info.plugins.length){
-			sd._fse.mkdirs(cssRoot+'/plugins');
-			var includeCss = '';
-			for (var i = 0; i < info.plugins.length; i++) {
-				includeCss+='@import "plugins/'+info.plugins[i]+'";\r\n';
-				watch_plugin(jsRoot+'/'+info.plugins[i]+'/', info.plugins[i]);
-			}
-			sd._fs.writeFileSync(cssRoot+'/plugins.scss', includeCss, 'utf8');
-		}
+
+info.plugins = info.plugins || [];
+if(info.plugins.length){
+	sd._fse.mkdirs(cssRoot+'/plugins');
+	var includeCss = '';
+	for (var i = 0; i < info.plugins.length; i++) {
+		includeCss+='@import "plugins/'+info.plugins[i]+'";\r\n';
+		watch_plugin(jsRoot+'/'+info.plugins[i]+'/', info.plugins[i]);
+	}
+	sd._fs.writeFileSync(cssRoot+'/plugins.scss', includeCss, 'utf8');
+}
 	/*
 	*	Live Reload
 	*/
-		var update = Date.now();
-		var folder_on_update = function(folder){
-			sd._fs.watch(folder, function(event, filename) {
-				update = Date.now();
-			});
-			var folders = sd._getDirectories(folder);
-			for (var i = 0; i < folders.length; i++) {
-				folder_on_update(folder+'/'+folders[i]);
-			}
-		}
-		folder_on_update(__dirname + '/angular');
-		folder_on_update(sd._clientRoot);
-		sd._app.get("/waw/last_update", function(req, res, next) {
-			res.send(update);
-		});
+		// var update = Date.now();
+		// var folder_on_update = function(folder){
+		// 	sd._fs.watch(folder, function(event, filename) {
+		// 		update = Date.now();
+		// 	});
+		// 	var folders = sd._getDirectories(folder);
+		// 	for (var i = 0; i < folders.length; i++) {
+		// 		folder_on_update(folder+'/'+folders[i]);
+		// 	}
+		// }
+		// folder_on_update(__dirname + '/angular');
+		// folder_on_update(clientRoot);
+		// sd._app.get("/waw/last_update", function(req, res, next) {
+		// 	res.send(update);
+		// });
 	/*
 	*	Files Serving / require serve files in client
 	*	Basically this is only for localhost,
@@ -410,7 +417,7 @@ module.exports = function(sd){
 				if( sd._isEndOfStr(req.originalUrl.split('?')[0], sd._ext[i]) ) {
 					for (var j = 0; j < sd._folders.length; j++) {
 						if(req.originalUrl.indexOf(sd._folders[j])>-1){
-							return res.sendFile(sd._clientRoot + req.originalUrl.split('?')[0]);
+							return res.sendFile(clientRoot + req.originalUrl.split('?')[0]);
 						}
 					}
 				}
@@ -418,7 +425,7 @@ module.exports = function(sd){
 			next();
 		});
 		for (var j = 0; j < info.router.length; j++) {
-			require(sd._clientRoot + '/' + info.router[j].src)(sd._app, sd);
+			require(clientRoot + '/' + info.router[j].src)(sd._app, sd);
 		}
 	/*
 	*	End of Client Routing

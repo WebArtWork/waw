@@ -19,7 +19,6 @@ module.exports = function(sd, partJson) {
 			/*
 			*	Create Routes
 			*/
-			console.log('creating create', name);
 				router.post("/create", sd['ensure_create_'+name]||sd._ensure, function(req, res) {
 					var doc = new Schema();
 					// if(partJson.socket){
@@ -28,72 +27,61 @@ module.exports = function(sd, partJson) {
 					// 		socket.broadcast.to(doc._id).emit('from_'+doc._id, content);
 					// 	});
 					// }
-					if(typeof doc.create !== 'function'){
-						return res.json(false);
-					}
-					doc.create(req.body, req.user, sd);
-					doc.save(function(err){
-						if(err) console.log(err);
-						if(err) return res.json(false);
-						res.json(doc);
-					});
-				});
-				// make above as below
-				router.post("/createCb", sd['ensure_create_'+name]||sd._ensure, function(req, res) {
-					var doc = new Schema();
-					if(partJson.socket){
-						socket.join(doc._id);
-						socket.on('to_'+doc._id, function(content){
-							socket.broadcast.to(doc._id).emit('from_'+doc._id, content);
+					if(typeof doc.createCb === 'function'){
+						doc.createCb(req.body, req.user, sd, function(){
+							doc.save(function(err){
+								if(err) return res.json(false);
+								req.body._id = doc._id;
+								res.json(req.body);
+							});
 						});
-					}
-					if(typeof doc.create !== 'function'){
-						return res.json(false);
-					}
-					doc.create(req.body, req.user, sd, function(){
+					}else if(typeof doc.create === 'function'){
+						doc.create(req.body, req.user, sd);
 						doc.save(function(err){
+							if(err) console.log(err);
 							if(err) return res.json(false);
-							req.body._id = doc._id;
-							res.json(req.body);
+							res.json(doc);
 						});
-					});
+					}else res.json(false);
 				});
 			/*
 			*	Get Routes
 			*/
+				var getProcess = function(req, res) {
+					let query = sd['query'+final_name]&&sd['query'+final_name](req, res)||{
+						moderators: req.user&&req.user._id
+					};
+					query = Schema.find(query);
+					let sort = sd['sort'+final_name]&&sd['sort'+final_name](req, res)||false;
+					if(sort){
+						query.sort(sort);
+					}
+					let skip = sd['skip'+final_name]&&sd['skip'+final_name](req, res)||false;
+					if(skip){
+						query.skip(skip);
+					}
+					let limit = sd['limit'+final_name]&&sd['limit'+final_name](req, res)||false;
+					if(limit){
+						query.limit(limit);
+					}
+					let select = sd['select'+final_name]&&sd['select'+final_name](req, res)||false;
+					if(select){
+						query.select(select);
+					}
+					let populate = sd['populate'+final_name]&&sd['populate'+final_name](req, res)||false;
+					if(populate){
+						query.populate(populate);
+					}
+					query.exec(function(err, docs) {
+						err&&console.trace(err);
+						res.json(docs || []);
+					});
+				}
 				var getRoute = function(get_name){
-					let final_name = '_get_'+name;
+					var final_name = '_get_'+name;
 					if(get_name) final_name += '_'+get_name;
-					router.get("/get"+get_name, sd['ensure'+final_name]||sd._next, function(req, res) {
-						let query = sd['query'+final_name]&&sd['query'+final_name](req, res)||{
-							moderators: req.user&&req.user._id
-						};
-						query = Schema.find(query);
-						let sort = sd['sort'+final_name]&&sd['sort'+final_name](req, res)||false;
-						if(sort){
-							query.sort(sort);
-						}
-						let skip = sd['skip'+final_name]&&sd['skip'+final_name](req, res)||false;
-						if(skip){
-							query.skip(skip);
-						}
-						let limit = sd['limit'+final_name]&&sd['limit'+final_name](req, res)||false;
-						if(limit){
-							query.limit(limit);
-						}
-						let select = sd['select'+final_name]&&sd['select'+final_name](req, res)||false;
-						if(select){
-							query.select(select);
-						}
-						let populate = sd['populate'+final_name]&&sd['populate'+final_name](req, res)||false;
-						if(populate){
-							query.populate(populate);
-						}
-						query.exec(function(err, docs) {
-							err&&console.trace(err);
-							res.json(docs || []);
-						});
-					});					
+					router.get("/get"+get_name, sd['ensure'+final_name]||sd._next, getProcess);					
+					router.get("/get"+get_name+'/*', sd['ensure'+final_name]||sd._next, getProcess);					
 				}
 				getRoute('');
 				if(partJson.crud.get){
