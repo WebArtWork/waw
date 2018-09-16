@@ -154,11 +154,11 @@ if(process.argv[2]){
 			console.log('waw version is '+config.version);
 			return;
 		// Parts Management
+		case 'a':
 		case 'addpart':
 		case 'part':
 		case 'add':
 		case 'p':
-		case 'a':
 		case 'ap':
 			if(process.argv[3]){
 				require(exe+'/part')(process.argv[3]);
