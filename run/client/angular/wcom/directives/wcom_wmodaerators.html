@@ -1,0 +1,14 @@
+<label class="wtags">
+	<span class='wtag' ng-repeat='obj in arr'>
+		<img ng-src='{{obj.avatarUrl}}' alt='{{obj.name}}'>
+		<span>{{obj.name}}</span>
+		<i class='icon icon-close' ng-click='arr.splice($index, 1); change();'></i>
+	</span>
+	<input type='text' placeholder='{{holder}}' ng-model='object.new_moderator'>
+</label>
+<div ng-if='object.new_moderator'>
+	<div ng-repeat='user in users|rArr:arr|filter:object.new_moderator' ng-click='arr.push(user); object.new_moderator=null; change();'>
+		<img ng-src='{{user.avatarUrl}}' alt='{{user.name}}'>
+		<span>{{user.name}}</span>
+	</div>
+</div>

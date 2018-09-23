@@ -1,0 +1,7 @@
+{
+    "name": "wcom",
+    "version": "0.1.1",
+    "license": "MIT",
+    "repository": "WebArtWork/wcom",
+    "keywords": ["waw", "angular", "crud", "mongo", "general", "modal", "popup", "spin", "file", "socket", "image", "hash"]
+}

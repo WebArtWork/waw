@@ -1,9 +1,0 @@
-<label class='wtags'>
-	<div class='wtag' ng-repeat='tag in tags'>
-		<div class="wtag--in">
-			<div class="wtag--text">#{{tag}}</div>
-			<i class='icon icon-close' ng-click='tags.splice($index, 1); update_tags();' title="Delete tag"></i>
-		</div>
-	</div>
-	<input type='text' placeholder='new tag' ng-model='new_tag' ng-keyup='enter($event)' title="Type tag and press Enter">
-</label>

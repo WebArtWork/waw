@@ -22,13 +22,11 @@
 		"body-parser": "^1.18.2",
 		"connect-mongo": "^2.0.0",
 		"cookie-parser": "^1.4.3",
-		"derer": "*",
 		"express": "^4.16.2",
 		"express-session": "^1.15.6",
 		"express-zip": "^2.0.1",
 		"fs-extra": "^4.0.2",
 		"gitty": "^3.6.0",
-		"js-minify": "*",
 		"method-override": "^2.3.10",
 		"mongoose": "^4.12.4",
 		"node-cmd": "^3.0.0",
@@ -40,6 +38,8 @@
 		"serve-favicon": "^2.4.5",
 		"showdown": "^1.8.6",
 		"socket.io": "^2.0.4",
+		"js-minify": "*",
+		"derer": "*",
 		"svg-fontify": "*"
 	}
 }

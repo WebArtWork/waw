@@ -1,10 +1,5 @@
-console.log('TESTING UPDATE');
-
-
-// comments
-
 angular.module("wcom_services", []).run(function($rootScope, $compile){
-	let body = angular.element(document).find('body').eq(0);
+	var body = angular.element(document).find('body').eq(0);
 	body.append($compile(angular.element('<pullfiles></pullfiles>'))($rootScope));
 }).factory('socket', function(){
 	"ngInject";
@@ -12,7 +7,7 @@ angular.module("wcom_services", []).run(function($rootScope, $compile){
 	var loc = window.location.host;
 	var socket = io.connect(loc);
 	return socket;
-}).service('fm', function($timeout){
+}).service('file', function($timeout){
 	"ngInject";
 	var self = this;
 	self.add = function(opts, cb){
@@ -152,32 +147,6 @@ angular.module("wcom_services", []).run(function($rootScope, $compile){
 			}
 		}
 	}
-}).service('css', function(){
-	this.add = (rules) => {
-		var styleEl = document.createElement('style'),
-			styleSheet;
-		// Append style element to head
-		document.head.appendChild(styleEl);
-		// Grab style sheet
-		styleSheet = styleEl.sheet;
-		for (var i = 0, rl = rules.length; i < rl; i++) {
-			var j = 1,
-				rule = rules[i],
-				selector = rules[i][0],
-				propStr = '';
-			// If the second argument of a rule is an array of arrays, correct our variables.
-			if (Object.prototype.toString.call(rule[1][0]) === '[object Array]') {
-				rule = rule[1];
-				j = 0;
-			}
-			for (var pl = rule.length; j < pl; j++) {
-				var prop = rule[j];
-				propStr += prop[0] + ':' + prop[1] + (prop[2] ? ' !important' : '') + ';\n';
-			}
-			// Insert CSS Rule
-			styleSheet.insertRule(selector + '{' + propStr + '}', styleSheet.cssRules.length);
-		}
-	}
 }).service('img', function(){
 	"ngInject";
 	this.fileToDataUrl = function(file, callback){
@@ -191,10 +160,8 @@ angular.module("wcom_services", []).run(function($rootScope, $compile){
 		if(!info.file) return console.log('No image');
 		info.width = info.width || 1920;
 		info.height = info.height || 1080;
-		if(info.file.type!="image/jpeg" && info.file.type!="image/png"){
-			callback(false);
+		if(info.file.type!="image/jpeg" && info.file.type!="image/png")
 			return console.log("You must upload file only JPEG or PNG format.");
-		}
 		var reader = new FileReader();
 		reader.onload = function (loadEvent) {
 			var canvasElement = document.createElement('canvas');
@@ -221,18 +188,18 @@ angular.module("wcom_services", []).run(function($rootScope, $compile){
 	}
 }).service('hash', function(){
 	"ngInject";
-	this.set = (obj)=>{
+	this.set = function(obj){
 		window.location.hash = '';
-		for(let key in obj){
+		for(var key in obj){
 			if(obj[key]) window.location.hash+='&'+key+'='+obj[key];
 
 		}
 	}
-	this.get = ()=>{
-		let hash = window.location.hash.replace('#!#', '');
+	this.get = function(){
+		var hash = window.location.hash.replace('#!#', '');
 		hash = hash.replace('#', '').split('&');
 		hash.shift();
-		let h = {};
+		var h = {};
 		for (var i = 0; i < hash.length; i++) {
 			hash[i] = hash[i].split('=');
 			h[hash[i][0]] = hash[i][1];

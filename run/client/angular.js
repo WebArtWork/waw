@@ -9,6 +9,7 @@ module.exports = function(sd, clientRoot){
 	/*
 	*	scss
 	*/
+		// add lint
 		sd._app.use(require('node-sass-middleware')({
 			src: process.cwd() + '/client',
 			dest: process.cwd() + '/client',
@@ -242,63 +243,133 @@ module.exports = function(sd, clientRoot){
 	*/
 var jsRoot = clientRoot + '/js';
 var cssRoot = clientRoot + '/css';
+var timeout = {};
+var minifier = function(){};
+if(!sd._config.ignoreGenerateLibs){
+	minifier = require('js-minify');
+}
 		// plugins management
+
 		var fill_plugin = function(folder, plugin){
-			return console.log(folder, ' | ', plugin);
-
-
 			if(!sd._fs.existsSync(folder+'config.json')) return;
-			return console.log('THIS IS plugin: ', plugin);
-			if(!sd._fs.existsSync(folder)){
-				return sd._fse.copySync(__dirname+'/angular/'+plugin, folder+plugin);
-			}
-			includeCss+='@import "plugins/'+plugin+'";\r\n';
-			compareCssFiles(folder+plugin+'.scss', cssRoot+'/plugins/'+plugin+'.scss');
-			sd._fse.removeSync(folder+plugin+'.js');
-			sd._fse.removeSync(folder+plugin+'-min.js');
-			var files = sd._getFiles(jsRoot+'/'+plugin);
-			let p_obj = {
-				name: plugin,
-				html: [],
-				dep: '',
-				js: []
-			}
-			for (var j = files.length - 1; j >= 0; j--) {
-				if(sd._isEndOfStr(files[j], '.js')){
-					let file = files[j].slice(0, files[j].length-3);
-					p_obj.dep+=(p_obj.dep&&', '||'')+'"'+file+'"';
-					p_obj.js.push(file);
-				}else if(sd._isEndOfStr(files[j], '.html')){
-					let file = files[j].slice(0, files[j].length-5);
-					p_obj.dep+=(p_obj.dep&&', '||'')+'"'+file+'.html"';
-					p_obj.html.push(file);
-				}
-			}
-			let data = sd._fs.readFileSync(__dirname+'/js/plugin.js.js', 'utf8');
-			data=data.replace('NAME', p_obj.name);
-			data=data.replace('MODULES', p_obj.dep);
-			for (var j = 0; j < p_obj.html.length; j++) {
-				let html = sd._fs.readFileSync(__dirname+'/js/plugin.html.js', 'utf8');
-				let htmlReplace = sd._fs.readFileSync(folder+p_obj.html[j]+'.html', 'utf8');
-				htmlReplace = sd._rpl(htmlReplace, '"', '\\"');
-				htmlReplace = htmlReplace.replace(/(\r|\t|\n)/gm,"");
-				html=html.replace('HTML', htmlReplace);
-				html=html.replace('FILE', p_obj.html[j]);
-				html=html.replace('FILE', p_obj.html[j]);
-				data+='\n'+html;
-			}
-			for (var j = 0; j < p_obj.js.length; j++) {
-				let jsdata = sd._fs.readFileSync(folder+p_obj.js[j]+'.js', 'utf8');
-				data+='\n'+jsdata;
-			}
-			sd._fs.writeFileSync(folder+plugin+'.js', data, 'utf8');
+			clearTimeout(timeout[plugin]);
+			timeout[plugin] = setTimeout(function(){
+				setTimeout(function(){
+					clearTimeout(timeout[plugin]);
+				}, 100);
+				var files = [];
+				sd._recursive(folder, [function(file, stats){
+					if((!sd._isEndOfStr(file, '.js')&&!sd._isEndOfStr(file, '.html')&&
+						!sd._isEndOfStr(file, '.css')&&!sd._isEndOfStr(file, '.scss'))||
+						file.split('\\').pop()==plugin+'.js'||
+						file.split('\\').pop()==plugin+'-min.js') return;
+					files.push({
+						isHtml: sd._isEndOfStr(file, '.html'),
+						isCss: sd._isEndOfStr(file, '.scss')||sd._isEndOfStr(file, '.css'),
+						isJs: sd._isEndOfStr(file, '.js'),
+						name: file.split('\\').pop(),
+						edit: stats.mtimeMs,
+						path: file,
+					});
+				}], function () {
+					if(!files.length) return;
+					var info = sd._fse.readJsonSync(folder+'config.json', {throws: false});
+					files.sort(function(a, b){
+						if(a.name > b.name) return 1;
+						return -1;
+					});
+					var mark = '', dep = '';
+					for (var i = 0; i < files.length; i++) {
+						mark+= files[i].name+' '+files[i].edit+' | ';
+						if(sd._isEndOfStr(files[j], '.js')){
+							let file = files[j].slice(0, files[j].length-3);
+							dep+=(dep&&', '||'')+'"'+
+							+'"';
+							p_obj.js.push(file);
+						}else if(sd._isEndOfStr(files[j], '.html')){
+							let file = files[j].slice(0, files[j].length-5);
+							dep+=(dep&&', '||'')+'"'+file+'.html"';
+							p_obj.html.push(file);
+						}
+					}
+					if(mark == info.mark) return;
+					info.mark = mark;
+					sd._fse.writeJsonSync(folder+'config.json', info, {throws: false});
+					sd._fse.removeSync(folder+plugin+'.js');
+					sd._fse.removeSync(folder+plugin+'-min.js');
+					if(includeCss.indexOf("plugins/'+plugin+'")==-1){
+						includeCss+='@import "plugins/'+plugin+'";\r\n';
+					}
+					var data = sd._fs.readFileSync(__dirname+'/js/plugin.js.js', 'utf8');
+					data=data.replace('NAME', plugin);
+
+
+
+
+
+
+					return;
+					if(!sd._fs.existsSync(folder)){
+						return sd._fse.copySync(__dirname+'/angular/'+plugin, folder+plugin);
+					}
+
+
+					var p_obj = {
+						name: plugin,
+						html: [],
+						dep: '',
+						js: []
+					}
+					for (var j = files.length - 1; j >= 0; j--) {
+						if(sd._isEndOfStr(files[j], '.js')){
+							var file = files[j].slice(0, files[j].length-3);
+							p_obj.dep+=(p_obj.dep&&', '||'')+'"'+file+'"';
+							p_obj.js.push(file);
+						}else if(sd._isEndOfStr(files[j], '.html')){
+							var file = files[j].slice(0, files[j].length-5);
+							p_obj.dep+=(p_obj.dep&&', '||'')+'"'+file+'.html"';
+							p_obj.html.push(file);
+						}
+					}
+
+					data=data.replace('MODULES', p_obj.dep); 
+					for (var j = 0; j < p_obj.html.length; j++) {
+						var html = sd._fs.readFileSync(__dirname+'/js/plugin.html.js', 'utf8');
+						var htmlReplace = sd._fs.readFileSync(folder+p_obj.html[j]+'.html', 'utf8');
+						htmlReplace = sd._rpl(htmlReplace, '"', '\\"');
+						htmlReplace = htmlReplace.replace(/(\r|\t|\n)/gm,"");
+						html=html.replace('HTML', htmlReplace);
+						html=html.replace('FILE', p_obj.html[j]);
+						html=html.replace('FILE', p_obj.html[j]);
+						data+='\n'+html;
+					}
+					for (var j = 0; j < p_obj.js.length; j++) {
+						var jsdata = sd._fs.readFileSync(folder+p_obj.js[j]+'.js', 'utf8');
+						data+='\n'+jsdata;
+					}
+					sd._fs.writeFileSync(folder+plugin+'.js', data, 'utf8');
+
+
+				});
+			}, 250);
 		}
+var watch_subfolder = function(folder, plugin, subfolder){
+	sd._fs.watch(folder+subfolder, function() {
+		fill_plugin(folder, plugin);
+	});
+}
 var watch_plugin = function(folder, plugin){
 	fill_plugin(folder, plugin);
 	sd._fs.watch(folder, function(event, filename) {
 		if(filename==plugin+'.js'||filename==plugin+'-min.js') return;
 		fill_plugin(folder, plugin);
 	});
+	var folders = sd._getDirectories(folder);
+	for (var i = 0; i < folders.length; i++) {
+		if(folders[i]!='.git'){
+			watch_subfolder(folder, plugin, folders[i]);
+		}
+	}
 }
 
 		// waw plugins
@@ -319,63 +390,36 @@ sd._app.get("/waw/p/:file", function(req, res, next) {
 	else res.send('// This is not plugin');
 });
 		// generation
-		if(!sd._config.ignoreGenerateLibs){
-			var minifier = require('js-minify');
-			var rpl_plugs = function(file, folder) {
-				if(file.indexOf('.js')>-1){
-					return clientRoot+folder+file;
-				}else{
-					return __dirname+'/angular/'+file+'/'+file+'.js';
-				}
-			}
-			var gen_plugs = function(dest, files, name, prod_files){
-				for (var i = 0; i < files.length; i++) {
-					files[i] = rpl_plugs(files[i], '/lab/');
-				}
-				if(sd._config.production){
-					for (var i = 0; i < prod_files.length; i++) {
-						prod_files[i] = rpl_plugs(prod_files[i], '/js/');
-						files.push(prod_files[i]);
-					}
-				}
-				minifier({
-					files: files,
-					way: dest + '/gen/',
-					prefix: sd._config.prefix,
-					production: !!sd._config.production,
-					name: name
-				});
-			}
-			if(info.lab){
-				for (var i = 0; i < info.lab.length; i++) {
-					gen_plugs(clientRoot, info.lab[i].files, info.lab[i].name, info.lab[i].prod);
-				}
-			}
+var rpl_plugs = function(file, folder) {
+	if(file.indexOf('.js')>-1){
+		return clientRoot+folder+file;
+	}else{
+		return __dirname+'/angular/'+file+'/'+file+'.js';
+	}
+}
+var gen_plugs = function(dest, files, name, prod_files){
+	for (var i = 0; i < files.length; i++) {
+		files[i] = rpl_plugs(files[i], '/lab/');
+	}
+	if(sd._config.production){
+		for (var i = 0; i < prod_files.length; i++) {
+			prod_files[i] = rpl_plugs(prod_files[i], '/js/');
+			files.push(prod_files[i]);
 		}
-		// css of plugins
-		var compareCssFiles = function(injsfile, incssfile){
-			var mtjs, mtcss;
-			if (sd._fs.existsSync(injsfile)) {
-				mtjs = sd._fs.statSync(injsfile).mtime;
-				mtjs = new Date(mtjs).getTime();
-			}
-			if (sd._fs.existsSync(incssfile)) {
-				mtcss = sd._fs.statSync(incssfile).mtime;
-				mtcss = new Date(mtcss).getTime();
-			}
-			if(!mtjs&&!mtcss){
-				sd._fs.writeFileSync(injsfile, '', 'utf8');
-				sd._fs.writeFileSync(incssfile, '', 'utf8');
-			}else if(!mtjs){
-				sd._fs.writeFileSync(injsfile, sd._fs.readFileSync(incssfile,'utf8'), 'utf8');
-			}else if(!mtcss){
-				sd._fs.writeFileSync(incssfile, sd._fs.readFileSync(injsfile,'utf8'), 'utf8');
-			}else if(mtjs>mtcss){
-				sd._fs.writeFileSync(incssfile, sd._fs.readFileSync(injsfile,'utf8'), 'utf8');
-			}else if(mtjs<mtcss){
-				sd._fs.writeFileSync(injsfile, sd._fs.readFileSync(incssfile,'utf8'), 'utf8');
-			}
-		}
+	}
+	minifier({
+		files: files,
+		way: dest + '/gen/',
+		prefix: sd._config.prefix,
+		production: !!sd._config.production,
+		name: name
+	});
+}
+if(!sd._config.ignoreGenerateLibs && info.lab){
+	for (var i = 0; i < info.lab.length; i++) {
+		gen_plugs(clientRoot, info.lab[i].files, info.lab[i].name, info.lab[i].prod);
+	}
+}
 
 info.plugins = info.plugins || [];
 if(info.plugins.length){

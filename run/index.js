@@ -2,6 +2,7 @@
 *	Initialize
 */
 	var sd = {
+		_recursive: require("recursive-readdir"),
 		_express: require('express'),
 		_passport: require('passport'),
 		_mongoose: require('mongoose'),

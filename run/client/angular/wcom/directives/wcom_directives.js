@@ -3,53 +3,51 @@ angular.module("wcom_directives", [])
 	"ngInject";
 	return{
 		restrict: 'E', scope: true, replace: true,
-		controller: function($scope, img, $timeout, fm){
-			const inputs = $scope.inputs = [];
-			const complete = (file, opts, cb) => {
-				if(opts.content){
-					var reader = new FileReader();
-					reader.onload = function() {
-						$timeout(function(){
-							cb(reader.result);
-						});
-					}
-					reader.readAsText(file);
-				}else{
-					img.resizeUpTo({
-						file: file,
-						width: opts.width||1920,
-						height: opts.height||1080
-					}, function(dataUrl) {
-						$timeout(function(){
-							cb(dataUrl, file);
-						});
-					});
-				}
-			}
-			fm.addDelay = function(opts, cb){
-				if(typeof cb != 'function' || !opts._id) return;
+		controller: function($scope, img, $timeout, file){
+			var inputs = $scope.inputs = [];
+			file.addDelay = function(opts, cb){
+				if(typeof cb != 'function' || !opts.id) return;
 				opts.multiple = !!opts.multiple;
 				inputs.push(opts);
 				$timeout(function(){
 					if(opts.multiple){
-						angular.element(document.getElementById(opts._id))
+						var addImage = function(file) {
+							img.resizeUpTo({
+								file: file,
+								width: opts.width||1920,
+								height: opts.height||1080
+							}, function(dataUrl) {
+								$timeout(function(){
+									cb(dataUrl, file);
+								});
+							});
+						}
+						angular.element(document.getElementById(opts.id))
 						.bind('change', function(evt) {
 							var target = evt.currentTarget || evt.target;
 							for (var i = 0; i < target.files.length; i++) {
-								complete(target.files[i], opts, cb);
+								addImage(target.files[i]);
 							}
 						});
 					}else{
-						angular.element(document.getElementById(opts._id))
+						angular.element(document.getElementById(opts.id))
 						.bind('change', function(evt) {
 							var target = evt.currentTarget || evt.target;
-							complete(target.files[0], opts, cb);
+							img.resizeUpTo({
+								file: target.files[0],
+								width: opts.width||1920,
+								height: opts.height||1080
+							}, function(dataUrl) {
+								$timeout(function(){
+									cb(dataUrl, target.files[0]);
+								});
+							});
 						});
 					}
 				}, 250);
 			}
 		},
-		template: '<input ng-repeat="i in inputs" type="file" ng-hide="true" id="{{i._id}}" multiple="{{i.multiple}}">'
+		template: '<input ng-repeat="i in inputs" type="file" ng-hide="true" id="{{i.id}}" multiple="{{i.multiple}}">'
 	}
 }).directive('elsize', function($timeout, $window){
 	"ngInject";
@@ -59,13 +57,9 @@ angular.module("wcom_directives", [])
 			elsize: '='
 		}, link: function(scope, el){
 			if(!scope.elsize) scope.elsize={};
-			scope.elsize.element = el;
 			var resize = function(){
 				scope.elsize.width = el[0].clientWidth;
 				scope.elsize.height = el[0].clientHeight;
-				if(typeof scope.elsize.cb == 'function'){
-					scope.elsize.cb(scope.elsize);
-				}
 				$timeout();
 			}
 			resize();
@@ -103,7 +97,7 @@ angular.module("wcom_directives", [])
 			}
 		}, templateUrl: 'wcom_wtags.html'
 	}
-}).directive('wmoderators', function(){
+}).directive('wmodaerators', function($filter){
 	"ngInject";
 	return {
 		restrict: 'AE',
@@ -112,14 +106,14 @@ angular.module("wcom_directives", [])
 			users: '=',
 			holder: '@',
 			change: '&'
-		}, templateUrl: 'wcom_wmoderators.html'
+		}, templateUrl: 'wcom_wmodaerators.html'
 	}
-}).directive('wmoderatorsview', function(){
+}).directive('wmodaeratorsview', function($filter){
 	"ngInject";
 	return {
 		restrict: 'AE',
 		scope: {
 			arr: '='
-		}, templateUrl: 'wcom_wmoderatorsview.html'
+		}, templateUrl: 'wcom_wmodaeratorsview.html'
 	}
 });
