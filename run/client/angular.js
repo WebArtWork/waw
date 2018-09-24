@@ -10,19 +10,20 @@ module.exports = function(sd, clientRoot){
 	*	scss
 	*/
 		// add lint
+		var sass = require('node-sass');
 		sd._app.use(require('node-sass-middleware')({
 			src: process.cwd() + '/client',
 			dest: process.cwd() + '/client',
 			debug: !sd._config.production,
 			outputStyle: 'compressed',
 			force: !sd._config.production
-		}));	
-		// sd._app.use(require('postcss-middleware')({
-		// 	plugins: [
-		// 		require('autoprefixer')({
-		// 		})
-		// 	]
-		// }));
+		}));
+		sd._app.use(require('postcss-middleware')({
+			plugins: [require('autoprefixer')({})],
+			src: function(req) {
+				return path.join(process.cwd() + '/client', req.url);
+			}
+		}));
 	/*
 	*	Translates
 	*	need to be fixed
@@ -241,15 +242,15 @@ module.exports = function(sd, clientRoot){
 	/*
 	*	Javascript Plugins and minify management
 	*/
-var jsRoot = clientRoot + '/js';
-var cssRoot = clientRoot + '/css';
-var timeout = {};
-var minifier = function(){};
-if(!sd._config.ignoreGenerateLibs){
-	minifier = require('js-minify');
-}
+		var plugins = sd._getDirectories(__dirname + '/angular');
+		var minifier = function(){};
+		if(!sd._config.ignoreGenerateLibs){
+			minifier = require('js-minify');
+		}
+		var jsRoot = clientRoot + '/js';
+		var cssRoot = clientRoot + '/css';
+		var timeout = {}, includeCss = '';
 		// plugins management
-
 		var fill_plugin = function(folder, plugin){
 			if(!sd._fs.existsSync(folder+'config.json')) return;
 			clearTimeout(timeout[plugin]);
@@ -262,6 +263,9 @@ if(!sd._config.ignoreGenerateLibs){
 					if((!sd._isEndOfStr(file, '.js')&&!sd._isEndOfStr(file, '.html')&&
 						!sd._isEndOfStr(file, '.css')&&!sd._isEndOfStr(file, '.scss'))||
 						file.split('\\').pop()==plugin+'.js'||
+						file.split('\\').pop()==plugin+'.css'||
+						file.split('\\').pop()==plugin+'-min.css'||
+						file.split('\\').pop()==plugin+'.scss'||
 						file.split('\\').pop()==plugin+'-min.js') return;
 					files.push({
 						isHtml: sd._isEndOfStr(file, '.html'),
@@ -273,7 +277,7 @@ if(!sd._config.ignoreGenerateLibs){
 					});
 				}], function () {
 					if(!files.length) return;
-					var info = sd._fse.readJsonSync(folder+'config.json', {throws: false});
+					var config = sd._fse.readJsonSync(folder+'config.json', {throws: false});
 					files.sort(function(a, b){
 						if(a.name > b.name) return 1;
 						return -1;
@@ -281,174 +285,171 @@ if(!sd._config.ignoreGenerateLibs){
 					var mark = '', dep = '';
 					for (var i = 0; i < files.length; i++) {
 						mark+= files[i].name+' '+files[i].edit+' | ';
-						if(sd._isEndOfStr(files[j], '.js')){
-							let file = files[j].slice(0, files[j].length-3);
-							dep+=(dep&&', '||'')+'"'+
-							+'"';
-							p_obj.js.push(file);
-						}else if(sd._isEndOfStr(files[j], '.html')){
-							let file = files[j].slice(0, files[j].length-5);
-							dep+=(dep&&', '||'')+'"'+file+'.html"';
-							p_obj.html.push(file);
+						if(sd._isEndOfStr(files[i].name, '.js')){
+							let file = files[i].name.slice(0, files[i].name.length-3);
+							dep+=(dep&&', '||'')+'"'+file+'"';
+						}else if(sd._isEndOfStr(files[i].name, '.html')){
+							dep+=(dep&&', '||'')+'"'+files[i].name+'"';
 						}
 					}
-					if(mark == info.mark) return;
-					info.mark = mark;
-					sd._fse.writeJsonSync(folder+'config.json', info, {throws: false});
-					sd._fse.removeSync(folder+plugin+'.js');
-					sd._fse.removeSync(folder+plugin+'-min.js');
 					if(includeCss.indexOf("plugins/'+plugin+'")==-1){
 						includeCss+='@import "plugins/'+plugin+'";\r\n';
+						sd._fs.writeFileSync(cssRoot+'/plugins.scss', includeCss, 'utf8');
 					}
-					var data = sd._fs.readFileSync(__dirname+'/js/plugin.js.js', 'utf8');
-					data=data.replace('NAME', plugin);
-
-
-
-
-
-
-					return;
-					if(!sd._fs.existsSync(folder)){
-						return sd._fse.copySync(__dirname+'/angular/'+plugin, folder+plugin);
-					}
-
-
-					var p_obj = {
-						name: plugin,
-						html: [],
-						dep: '',
-						js: []
-					}
-					for (var j = files.length - 1; j >= 0; j--) {
-						if(sd._isEndOfStr(files[j], '.js')){
-							var file = files[j].slice(0, files[j].length-3);
-							p_obj.dep+=(p_obj.dep&&', '||'')+'"'+file+'"';
-							p_obj.js.push(file);
-						}else if(sd._isEndOfStr(files[j], '.html')){
-							var file = files[j].slice(0, files[j].length-5);
-							p_obj.dep+=(p_obj.dep&&', '||'')+'"'+file+'.html"';
-							p_obj.html.push(file);
+					if(mark == config.mark) return;
+					config.mark = mark;
+					sd._fse.writeJsonSync(folder+'config.json', config, {throws: false});
+					sd._fse.removeSync(folder+plugin+'.js');
+					sd._fse.removeSync(folder+plugin+'-min.js');
+					var data = sd._fs.readFileSync(__dirname+'/js/plugin.js.js', 'utf8'), css = '';
+					data = data.replace('NAME', plugin);
+					data = data.replace('MODULES', dep);
+					for (var i = 0; i < files.length; i++) {
+						if(sd._isEndOfStr(files[i].name, '.js')){
+							data+='\n'+sd._fs.readFileSync(files[i].path, 'utf8');
+						}else if(sd._isEndOfStr(files[i].name, '.html')){
+							var html = sd._fs.readFileSync(__dirname+'/js/plugin.html.js', 'utf8');
+							var htmlReplace = sd._fs.readFileSync(files[i].path, 'utf8');
+							htmlReplace = sd._rpl(htmlReplace, '"', '\\"');
+							htmlReplace = htmlReplace.replace(/(\r|\t|\n)/gm,"");
+							html=html.replace('HTML', htmlReplace);
+							html=html.split('FILE').join(files[i].name);
+							data+='\n'+html;
+						}else if(sd._isEndOfStr(files[i].name, '.scss') || sd._isEndOfStr(files[i].name, '.css')){
+							css += sd._fs.readFileSync(files[i].path, 'utf8');
 						}
 					}
-
-					data=data.replace('MODULES', p_obj.dep); 
-					for (var j = 0; j < p_obj.html.length; j++) {
-						var html = sd._fs.readFileSync(__dirname+'/js/plugin.html.js', 'utf8');
-						var htmlReplace = sd._fs.readFileSync(folder+p_obj.html[j]+'.html', 'utf8');
-						htmlReplace = sd._rpl(htmlReplace, '"', '\\"');
-						htmlReplace = htmlReplace.replace(/(\r|\t|\n)/gm,"");
-						html=html.replace('HTML', htmlReplace);
-						html=html.replace('FILE', p_obj.html[j]);
-						html=html.replace('FILE', p_obj.html[j]);
-						data+='\n'+html;
-					}
-					for (var j = 0; j < p_obj.js.length; j++) {
-						var jsdata = sd._fs.readFileSync(folder+p_obj.js[j]+'.js', 'utf8');
-						data+='\n'+jsdata;
-					}
+					sd._fs.writeFileSync(folder+plugin+'.scss', css, 'utf8');
+					sd._fs.writeFileSync(cssRoot+'/plugins/'+plugin+'.scss', css, 'utf8');
+					sass.render({
+						data: css,
+						outputStyle: 'compressed'
+					}, function(err, data){
+						if(data){
+							sd._fs.writeFileSync(folder+plugin+'-min.css', data.css.toString(), 'utf8');
+						}
+					});
+					sass.render({
+						data: css,
+						outputStyle: 'expanded'
+					}, function(err, data){
+						if(data){
+							sd._fs.writeFileSync(folder+plugin+'.css', data.css.toString(), 'utf8');
+						}
+					});
 					sd._fs.writeFileSync(folder+plugin+'.js', data, 'utf8');
-
-
+					minifier({
+						files: [folder+plugin+'.js'],
+						way: folder,
+						prefix: sd._config.prefix,
+						production: false,
+						name: plugin,
+						force: true
+					});
 				});
 			}, 250);
 		}
-var watch_subfolder = function(folder, plugin, subfolder){
-	sd._fs.watch(folder+subfolder, function() {
-		fill_plugin(folder, plugin);
-	});
-}
-var watch_plugin = function(folder, plugin){
-	fill_plugin(folder, plugin);
-	sd._fs.watch(folder, function(event, filename) {
-		if(filename==plugin+'.js'||filename==plugin+'-min.js') return;
-		fill_plugin(folder, plugin);
-	});
-	var folders = sd._getDirectories(folder);
-	for (var i = 0; i < folders.length; i++) {
-		if(folders[i]!='.git'){
-			watch_subfolder(folder, plugin, folders[i]);
+		var watch_subfolder = function(folder, plugin, subfolder){
+			sd._fs.watch(folder+subfolder, function() {
+				fill_plugin(folder, plugin);
+			});
+			var folders = sd._getDirectories(folder+subfolder);
+			for (var i = 0; i < folders.length; i++) {
+				if(folders[i]!='.git'){
+					watch_subfolder(folder, plugin, folders[i]);
+				}
+			}
 		}
-	}
-}
-
-		// waw plugins
-var plugins = sd._getDirectories(__dirname + '/angular');
-for (var i = 0; i < plugins.length; i++) {
-	var p = plugins[i].toLowerCase();
-	watch_plugin(__dirname + '/angular/' + p + '/', p);
-}
-sd._app.get("/waw/p/:file", function(req, res, next) {
-	var p = req.params.file.toLowerCase().replace('.js',''), send = false;;
-	for (var i = 0; i < plugins.length; i++) {
-		if(plugins[i] == p){
-			send = true;
-			break;
+		var watch_plugin = function(folder, plugin){
+			fill_plugin(folder, plugin);
+			sd._fs.watch(folder, function(event, filename) {
+				if(filename==plugin+'.js'||filename==plugin+'-min.js') return;
+				fill_plugin(folder, plugin);
+			});
+			var folders = sd._getDirectories(folder);
+			for (var i = 0; i < folders.length; i++) {
+				if(folders[i]!='.git'){
+					watch_subfolder(folder, plugin, folders[i]);
+				}
+			}
 		}
-	}
-	if(send) res.sendFile(__dirname + '/angular/' + p + '/' + req.params.file);
-	else res.send('// This is not plugin');
-});
 		// generation
-var rpl_plugs = function(file, folder) {
-	if(file.indexOf('.js')>-1){
-		return clientRoot+folder+file;
-	}else{
-		return __dirname+'/angular/'+file+'/'+file+'.js';
-	}
-}
-var gen_plugs = function(dest, files, name, prod_files){
-	for (var i = 0; i < files.length; i++) {
-		files[i] = rpl_plugs(files[i], '/lab/');
-	}
-	if(sd._config.production){
-		for (var i = 0; i < prod_files.length; i++) {
-			prod_files[i] = rpl_plugs(prod_files[i], '/js/');
-			files.push(prod_files[i]);
+		var rpl_plugs = function(file, folder) {
+			if(file.indexOf('.js')>-1){
+				return clientRoot+folder+file;
+			}else{
+				return __dirname+'/angular/'+file+'/'+file+'.js';
+			}
 		}
-	}
-	minifier({
-		files: files,
-		way: dest + '/gen/',
-		prefix: sd._config.prefix,
-		production: !!sd._config.production,
-		name: name
-	});
-}
-if(!sd._config.ignoreGenerateLibs && info.lab){
-	for (var i = 0; i < info.lab.length; i++) {
-		gen_plugs(clientRoot, info.lab[i].files, info.lab[i].name, info.lab[i].prod);
-	}
-}
-
-info.plugins = info.plugins || [];
-if(info.plugins.length){
-	sd._fse.mkdirs(cssRoot+'/plugins');
-	var includeCss = '';
-	for (var i = 0; i < info.plugins.length; i++) {
-		includeCss+='@import "plugins/'+info.plugins[i]+'";\r\n';
-		watch_plugin(jsRoot+'/'+info.plugins[i]+'/', info.plugins[i]);
-	}
-	sd._fs.writeFileSync(cssRoot+'/plugins.scss', includeCss, 'utf8');
-}
+		var gen_plugs = function(dest, files, name, prod_files){
+			for (var i = 0; i < files.length; i++) {
+				files[i] = rpl_plugs(files[i], '/lab/');
+			}
+			if(sd._config.production){
+				for (var i = 0; i < prod_files.length; i++) {
+					prod_files[i] = rpl_plugs(prod_files[i], '/js/');
+					files.push(prod_files[i]);
+				}
+			}
+			minifier({
+				files: files,
+				way: dest + '/gen/',
+				prefix: sd._config.prefix,
+				production: !!sd._config.production,
+				name: name
+			});
+		}
+		if(!sd._config.ignoreGenerateLibs && info.lab){
+			for (var i = 0; i < info.lab.length; i++) {
+				gen_plugs(clientRoot, info.lab[i].files, info.lab[i].name, info.lab[i].prod);
+			}
+		}
+		info.plugins = info.plugins || [];
+		if(info.plugins.length){
+			sd._fse.mkdirs(cssRoot+'/plugins');
+			for (var i = 0; i < info.plugins.length; i++) {
+				watch_plugin(jsRoot+'/'+info.plugins[i]+'/', info.plugins[i]);
+			}
+			for (var j = plugins.length - 1; j >= 0; j--) {
+				if(plugins[j] == info.plugins[i]){
+					plugins.splice(j, 1);
+				}
+			}
+		}
+		// waw plugins
+		for (var i = 0; i < plugins.length; i++) {
+			var p = plugins[i].toLowerCase();
+			watch_plugin(__dirname + '/angular/' + p + '/', p);
+		}
+		sd._app.get("/waw/p/:file", function(req, res, next) {
+			var p = req.params.file.toLowerCase().slice(0, req.params.file.length-3), send = false;;
+			for (var i = 0; i < plugins.length; i++) {
+				if(plugins[i] == p){
+					send = true;
+					break;
+				}
+			}
+			if(send) res.sendFile(__dirname + '/angular/' + p + '/' + p + '.js');
+			else res.send('// This is not plugin');
+		});
 	/*
 	*	Live Reload
 	*/
-		// var update = Date.now();
-		// var folder_on_update = function(folder){
-		// 	sd._fs.watch(folder, function(event, filename) {
-		// 		update = Date.now();
-		// 	});
-		// 	var folders = sd._getDirectories(folder);
-		// 	for (var i = 0; i < folders.length; i++) {
-		// 		folder_on_update(folder+'/'+folders[i]);
-		// 	}
-		// }
-		// folder_on_update(__dirname + '/angular');
-		// folder_on_update(clientRoot);
-		// sd._app.get("/waw/last_update", function(req, res, next) {
-		// 	res.send(update);
-		// });
+		var update = Date.now();
+		var folder_on_update = function(folder){
+			sd._fs.watch(folder, function(event, filename) {
+				update = Date.now();
+			});
+			var folders = sd._getDirectories(folder);
+			for (var i = 0; i < folders.length; i++) {
+				folder_on_update(folder+'/'+folders[i]);
+			}
+		}
+		folder_on_update(__dirname + '/angular');
+		folder_on_update(clientRoot);
+		sd._app.get("/waw/last_update", function(req, res, next) {
+			res.send(update.getTime());
+		});
 	/*
 	*	Files Serving / require serve files in client
 	*	Basically this is only for localhost,

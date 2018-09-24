@@ -224,6 +224,7 @@ module.exports = function(sd){
 			return newArr;
 		}
 		sd._isEndOfStr = function(str, strCheck){
+			if(!str||!strCheck) return false;
 			var length = strCheck.length;
 			return str.slice(str.length-length).toLowerCase()==strCheck.toLowerCase();
 		}
