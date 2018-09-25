@@ -1,7 +1,6 @@
 module.exports = function(sd, cb){
 	require(__dirname + '/parts')(sd);
 	require(__dirname + '/modules')(sd, function(){
-		console.log('STARTING REST API');
 		if(sd._parts){
 			for (var i = 0; i < sd._parts.length; i++) {
 				if(sd._parts[i].info.router){

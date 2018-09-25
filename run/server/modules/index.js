@@ -1,5 +1,4 @@
 module.exports = function(sd, next){
-	console.log('INSTALLING NODE MODULES');
 	sd._package.i('mongoose');
 	var installs = [];
 	var addInstall = function(dep){

@@ -5,7 +5,7 @@ module.exports = function(sd, clientRoot){
 		console.log("WAW Project looks to don't have client.");
 		process.exit();
 	}
-	sd.__derer_viewes.push(process.cwd() + '/client/html');
+	sd.__derer_viewes.push(clientRoot + '/html');
 	/*
 	*	scss
 	*/
@@ -18,12 +18,12 @@ module.exports = function(sd, clientRoot){
 			outputStyle: 'compressed',
 			force: !sd._config.production
 		}));
-		sd._app.use(require('postcss-middleware')({
-			plugins: [require('autoprefixer')({})],
-			src: function(req) {
-				return path.join(process.cwd() + '/client', req.url);
-			}
-		}));
+		// sd._app.use(/\.css/, require('postcss-middleware')({
+		// 	plugins: [require('autoprefixer')({})],
+		// 	src: function(req){
+		// 		return req.originalUrl;
+		// 	}
+		// }));
 	/*
 	*	Translates
 	*	need to be fixed
@@ -38,7 +38,7 @@ module.exports = function(sd, clientRoot){
 		/*
 		*	Initialize
 		*/
-			var translateFolder = clientRoot + '/lang';
+			var translateFolder = clientRoot + '/assets/lang';
 			var df = sd._df = {};
 			var ff = {};
 			ff = sd._getFiles(translateFolder);

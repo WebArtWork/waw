@@ -1,5 +1,4 @@
 module.exports = function(sd){
-	console.log('READING PARTS');
 	var dirs = sd._getDirectories(process.cwd() + '/server');
 	sd._parts = [];
 	sd._dependencies = [];

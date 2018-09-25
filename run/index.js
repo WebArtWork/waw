@@ -132,9 +132,10 @@
 	});
 	sd.__derer_viewes = [];
 	sd._app.set('views', sd.__derer_viewes);
+
 	sd._page = function(url, page, obj, trUrls) {
-		if(!obj) obj = {};
-		var render = function(req, res) {
+		if(!obj.page) obj.page = page;
+		sd._route(url, function(req, res, next){
 			if (typeof obj == 'function') {
 				obj = obj(req, res);
 			}
@@ -142,24 +143,8 @@
 			obj.description = obj.page + ':description';
 			obj.image = obj.page + ':image';
 			obj.keywords = obj.page + ':keywords';
-			/*for (var i = 0; i < languages.length; i++) {
-				obj[languages[i]+'Link'] = langs[languages[i]];
-			}*/
 			res.render(page, obj);
-			//res.render(page, sd._ro(req, res, obj));
-		} 
-		if (url == '/') url = '';
-		var langs = {};
-		sd._app.get(url || '/', render);
-	/*	for (var key in trUrls) {
-			if (_languages[trUrls[key]]) {
-				langs[trUrls[key]] = key;
-				sd._app.get(key, sd['_set_' + trUrls[key]], render);
-			}
-		}
-		for (var i = 0; i < languages.length; i++) {
-			if (!langs[languages[i]]) sd._app.get(url + '/' + languages[i], sd['_set_' + languages[i]], render);
-		}*/
+		});
 	}
 /*
 *	Middleware for parts
@@ -174,7 +159,7 @@
 		}else next();
 	});
 	sd._route = function(url, cb){
-		sd._middleware.push(function(obj, next){
+		sd._middleware.push(function(next, obj){
 			if(obj.req.originalUrl.toLowerCase() == url.toLowerCase()){
 				return cb(obj.req, obj.res, next);
 			}
