@@ -1,5 +1,5 @@
 module.exports = function(sd){
-	sd._folders = ['css','fonts','gen','html','img','js','lang','page'];
+	sd._folders = ['assets', 'css', 'directives', 'filters', 'html', 'pages', 'services',   'fonts', 'gen', 'img', 'js', 'lang'];
 	sd._ext = ['.css','.ttf','.woff','.woff2','.svg','.otf','.js','.html','.gif','.jpg','.png'];
 	sd._clientRoot = process.cwd()+'/client';
 	for (var i = 0; i < sd._parts.length; i++) {
