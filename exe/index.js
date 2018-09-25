@@ -36,24 +36,7 @@ var rl = readline.createInterface({
 	*/
 	var list = {
 		'1) Angular.js Project': 'git@github.com:WebArtWork/wawAngular.git',
-		'2) Angular 6 Project': 'git@github.com:WebArtWork/wawNg.git',
-		'3) List waw apps to select as start.': false
-	};
-	var apps_list = {
-		'1) waw Translate app': 'git@github.com:WebArtWork/translate.git',
-		'2) Bulka Market': 'git@github.com:WebArtWork/bulka.market.git'
-	}
-	var install_app = function(){
-		var text = 'Which waw app you want to use?', counter=0, repos={};
-		for(var key in apps_list){
-			repos[++counter] = apps_list[key];
-			text += '\n'+key;
-		}
-		text += '\nChoose number: ';
-		rl.question(text, function(answer){
-			if(!answer||!repos[parseInt(answer)]) return install();
-			require(__dirname+'/update').install(_project_name, repos[parseInt(answer)]);
-		});
+		'2) Angular 6 Project': 'git@github.com:WebArtWork/wawNg.git'
 	};
 	var install = function(name){
 		if(name) _project_name = name;
@@ -69,7 +52,6 @@ var rl = readline.createInterface({
 		}
 		text += '\nChoose number: ';
 		rl.question(text, function(answer){
-			if(parseInt(answer)==3) return install_app();
 			if(!answer||!repos[parseInt(answer)]) return install();
 			require(__dirname+'/update').install(_project_name, repos[parseInt(answer)]);
 		});

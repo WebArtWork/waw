@@ -125,11 +125,6 @@ if(process.argv[2]){
 	/*
 	* Run
 	*/
-		// Nodemon
-		case 'r':
-		case 'run':
-			should_have_nodemon();
-			return run();
 		// PM2
 		case 's':
 		case 'start':
@@ -153,6 +148,11 @@ if(process.argv[2]){
 			var config = fse.readJsonSync(__dirname+'/package.json', {throws: false});
 			console.log('waw version is '+config.version);
 			return;
+		// CLI Management
+		case 'g':
+		case 'gen':
+		case 'generate':
+			return require(exe+'/cli')();
 		// Parts Management
 		case 'a':
 		case 'addpart':

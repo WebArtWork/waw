@@ -250,6 +250,11 @@ module.exports = function(sd){
 	*/
 
 		sd._writeFile = function(src, renames, dest, callback) {
+			if(typeof dest == 'function'){
+				callback = dest;
+				dest = src;
+			}
+			if(!dest) dest = src;
 			var data = sd._fs.readFileSync(src, 'utf8');
 			for (var i = 0; i < renames.length; i++) {
 				data = data.replace(new RegExp(renames[i].from, 'g'), renames[i].to);
