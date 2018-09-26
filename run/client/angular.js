@@ -346,6 +346,7 @@ module.exports = function(sd, clientRoot){
 						name: plugin,
 						force: true
 					});
+					update = Date.now();
 				});
 			}, 250);
 		}
@@ -448,7 +449,8 @@ module.exports = function(sd, clientRoot){
 		folder_on_update(__dirname + '/angular');
 		folder_on_update(clientRoot);
 		sd._app.get("/waw/last_update", function(req, res, next) {
-			res.send(update.getTime());
+			if(sd._config.livereload) res.send(update.getTime());
+			else res.send(false);
 		});
 	/*
 	*	Files Serving / require serve files in client
