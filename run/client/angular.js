@@ -1,4 +1,4 @@
-module.exports = function(sd, clientRoot){
+ module.exports = function(sd, clientRoot){
 	if(sd._fs.existsSync(clientRoot+'/config.json')){		
 		var info = sd._fse.readJsonSync(clientRoot+'/config.json', {throws: false});
 	}else{
@@ -247,7 +247,6 @@ module.exports = function(sd, clientRoot){
 		if(!sd._config.ignoreGenerateLibs){
 			minifier = require('js-minify');
 		}
-		var jsRoot = clientRoot + '/js';
 		var cssRoot = clientRoot + '/css';
 		var timeout = {}, includeCss = '';
 		// plugins management
@@ -402,21 +401,21 @@ module.exports = function(sd, clientRoot){
 		}
 		if(!sd._config.ignoreGenerateLibs && info.lab){
 			for (var i = 0; i < info.lab.length; i++) {
-				gen_plugs(clientRoot, info.lab[i].files, info.lab[i].name, info.lab[i].prod);
+				gen_plugs(clientRoot+'/assets', info.lab[i].files, info.lab[i].name, info.lab[i].prod);
 			}
 		}
 		info.plugins = info.plugins || [];
-		if(info.plugins.length){
-			sd._fse.mkdirs(cssRoot+'/plugins');
-			for (var i = 0; i < info.plugins.length; i++) {
-				watch_plugin(jsRoot+'/'+info.plugins[i]+'/', info.plugins[i]);
-			}
-			for (var j = plugins.length - 1; j >= 0; j--) {
-				if(plugins[j] == info.plugins[i]){
-					plugins.splice(j, 1);
-				}
-			}
-		}
+			// if(info.plugins.length){
+			// 	sd._fse.mkdirs(cssRoot+'/plugins');
+			// 	for (var i = 0; i < info.plugins.length; i++) {
+			// 		watch_plugin(clientRoot+'/'+info.plugins[i]+'/', info.plugins[i]);
+			// 	}
+			// 	for (var j = plugins.length - 1; j >= 0; j--) {
+			// 		if(plugins[j] == info.plugins[i]){
+			// 			plugins.splice(j, 1);
+			// 		}
+			// 	}
+			// }
 		// waw plugins
 		for (var i = 0; i < plugins.length; i++) {
 			var p = plugins[i].toLowerCase();
