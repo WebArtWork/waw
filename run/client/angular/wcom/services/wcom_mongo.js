@@ -275,6 +275,114 @@ angular.module("wcom_mongo", []).service('mongo', function($http, $timeout, sock
 	/*
 	*	mongo sort filters
 	*/
+		this.sortAscId = function(){
+   			return function(a,b){
+   				if(a._id>b._id) return 1;
+   				else return -1;
+   			}
+   		};
+   		this.sortDescId = function(){
+   			return function(a,b){
+   				if(a._id<b._id) return 1;
+   				else return -1;
+   			}
+   		};
+   		this.sortAscString = function(opts){
+   			if(typeof opts == 'string'){
+   				opts = {
+   					field: opts
+   				}
+   			}
+   			return function(a,b){
+   				if(a[opts.field].toLowerCase()>b[opts.field].toLowerCase()) return 1;
+   				else if(a[opts.field].toLowerCase()<b[opts.field].toLowerCase() || !opts.next) return -1;
+   				else return opts.next(a,b);
+   			}
+   		}
+   		this.sortDescString = function(opts){
+   			if(typeof opts == 'string'){
+   				opts = {
+   					field: opts
+   				}
+   			}
+   			return function(a,b){
+   				if(a[opts.field].toLowerCase()<b[opts.field].toLowerCase()) return 1;
+   				else if(a[opts.field].toLowerCase()>b[opts.field].toLowerCase() || !opts.next) return -1;
+   				else return opts.next(a,b);
+   			}
+   		}
+   		this.sortAscDate = function(opts){
+   			if(typeof opts == 'string'){
+   				opts = {
+   					field: opts
+   				}
+   			}
+   			return function(a,b){
+   				if(a[opts.field].getTime()>b[opts.field].getTime()) return 1;
+   				else if(a[opts.field].getTime()<b[opts.field].getTime() || !opts.next) return -1;
+   				else return opts.next(a,b);
+   			}
+   		}
+   		this.sortDescDate = function(opts){
+   			if(typeof opts == 'string'){
+   				opts = {
+   					field: opts
+   				}
+   			}
+   			return function(a,b){
+   				if(a[opts.field].getTime()<b[opts.field].getTime()) return 1;
+   				else if(a[opts.field].getTime()>b[opts.field].getTime() || !opts.next) return -1;
+   				else return opts.next(a,b);
+   			}
+   		}
+   		this.sortAscNumber = function(opts){
+   			if(typeof opts == 'string'){
+   				opts = {
+   					field: opts
+   				}
+   			}
+   			return function(a,b){
+   				if(a[opts.field]>b[opts.field]) return 1;
+   				else if(a[opts.field]<b[opts.field] || !opts.next) return -1;
+   				else return opts.next(a,b);
+   			}
+   		}
+   		this.sortDescNumber = function(opts){
+   			if(typeof opts == 'string'){
+   				opts = {
+   					field: opts
+   				}
+   			}
+   			return function(a,b){
+   				if(a[opts.field]<b[opts.field]) return 1;
+   				else if(a[opts.field]>b[opts.field] || !opts.next) return -1;
+   				else return opts.next(a,b);
+   			}
+   		}
+   		this.sortAscBoolean = function(opts){
+   			if(typeof opts == 'string'){
+   				opts = {
+   					field: opts
+   				}
+   			}
+   			return function(a,b){
+   				if(!a[opts.field]&&b[opts.field]) return 1;
+   				else if(a[opts.field]&&!b[opts.field] || !opts.next) return -1;
+   				else return opts.next(a,b);
+   			}
+   		}
+   		this.sortDescBoolean = function(opts){
+   			if(typeof opts == 'string'){
+   				opts = {
+   					field: opts
+   				}
+   			}
+   			return function(a,b){
+   				if(a[opts.field]&&!b[opts.field]) return 1;
+   				else if(!a[opts.field]&&b[opts.field] || !opts.next) return -1;
+   				else return opts.next(a,b);
+   			}
+   		}
 	/*
 	*	mongo replace filters
 	*/

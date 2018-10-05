@@ -197,6 +197,69 @@ mongo.on('user post', function(){
 	console.log('user and post part has been loaded');
 });
 ```
+## Sort
+Set of functions, which are accepted by th function ```array.sort()``` as a parameter. Each of these functions is for sorting documents(objects).
+### sortAscId `function`
+accepting array of objects and return it sorted in ascending order by _id
+Example:
+```javascript
+array.sort(mongo.sortAscId());
+```
+### sortDescId `function`
+accepting array of objects and return it sorted in descending order by _id
+Example:
+```javascript
+mongo.sortDescId();
+```
+### sortAscString `function`
+accepting array of object and return it sorted in ascending order by alphabet
+Example:
+```javascript
+mongo.sortAscString();
+```
+### sortDescString `function`
+accepting array of object and return it sorted in descending order by alphabet
+Example:
+```javascript
+mongo.sortDescString();
+```
+### sortAscDate `function`
+accepting array of object and return it sorted in ascending order by date
+Example:
+```javascript
+mongo.sortAscDate();
+```
+### sortDescDate `function`
+accepting array of object and return it sorted in descending order by date
+Example:
+```javascript
+mongo.sortDescDate();
+```
+### sortAscNumber `function`
+accepting array of object and return it sorted in ascending order by number
+Example:
+```javascript
+mongo.sortAscNumber();
+```
+### sortDescNumber `function`
+accepting array of object and return it sorted in descending order by number
+Example:
+```javascript
+mongo.sortDescNumber();
+```
+### sortAscBoolean `function`
+accepting array of object and return it sorted: first - true, second - false
+Example:
+```javascript
+mongo.sortAscBoolean();
+```
+### sortDescBoolean `function`
+accepting array of object and return it sorted: first - false, second - true
+Example:
+```javascript
+mongo.sortDescBoolean();
+```
+
 ### beArr `function`
 checking value if it's array then we keep it and in other case, we replace it with new array. Example where each doc will have data as array:
 ```javasript
