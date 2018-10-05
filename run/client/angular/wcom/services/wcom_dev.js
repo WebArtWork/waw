@@ -11,10 +11,10 @@ angular.module("wcom_dev", []).run([function($http){
 			});
 		}, 2000);
 	}
-	$http.get('/waw/last_update').then(function(resp){
-		if(resp.data){
-			update = resp.data;
-			check_refresh();
-		}
-	});
+	// $http.get('/waw/last_update').then(function(resp){
+	// 	if(resp.data){
+	// 		update = resp.data;
+	// 		check_refresh();
+	// 	}
+	// });
 }]);
