@@ -1,1 +1,0 @@
-module.exports = function(sd, partJson, name) {}
