@@ -23,9 +23,6 @@
 	"preferGlobal": "true",
 	"dependencies": {
 		"gitty": "^3.7.0",
-		"node-cmd": "^3.0.0",
-		"npminstall": "^3.22.0",
-		"recursive-readdir": "^2.2.2",
-		"request": "^2.88.0"
+		"npmi": "^4.0.0"
 	}
 }
