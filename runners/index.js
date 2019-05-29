@@ -1,41 +1,47 @@
 /*
 *	Initialize
 */
-	var git = require('gitty');
-	var npmi = require('npmi');
-	var fs = require('fs');
-	var wawConfig = JSON.parse(fs.readFileSync(__dirname+'/../config.json'));
-	var config = {};
+	const git = require('gitty');
+	const npmi = require('npmi');
+	const fs = require('fs');
+	const wawConfig = JSON.parse(fs.readFileSync(__dirname+'/../config.json'));
+	const config = {};
 	if (fs.existsSync(process.cwd()+'/config.json')) {
 		config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
 		fs.mkdirSync(process.cwd()+'/client', { recursive: true });
 		fs.mkdirSync(process.cwd()+'/server', { recursive: true });
 	}
 	if (fs.existsSync(process.cwd()+'/server.json')) {
-		var serverConfig = fs.readFileSync(process.cwd()+'/server.json');
-		for(var each in serverConfig){
+		let serverConfig = fs.readFileSync(process.cwd()+'/server.json');
+		for(let each in serverConfig){
 			config[each] = serverConfig[each];
 		}
 	}
-	var argv = process.argv.slice();
+	const argv = process.argv.slice();
 	argv.shift();
 	argv.shift();
 	if(!argv.length) argv.push('');
 /*
 *	Read
 */
-	const { lstatSync, readdirSync } = fs;
-	const { join } = require('path');
-	const isDirectory = source => lstatSync(source).isDirectory();
-	const getDirectories = source => readdirSync(source).map(name => join(source, name)).filter(isDirectory).map(source=>{source});
-	console.log(getDirectories(process.cwd()+'/runners'));
+	const isDirectory = source => fs.lstatSync(source).isDirectory();
+	const isFile = source => fs.lstatSync(source).isFile();
+	const getDirectories = source => fs.readdirSync(source).map(name => require('path').join(source, name)).filter(isDirectory);
+	const getFolders = function(loc){
+		if (!fs.existsSync(loc)) return [];
+		let folders = getDirectories(loc);
+		for (let i = 0; i < folders.length; i++) {
+			folders[i] = folders[i].split('\\').pop();
+		}
+		return folders;
+	}
 /*
 *	Read
 */
-	var commands = {};
-	var install_modules = function(modulesLoc, dependencies, cb){
-		var counter = 1;
-		for(var each in dependencies){
+	const commands = {};
+	const install_modules = function(modulesLoc, dependencies, cb){
+		let counter = 1;
+		for(let each in dependencies){
 			if (fs.existsSync(modulesLoc+'/node_modules/'+each)) continue;
 			counter++;
 			npmi({
@@ -52,10 +58,10 @@
 		}
 		if(--counter==0) cb();
 	}
-	var read_runner = function(modulesLoc, runnerLoc, cb){
-		var runnerConfig = JSON.parse(fs.readFileSync(runnerLoc+'/runner.json'));
+	const read_runner = function(modulesLoc, runnerLoc, cb){
+		let runnerConfig = JSON.parse(fs.readFileSync(runnerLoc+'/runner.json'));
 		if(Array.isArray(runnerConfig.commands)){
-			for (var i = 0; i < runnerConfig.commands.length; i++) {
+			for (let i = 0; i < runnerConfig.commands.length; i++) {
 				commands[runnerConfig.commands[i]] = runnerLoc;
 			}
 		}
@@ -65,18 +71,16 @@
 *	Start
 */
 	module.exports = function(appJs){
-		/*
-		var local = config.runners.local;
-		for (var i = 0; i < local.length; i++) {
-			if(typeof local[i] == 'string' && local[i].length < 30){
-				read_runner(process.cwd(), process.cwd()+'/runners/'+local[i], function(){
+		let runners = getFolders(process.cwd()+'/runners');
+		for (let i = 0; i < runners.length; i++) {
+			if(typeof runners[i] == 'string' && runners[i].length < 30){
+				read_runner(process.cwd(), process.cwd()+'/runners/'+runners[i], function(){
 					if(commands[argv[0]]){
-						require(commands[argv[0]])(appJs);
+						require(commands[argv[0]])(appJs, argv);
 					}
 				});
 			}
 		}
-		*/
 	}
 /*
 *	End
