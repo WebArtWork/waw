@@ -1,4 +1,3 @@
-console.log('SERVER STARTS');
 /*
 *	Modules
 */
@@ -21,7 +20,22 @@ console.log('SERVER STARTS');
 /*
 *	Initialize
 */
+	const wawConfig = JSON.parse(fs.readFileSync(__dirname+'/../config.json'));
+	let config = {};
+	if (fs.existsSync(process.cwd()+'/config.json')) {
+		config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
+		fs.mkdirSync(process.cwd()+'/client', { recursive: true });
+		fs.mkdirSync(process.cwd()+'/server', { recursive: true });
+	}
+	if (fs.existsSync(process.cwd()+'/server.json')) {
+		let serverConfig = fs.readFileSync(process.cwd()+'/server.json');
+		for(let each in serverConfig){
+			config[each] = serverConfig[each];
+		}
+	}
 	const sd = {
+		wawConfig: wawConfig,
+		config: config,
 		fs: fs,
 		fetch: function(){
 
@@ -67,6 +81,10 @@ console.log('SERVER STARTS');
 		},
 		serial: (arr, callback) => serial(0, arr, callback) ,
 		each: function(arrOrObj, func, callback, isSerial=false){
+			if(typeof callback == 'boolean'){
+				isSerial = callback;
+				callback = ()=>{};
+			}
 			if(Array.isArray(arrOrObj)){
 				let counter = arrOrObj.length;
 				if(counter===0) return callback();
@@ -154,7 +172,14 @@ console.log('SERVER STARTS');
 			sd.npmi(process.cwd(), each, dependency, cbInstall);
 		}, cbParts);
 	}, function(){
-		console.log('LOAD ROUTES');
+		sd.each(parts, function(part, cbParts){
+			sd.each(part.router, function(router, cbRoutes){
+				if (fs.existsSync(part.__dirname+router.src)) {
+					require(part.__dirname+router.src)(sd);
+				}
+				cbRoutes();
+			}, cbParts);
+		}, true);
 	}, true);
 /*
 *	End of parts read

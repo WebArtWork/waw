@@ -5,7 +5,7 @@
 	const npmi = require('npmi');
 	const fs = require('fs');
 	const wawConfig = JSON.parse(fs.readFileSync(__dirname+'/../config.json'));
-	const config = {};
+	let config = {};
 	if (fs.existsSync(process.cwd()+'/config.json')) {
 		config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
 		fs.mkdirSync(process.cwd()+'/client', { recursive: true });
