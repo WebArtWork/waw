@@ -3,4 +3,4 @@
 # Except this file
 !.gitignore
 !index.js
-!part.json
+!default

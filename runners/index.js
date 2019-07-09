@@ -1,67 +1,33 @@
-/*
-*	Initialize
-*/
-	const git = require('gitty');
-	const npmi = require('npmi');
-	const fs = require('fs');
-	const wawConfig = JSON.parse(fs.readFileSync(__dirname+'/../config.json'));
-	let config = {};
-	if (fs.existsSync(process.cwd()+'/config.json')) {
-		config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
-		fs.mkdirSync(process.cwd()+'/client', { recursive: true });
-		fs.mkdirSync(process.cwd()+'/server', { recursive: true });
-	}
-	if (fs.existsSync(process.cwd()+'/server.json')) {
-		let serverConfig = fs.readFileSync(process.cwd()+'/server.json');
-		for(let each in serverConfig){
-			config[each] = serverConfig[each];
-		}
-	}
-	const argv = process.argv.slice();
-	argv.shift();
-	argv.shift();
-	if(!argv.length) argv.push('');
-/*
-*	Read
-*/
-	const isDirectory = source => fs.lstatSync(source).isDirectory();
-	const isFile = source => fs.lstatSync(source).isFile();
-	const getDirectories = source => fs.readdirSync(source).map(name => require('path').join(source, name)).filter(isDirectory);
-	const getFolders = function(loc){
-		if (!fs.existsSync(loc)) return [];
-		let folders = getDirectories(loc);
-		for (let i = 0; i < folders.length; i++) {
-			folders[i] = folders[i].split('\\').pop();
-		}
-		return folders;
-	}
+const sd = require(__dirname+'/../helpers');
+const argv = process.argv.slice();
+argv.shift();
+argv.shift();
+if(!argv.length) argv.push('');
 /*
 *	Read
 */
 	const commands = {};
 	const install_modules = function(modulesLoc, dependencies, cb){
-		let counter = 1;
-		for(let each in dependencies){
-			if (fs.existsSync(modulesLoc+'/node_modules/'+each)) continue;
-			counter++;
-			npmi({
-			    name: each,
-			    version: dependencies[each],
-			    path: modulesLoc,
-			    forceInstall: true,
-			    npmLoad: {
-			        loglevel: 'silent'
-			    }
-			}, function(){
-				if(--counter==0) cb();
-			});
-		}
-		if(--counter==0) cb();
+		sd.each(dependencies, (name, version, cbModule)=>{
+			if (sd.fs.existsSync(modulesLoc+'/node_modules/'+name)) return cbModule();
+			sd.npmi({
+				name: name,
+				version: version,
+				path: modulesLoc,
+				forceInstall: true,
+				npmLoad: {
+					loglevel: 'silent'
+				}
+			}, cbModule);
+		}, cb);
 	}
 	const read_runner = function(modulesLoc, runnerLoc, cb){
-		let runnerConfig = JSON.parse(fs.readFileSync(runnerLoc+'/runner.json'));
+		let runnerConfig = JSON.parse(sd.fs.readFileSync(runnerLoc+'/runner.json'));
 		if(Array.isArray(runnerConfig.commands)){
 			for (let i = 0; i < runnerConfig.commands.length; i++) {
+				if(commands[runnerConfig.commands[i]]){
+					sd.exit('Multiple commands detected on runners. You can review all runners that you are using to customize the commands.'); 
+				}
 				commands[runnerConfig.commands[i]] = runnerLoc;
 			}
 		}
@@ -70,17 +36,34 @@
 /*
 *	Start
 */
-	module.exports = function(appJs){
-		let runners = getFolders(process.cwd()+'/runners');
+	module.exports = function(root){
+		let executers = [];
+		let unique = {};
+		const runners = sd.getDirectories(process.cwd()+'/runners', true);
 		for (let i = 0; i < runners.length; i++) {
-			if(typeof runners[i] == 'string' && runners[i].length < 30){
-				read_runner(process.cwd(), process.cwd()+'/runners/'+runners[i], function(){
-					if(commands[argv[0]]){
-						require(commands[argv[0]])(appJs, argv);
-					}
-				});
-			}
+			if(unique[runners[i]]) continue;
+			unique[runners[i]] = true;
+			executers.push(function(cb){
+				read_runner(process.cwd(), process.cwd()+'/runners/'+runners[i], cb);
+			});
 		}
+		if(!unique.default){
+			executers.push(function(cb){
+				read_runner(root, __dirname+'/default', cb);
+			});
+		}
+		if(sd.config.runners){
+			sd.each(sd.config.runners, (name, version)=>{
+				executers.push(function(cb){
+					read_runner(root, __dirname+'/'+name+'/'+version, cb);
+				});
+			});
+		}
+		sd.parallel(executers, function(){
+			if(commands[argv[0]]){
+				require(commands[argv[0]])(sd, argv, root);
+			}
+		});
 	}
 /*
 *	End
