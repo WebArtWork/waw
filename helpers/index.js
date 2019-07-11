@@ -1,6 +1,8 @@
 const git = require('gitty');
 const npmi = require('npmi');
 const fs = require('fs');
+const path = require('path');
+
 
 const isDirectory = source => fs.lstatSync(source).isDirectory();
 const getDirectories = source => fs.readdirSync(source).map(name => require('path').join(source, name)).filter(isDirectory);
@@ -27,14 +29,35 @@ if (fs.existsSync(process.cwd()+'/server.json')) {
 	}
 }
 module.exports = {
+	log: (...arguments)=>{
+		console.log(arguments);
+		// https://stackoverflow.com/questions/16697791/nodejs-get-filename-of-caller-function
+	},
 	helper: (name)=>{
 		return require(__dirname+'/'+name);
+	},
+	afterWhile: (obj, cb, time=1000)=>{
+		if(typeof cb == 'function' && typeof time == 'number'){
+			clearTimeout(obj.__updateTimeout);
+			obj.__updateTimeout = setTimeout(cb, time);
+		}
+	},
+	capitalize: string=>{
+		return string.charAt(0).toUpperCase() + string.slice(1);
 	},
 	wawConfig: wawConfig,
 	config: config,
 	git: git,
-	fetch: function(){
-
+	fetch: function(folder, repo, cb, branch='master', commit=false){
+		fs.mkdirSync(folder, { recursive: true });
+		folder = git(folder);
+		folder.init(function(){
+			folder.addRemote('origin', repo, function(err){
+				folder.fetch('--all',function(err){
+					folder.reset('origin/'+branch, cb);
+				});
+			});
+		});
 	},
 	npmi: npmi,
 	npmInstall: function(path, dependency, version, cb){

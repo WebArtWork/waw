@@ -21,7 +21,22 @@ if(!argv.length) argv.push('');
 			}, cbModule);
 		}, cb);
 	}
+	const fetch_runner = function(modulesLoc, runnerLoc, cb){
+		let runner = runnerLoc.split('/');
+		runner = {
+			version: runner[runner.length-1],
+			name: runner[runner.length-2]
+		}
+		if(!sd.wawConfig.packages[runner.name]) sd.exit("Runner "+runner.name+" is not register, you can add it by 'waw set package RUNNERNAME REPOLINK'");
+		sd.fetch(runnerLoc, sd.wawConfig.packages[runner.name], err=>{
+			if(err) sd.exit("Couldn't pull the repo for runner "+runner.name+", please verify that repo LINK is correct and you have access to it.");
+			read_runner(modulesLoc, runnerLoc, cb);
+		});
+	}
 	const read_runner = function(modulesLoc, runnerLoc, cb){
+		if (!sd.fs.existsSync(runnerLoc+'/runner.json')) {
+			return fetch_runner(modulesLoc, runnerLoc, cb);
+		}
 		let runnerConfig = JSON.parse(sd.fs.readFileSync(runnerLoc+'/runner.json'));
 		if(Array.isArray(runnerConfig.commands)){
 			for (let i = 0; i < runnerConfig.commands.length; i++) {

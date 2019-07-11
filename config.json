@@ -1,1 +1,1 @@
-{"packages":{"nodemon":"git@github.com:WebArtWork/nodemon.git","nodemon1":"LINK1"}}
+{"packages":{"nodemon":"git@github.com:WebArtWork/nodemon.git","express":"git@github.com:WebArtWork/express.git","mongo":"git@github.com:WebArtWork/mongo.git","passport":"git@github.com:WebArtWork/passport.git","crud":"git@github.com:WebArtWork/crud.git","ngx":"git@github.com:WebArtWork/ngx.git","derer":"git@github.com:WebArtWork/derer-part.git","session":"git@github.com:WebArtWork/session.git"}}
