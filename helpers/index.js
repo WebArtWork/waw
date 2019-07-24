@@ -2,10 +2,16 @@ const git = require('gitty');
 const npmi = require('npmi');
 const fs = require('fs');
 const path = require('path');
+const readline = require('readline');
 
 
 const isDirectory = source => fs.lstatSync(source).isDirectory();
-const getDirectories = source => fs.readdirSync(source).map(name => require('path').join(source, name)).filter(isDirectory);
+const getDirectories = source => {
+	if (!fs.existsSync(source)) {
+		return [];
+	}
+	return fs.readdirSync(source).map(name => require('path').join(source, name)).filter(isDirectory);
+}
 const isFile = source => fs.lstatSync(source).isFile();
 const getFiles = source => fs.readdirSync(source).map(name => require('path').join(source, name)).filter(isFile);
 const serial = function(i, arr, callback){
@@ -13,6 +19,15 @@ const serial = function(i, arr, callback){
 	arr[i](function(){
 		serial(++i, arr, callback);
 	});
+}
+const unite = (...arguments)=>{
+	let arr = [];
+	for (let i = 0; i < arguments.length; i++) {
+		for (let j = 0; j < arguments[i].length; j++) {
+			arr.push(arguments[i][j]);
+		}
+	}
+	return arr;
 }
 
 const wawConfig = JSON.parse(fs.readFileSync(__dirname+'/../config.json'));
@@ -28,13 +43,70 @@ if (fs.existsSync(process.cwd()+'/server.json')) {
 		config[each] = serverConfig[each];
 	}
 }
+
+const fetch_helper = (name, version)=>{
+	if(!sd.wawConfig.packages[name]){
+		sd.exit("Helper "+name+" is not register, you can add it by 'waw set package HELPERNAME REPOLINK'");
+	}
+	if (sd.fs.existsSync(__dirname+'/'+name+'/'+version)){
+		let part = read_part(__dirname+'/'+name+'/'+version, __dirname+'/'+name+'/'+version);
+		if(part) parts.push(part);
+		return;
+	}
+	executers.push(function(cb){
+		sd.fetch(__dirname+'/'+name+'/'+version, sd.wawConfig.packages[name], err=>{
+			if(err) sd.exit("Couldn't pull the repo for part "+name+", please verify that repo LINK is correct and you have access to it.");
+			let part = read_part(__dirname+'/'+name+'/'+version, __dirname+'/'+name+'/'+version);
+			if(part) parts.push(part);
+			cb();
+		});
+	});
+}
+const read_helper = src=>{
+	let url = src+'/helper.json';
+	if (fs.existsSync(url)) {
+		let config = JSON.parse(fs.readFileSync(url));
+		if(!config.bin) return false;
+		config.__dirname = src;
+		for (var i = 0; i < config.bin.length; i++) {
+			config.bin[i] = src + '/' + config.bin[i];
+		}
+		return config;
+	}else return false;
+}
+const helpers_list = unite(getDirectories(process.cwd()+'/helpers', true), getDirectories(__dirname, true));
+const helpers = {};
+for (let i = helpers_list.length - 1; i >= 0; i--) {
+	helpers_list[i] = read_helper(helpers_list[i]);
+	if(!helpers_list[i] || helpers[helpers_list[i].name]){
+		helpers_list.splice(i, 1);
+		continue;
+	}
+	helpers[helpers_list[i].name] = helpers_list[i];
+}
 module.exports = {
+	readline: readline.createInterface({
+		input: process.stdin,
+		output: process.stdout
+	}),
 	log: (...arguments)=>{
-		console.log(arguments);
+		console.log('footer.js 123:', arguments);
 		// https://stackoverflow.com/questions/16697791/nodejs-get-filename-of-caller-function
 	},
 	helper: (name)=>{
-		return require(__dirname+'/'+name);
+		if(!helpers[name]) sd.exit('The helper '+name+' that you are looking for is not existing');
+		let helper = {};
+		for (var i = 0; i < helpers[name].bin.length; i++) {
+			let fetch = helpers[name].bin[i];
+			if(typeof fetch == 'string' && fs.existsSync(fetch)){
+				fetch = require(fetch);
+			}
+			if(typeof fetch != 'object') continue;
+			for(let each in fetch){
+				helper[each] = fetch[each]
+			}
+		}
+		return helper;
 	},
 	afterWhile: (obj, cb, time=1000)=>{
 		if(typeof cb == 'function' && typeof time == 'number'){
