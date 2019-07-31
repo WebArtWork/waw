@@ -147,6 +147,7 @@ module.exports = {
 		}, cb);
 	},
 	fs: fs,
+	path: path,
 	isDirectory: isDirectory,
 	getDirectories: function(loc, clear=false){
 		if(!clear){
