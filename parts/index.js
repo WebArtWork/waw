@@ -6,7 +6,12 @@ const sortPriority = function(a, b){
 const read_part = function(location, root){
 	let url = location+'/part.json';
 	if (sd.fs.existsSync(url)) {
-		let config = JSON.parse(sd.fs.readFileSync(url));
+		let config;
+		try{
+			config = JSON.parse(sd.fs.readFileSync(url));
+		}catch(err){
+			return false;
+		}
 		config.__dirname = location+'/';
 		config.__root = root;
 		return config;
