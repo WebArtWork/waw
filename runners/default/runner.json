@@ -1,0 +1,6 @@
+{
+	"name": "default",
+	"version": "latest",
+	"dependencies": {},
+	"commands": ["new","n","generate","g","set", "s", "list", "l", "fetch", "f", "pull", "p", "update", "u", "install", "i"]
+}
