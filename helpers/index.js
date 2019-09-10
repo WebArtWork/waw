@@ -108,6 +108,12 @@ module.exports = {
 		}
 		return helper;
 	},
+	dataUrlToLocation(dataUrl, loc, file, cb){
+		var base64Data = dataUrl.replace(/^data:image\/png;base64,/, '').replace(/^data:image\/jpeg;base64,/, '');
+		var decodeData = new Buffer(base64Data, 'base64');
+		fs.mkdirSync(loc, { recursive: true });
+		fs.writeFile(loc+'/'+file, decodeData, cb);
+	},
 	afterWhile: (obj, cb, time=1000)=>{
 		if(typeof cb == 'function' && typeof time == 'number'){
 			clearTimeout(obj.__updateTimeout);

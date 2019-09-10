@@ -21,6 +21,7 @@ const parts = sd.getDirectories(process.cwd()+'/server', true);
 let unique = {};
 for (let i = parts.length - 1; i >= 0; i--) {
 	parts[i] = read_part(process.cwd()+'/server/'+parts[i], process.cwd());
+	
 	if(!parts[i] || unique[parts[i].name]){
 		parts.splice(i, 1);
 		continue;
