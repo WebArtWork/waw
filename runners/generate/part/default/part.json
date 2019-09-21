@@ -1,0 +1,15 @@
+{
+	"name": "CNAME",
+	"router": [{
+		"name": "Base",
+		"src": "router.js"
+	}],
+	"dependencies": {},
+	"crud": [{
+		"name" : "NAME",
+		"update": {
+			"keys": ["name", "description"]
+		},
+		"delete": [""]	
+	}]
+}

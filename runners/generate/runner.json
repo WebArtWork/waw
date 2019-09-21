@@ -1,0 +1,6 @@
+{
+	"name": "generate",
+	"version": "latest",
+	"dependencies": {},
+	"commands": ["gp", "generate", "g"]
+}
