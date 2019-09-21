@@ -67,6 +67,11 @@ if(!argv.length) argv.push('');
 				read_runner(__dirname+'/default', cb);
 			});
 		}
+		if(!unique.generate){
+			executers.push(function(cb){
+				read_runner(__dirname+'/generate', cb);
+			});
+		}
 		if(sd.config.runners){
 			sd.each(sd.config.runners, (name, version)=>{
 				executers.push(function(cb){

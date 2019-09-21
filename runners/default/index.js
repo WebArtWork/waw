@@ -37,26 +37,6 @@ module.exports = function(sd, argv, root){
 			sd.exit('Successfully Created.', 1);
 		});
 	}
-	const create_part = name=>{
-		if(!name){
-			return sd.readline.question('Provide name for the part you want to create: ', function(answer){
-				create_part(answer);
-			});
-		}
-		name = name.toLowerCase();
-		const Name = sd.capitalize(name);
-		const from = __dirname + '/generate/part';
-		// FROM
-		const files = sd.getFiles(from, true);
-		sd.fs.mkdirSync(process.cwd()+'/server/'+name+'/', { recursive: true });
-		for (var i = 0; i < files.length; i++) {
-			let content = sd.fs.readFileSync(from+'/'+files[i], 'utf8');
-			content = content.split('CNAME').join(Name);
-			content = content.split('NAME').join(name);
-			sd.fs.writeFileSync(process.cwd()+'/server/'+name+'/'+files[i], content, 'utf8', { recursive: true });
-		}
-		sd.exit('Successfully Created.', 1);
-	}
 	const set_package = (name, link)=>{
 		if(!name){
 			return sd.readline.question('Provide name for the repo you want to set: ', function(answer){
@@ -76,15 +56,6 @@ module.exports = function(sd, argv, root){
 		case 'new':
 		case 'n':
 			return create_project(argv.shift(), argv.shift());
-		case 'generate':
-		case 'g':
-			switch(argv.shift().toLowerCase()){
-				case 'p':
-				case 'part':
-					return create_part(argv.shift());
-				default:
-			}
-			break;
 		case 'l':
 		case 'list':
 			let list = argv.shift() || '';
