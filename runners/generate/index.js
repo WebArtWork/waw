@@ -1,5 +1,5 @@
 module.exports = function(sd, argv, root){
-	const copy_folder = (from, to, name, replaces)=>{
+	const copy_folder = function (from, to, name, replaces) {
 		var to_name;
 		var to_Name;
 		if (sd.fs.existsSync(process.cwd() + '/server/' + name)) {
@@ -15,7 +15,6 @@ module.exports = function(sd, argv, root){
 			}
 		}
 		const files = sd.getFiles(from, true);
-		console.log(to+to_name+'/');
 		sd.fs.mkdirSync(to+to_name+'/', { recursive: true });
 		for (var i = 0; i < files.length; i++) {
 			let content = sd.fs.readFileSync(from+'/'+files[i], 'utf8');
