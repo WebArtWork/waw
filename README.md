@@ -1,55 +1,23 @@
-# Web Art Work Framework
-Framework Build to support every platform and many different technologies. On Mobiles area it use Cordova lib which works over webiste code. On computers OS like windows, iOS or linux it use Electron which also works on website code. For website work, there are 4 different base for workout as Angular.js, Vue.js, React.js and Angular which handle front-end workthrough.
+# waw
+[waw](https://webart.work) is the open-source web, mobile and desktop app development framework that makes it easy to
+build top quality web apps with web technologies.
 
-## waw Core
-[Each waw project](https://github.com/WebArtWork/waw/wiki/waw-Logic) has the same structure which is divided into client and server folders. [Server](https://github.com/WebArtWork/waw/wiki/waw-Server) is responsible for the REST API and all server side processes. [CRUD](https://github.com/WebArtWork/waw/wiki/waw-CRUD) is build to use routes which is similar on each piece of logic and server config modify details of it. Client is responsible for what browser client see and can be build with [Angular.js](https://github.com/WebArtWork/waw/wiki/waw-Angular) or [Angular 6](https://github.com/WebArtWork/waw/wiki/waw-Ngx). [Translate](https://github.com/WebArtWork/waw/wiki/waw-Translate) is part of client and it's responsible to translate the web content into different language without using code modifications.
+## Packages
+| Project | Package | Version | Links |
+| ------- | ------- | ------- |:-----:|
+| **Core** | [`@waw/core`](https://www.npmjs.com/package/@waw/core) | [![version](https://img.shields.io/npm/v/@waw/core/latest.svg)](https://www.npmjs.com/package/@waw/core) | [`README.md`](core/README.md)
+| **Angular** | [`@waw/angular`](https://www.npmjs.com/package/@waw/angular) | [![version](https://img.shields.io/npm/v/@waw/angular/latest.svg)](https://www.npmjs.com/package/@waw/angular) | [`README.md`](angular/README.md)
+| **Vue** | [`@waw/vue`](https://www.npmjs.com/package/@waw/vue) | [![version](https://img.shields.io/npm/v/@waw/vue/latest.svg)](https://www.npmjs.com/package/@waw/vue) | [`README.md`](vue/README.md)
+| **React** | [`@waw/react`](https://www.npmjs.com/package/@waw/react) | [![version](https://img.shields.io/npm/v/@waw/react/latest.svg)](https://www.npmjs.com/package/@waw/react) | [`README.md`](packages/react/README.md)
+Looking for the `ionic-angular` package? Ionic 3 has been moved to the [`ionic-v3`](https://github.com/ionic-team/ionic-v3) repo. See [Earlier Versions](#earlier-versions).
 
-## Node.js
-[Node.js](https://nodejs.org) is the main key of the framework, something that's it's built on. To work with framework you have to install it on your environment. Prefferable use LTS version, to don't have any problems with not tested node.js.
+## Getting Started
+`npm i -g waw`
+`waw new`
+`waw add`
 
-## Installtion
-```bash
-npm i -g waw
-```
-If you are experiencing issues with installation on permision level, you can try command.
-```bash
-npm i -g --unsafe-perm waw
-```
-### Packages required globally
-npmi is package with which waw can install other packages within the waw project.
-```bash
-npm i -g npmi
-```
-pm2 is required mostly on servers, which keep your process online no matter what happens.
-```bash
-npm i -g pm2
-```
-nodemon is local project runner, which allow you to develop in a nice way.
-```bash
-npm i -g nodemon
-```
-
-## Get Started
-To create new waw project you can type:
-```bash
-waw new
-```
-which will create project within the folder you are in, with name which you provided and client branch which you selected.
-
-Inside waw project folder you can type 
-```bash
-waw
-```
-which will start your project if everything is installed correctly.
-
-## Framework Structure
-For those who want to check code of the waw, there are 3 folders exe, run and sd which handle everything within the framework.
-
-### exe 
-handle all commands which can be executed from terminal, like create new project or create new part and many others.
-
-### run
-This folder basically create website, reading all parts from the server, run workers of the client connect with other Web Art Work tools.
-
-### sd
-There are scripts which are helpful in both exe and run folder and for that scenario there is sd folder which mostly have useful functions and packages.
+## Contributing
+Thanks for your interest in contributing! Read up on our guidelines for
+[contributing](https://github.com/WebArtWork/waw/CONTRIBUTING.md)
+and then look through our issues with a [help wanted](https://github.com/WebArtWork/waw/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)
+label.
