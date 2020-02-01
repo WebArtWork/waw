@@ -5,15 +5,17 @@ build top quality web apps with web technologies.
 ## Packages
 | Project | Package | Version | Links |
 | ------- | ------- | ------- |:-----:|
-| **Core** | [`@waw/core`](https://www.npmjs.com/package/@waw/core) | [![version](https://img.shields.io/npm/v/@waw/core/latest.svg)](https://www.npmjs.com/package/@waw/core) | [`README.md`](core/README.md)
-| **Angular** | [`@waw/angular`](https://www.npmjs.com/package/@waw/angular) | [![version](https://img.shields.io/npm/v/@waw/angular/latest.svg)](https://www.npmjs.com/package/@waw/angular) | [`README.md`](angular/README.md)
-| **Vue** | [`@waw/vue`](https://www.npmjs.com/package/@waw/vue) | [![version](https://img.shields.io/npm/v/@waw/vue/latest.svg)](https://www.npmjs.com/package/@waw/vue) | [`README.md`](vue/README.md)
-| **React** | [`@waw/react`](https://www.npmjs.com/package/@waw/react) | [![version](https://img.shields.io/npm/v/@waw/react/latest.svg)](https://www.npmjs.com/package/@waw/react) | [`README.md`](packages/react/README.md)
-Looking for the `ionic-angular` package? Ionic 3 has been moved to the [`ionic-v3`](https://github.com/ionic-team/ionic-v3) repo. See [Earlier Versions](#earlier-versions).
+| **Core** | [`@waw/core`](https://github.com/WebArtWork/core) | [![version](https://img.shields.io/npm/v/@waw/core/latest.svg)](https://www.npmjs.com/package/@waw/core) | [`repo`](https://github.com/WebArtWork/core)
+| **Angular** || [![version](https://img.shields.io/npm/v/@waw/angular/latest.svg)](https://www.npmjs.com/package/@waw/angular) | [`repo`](https://github.com/WebArtWork/wawNgx)
+| **Vue** || [![version](https://img.shields.io/npm/v/@waw/vue/latest.svg)](https://www.npmjs.com/package/@waw/vue) | [`repo`](https://github.com/WebArtWork/wawVue)
+| **React** || [![version](https://img.shields.io/npm/v/@waw/react/latest.svg)](https://www.npmjs.com/package/@waw/react) | [`repo`](https://github.com/WebArtWork/wawReact)
 
 ## Getting Started
+### Framework installation which require node.js
 `npm i -g waw`
+### Create new waw project
 `waw new`
+### Add new part, which represent piece of back-end
 `waw add`
 
 ## Contributing
