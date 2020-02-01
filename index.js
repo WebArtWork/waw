@@ -41,17 +41,19 @@ const core_parts = {
 			config[each] = serverConfig[each];
 		}
 	}
-	console.log('config:', config);
 /*
 *	Read Project Parts
 */
 	const parts = getDirectories(process.cwd()+'/server');
 	let _parts = {};
-	for (let i = 0; i < parts.length; i++) {
+	for (let i = parts.length-1; i >= 0; i--) {
 		parts[i] = parts[i].split('\\').pop();
-		_parts[parts[i]] = true;
+		if (fs.existsSync(process.cwd()+'/server/'+parts[i]+'/part.json')) {
+			_parts[parts[i]] = JSON.parse(fs.readFileSync(process.cwd()+'/server/'+parts[i]+'/part.json'));
+		}else{
+			parts.splice(i, 1);
+		}
 	}
-	console.log(parts);
 /*
 *	Read and Install Common Parts
 */
@@ -61,12 +63,21 @@ const core_parts = {
 		}
 	}
 /*
+*	Execute runners
+*/
+	const argv = process.argv.slice();
+	argv.shift();
+	argv.shift();
+	if(argv.length){
+		let command = argv.shift();
+		command = command.toLowerCase();
+		
+		console.log(command);
+	}
+/*
+*	Require routers
+*/
+/*
 *	End of waw
 */
-
 process.exit(1);
-/*
-Execute runners
-Require routers
-*/
-//require(__dirname+'/runners')(__dirname);
