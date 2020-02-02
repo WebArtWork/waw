@@ -42,24 +42,45 @@ const core_parts = {
 		}
 	}
 /*
-*	Read Project Parts
-*/
-	const parts = getDirectories(process.cwd()+'/server');
-	let _parts = {};
-	for (let i = parts.length-1; i >= 0; i--) {
-		parts[i] = parts[i].split('\\').pop();
-		if (fs.existsSync(process.cwd()+'/server/'+parts[i]+'/part.json')) {
-			_parts[parts[i]] = JSON.parse(fs.readFileSync(process.cwd()+'/server/'+parts[i]+'/part.json'));
-		}else{
-			parts.splice(i, 1);
-		}
-	}
-/*
 *	Read and Install Common Parts
 */
 	for(let each in core_parts){
 		if (!fs.existsSync(__dirname+'/server/'+each)) {
-			fetch(__dirname+'/server/'+each, core_parts[each]);
+			fetch(__dirname+'/server/'+each, core_parts[each], ()=>{
+				console.log('continue');
+			});
+		}
+	}
+/*
+*	Read Project Parts
+*/
+	const parts = getDirectories(process.cwd()+'/server');
+	const _parts = {};
+	for (let i = parts.length-1; i >= 0; i--) {
+		parts[i] = parts[i].split('\\').pop();
+		if (fs.existsSync(process.cwd()+'/server/'+parts[i]+'/part.json')) {
+			_parts[parts[i]] = JSON.parse(fs.readFileSync(process.cwd()+'/server/'+parts[i]+'/part.json'));
+			_parts[parts[i]].__root = process.cwd()+'/server/'+parts[i];
+		}else{
+			parts.splice(i, 1);
+		}
+	}
+	for(let each in config.parts){
+		if (fs.existsSync(__dirname+'/server/'+each)) {
+			if (fs.existsSync(__dirname+'/server/'+each+'/part.json')) {
+				parts.unshift(each);
+				_parts[each] = JSON.parse(fs.readFileSync(__dirname+'/server/'+each+'/part.json'));
+				_parts[each].__root = __dirname+'/server/'+each;
+			}
+		}
+	}
+	if(!parts.length){
+		for(let each in core_parts){
+			if (fs.existsSync(__dirname+'/server/'+each+'/part.json')) {
+				parts.unshift(each);
+				_parts[each] = JSON.parse(fs.readFileSync(__dirname+'/server/'+each+'/part.json'));
+				_parts[each].__root = __dirname+'/server/'+each;
+			}
 		}
 	}
 /*
@@ -70,13 +91,24 @@ const core_parts = {
 	argv.shift();
 	if(argv.length){
 		let command = argv.shift();
-		command = command.toLowerCase();
-		
-		console.log(command);
+		for (var i = 0; i < parts.length; i++) {
+			if(_parts[parts[i]].runner){
+				let runners = require(_parts[parts[i]].__root+'/'+_parts[parts[i]].runner);
+				if(typeof runners == 'object' && !Array.isArray(runners)){
+					for(let each in runners){
+						if(each.toLowerCase() == command.toLowerCase()){
+							runners[each](argv);
+							break;
+						}
+					}
+				}
+			}
+		}
 	}
 /*
 *	Require routers
 */
+	// run back-end server
 /*
 *	End of waw
 */
