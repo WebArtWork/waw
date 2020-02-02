@@ -44,7 +44,7 @@ const core_parts = {
 /*
 *	Read Project Config
 */
-	const config = {};
+	let config = {};
 	if (fs.existsSync(process.cwd()+'/config.json')) {
 		config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
 		fs.mkdirSync(process.cwd()+'/client', { recursive: true });
@@ -71,7 +71,15 @@ const core_parts = {
 					if(typeof runners == 'object' && !Array.isArray(runners)){
 						for(let each in runners){
 							if(each.toLowerCase() == command.toLowerCase()){
-								runners[each](argv, config, _parts[parts[i]], process.cwd(), _parts[parts[i]].__root, __dirname);
+								let stop = runners[each]({
+									argv: argv,
+									config: config,
+									part_config: _parts[parts[i]],
+									project_root: process.cwd(),
+									part_root: _parts[parts[i]].__root,
+									waw_root: __dirname
+								});
+								if(stop) return;
 								break;
 							}
 						}
@@ -79,6 +87,7 @@ const core_parts = {
 				}
 			}
 		}
+
 		process.exit(1);
 	}
 /*
