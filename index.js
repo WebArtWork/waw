@@ -8,6 +8,7 @@ const core_parts = {
 */
 	const fs = require('fs');
 	const git = require('gitty');
+	const npmi = require('npmi');
 	const isDirectory = source => fs.lstatSync(source).isDirectory();
 	const getDirectories = source => {
 		if (!fs.existsSync(source)) {
@@ -112,8 +113,26 @@ const core_parts = {
 			}
 		}
 		let installs = [];
+		const add_install = function(name, version, path){
+			installs.push(function(next){
+				npmi({
+					name: name,
+					version: version,
+					path: path,
+					forceInstall: true,
+					npmLoad: {
+						loglevel: 'silent'
+					}
+				}, next);
+			});
+		}
 		for (var i = 0; i < parts.length; i++) {
-			console.log(_parts[parts[i]].dependencies);
+			for(let each in _parts[parts[i]].dependencies){
+				if (fs.existsSync(_parts[parts[i]].__root+'/node_modules/'+each)) {
+					continue;
+				}
+				add_install(each, _parts[parts[i]].dependencies[each], _parts[parts[i]].__root);
+			}
 		}
 		parallel(installs, execute_runners);
 	}
