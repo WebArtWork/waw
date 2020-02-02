@@ -44,7 +44,7 @@ const core_parts = {
 /*
 *	Read Project Config
 */
-	let config = {};
+	const config = {};
 	if (fs.existsSync(process.cwd()+'/config.json')) {
 		config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
 		fs.mkdirSync(process.cwd()+'/client', { recursive: true });
@@ -71,7 +71,7 @@ const core_parts = {
 					if(typeof runners == 'object' && !Array.isArray(runners)){
 						for(let each in runners){
 							if(each.toLowerCase() == command.toLowerCase()){
-								runners[each](argv);
+								runners[each](argv, config, _parts[parts[i]], process.cwd(), _parts[parts[i]].__root, __dirname);
 								break;
 							}
 						}
