@@ -9,10 +9,11 @@ const core_parts = {
 	const fs = require('fs');
 	const git = require('gitty');
 	const npmi = require('npmi');
+	const nodemon = require('nodemon');
 	const isDirectory = source => fs.lstatSync(source).isDirectory();
 	const getDirectories = source => {
 		if (!fs.existsSync(source)) {
-			return [];
+			return []; 
 		}
 		return fs.readdirSync(source).map(name => require('path').join(source, name)).filter(isDirectory);
 	}
@@ -65,6 +66,7 @@ const core_parts = {
 		argv.shift();
 		if(argv.length){
 			let command = argv.shift();
+			let done = false;
 			for (var i = 0; i < parts.length; i++) {
 				if(_parts[parts[i]].runner){
 					let runners = require(_parts[parts[i]].__root+'/'+_parts[parts[i]].runner);
@@ -80,15 +82,27 @@ const core_parts = {
 									waw_root: __dirname
 								});
 								if(stop) return;
+								done = true;
 								break;
 							}
 						}
+						if(done) break;
 					}
 				}
 			}
 		}
-
-		process.exit(1);
+		nodemon({
+			script: __dirname+'/app.js',
+			watch: [process.cwd()+'/server', __dirname+'/server', __dirname+'/app.js'],
+			ext: 'js json'
+		});
+		nodemon.on('start', function () {
+			console.log('App has started');
+		}).on('quit', function () {
+			console.log('App has quit');
+		}).on('restart', function (files) {
+			console.log('App restarted due to: ', files);
+		});
 	}
 /*
 *	Read Project Parts
