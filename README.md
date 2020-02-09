@@ -4,7 +4,7 @@ build top quality web apps with web technologies.
 
 ## Getting Started
 ### Framework installation which require node.js
-`npm i -g waw`
+`npm i -g git@github.com:WebArtWork/waw.git#dev --save`
 ### Create new waw project
 `waw new`
 ### Add new part, which represent piece of back-end
