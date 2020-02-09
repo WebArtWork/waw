@@ -97,11 +97,9 @@ const core_parts = {
 			ext: 'js json'
 		});
 		nodemon.on('start', function () {
-			console.log('App has started');
-		}).on('quit', function () {
-			console.log('App has quit');
+			console.log(' ===== App has started ===== ');
 		}).on('restart', function (files) {
-			console.log('App restarted due to: ', files);
+			console.log(' ===== App restarted ===== ');
 		});
 	}
 /*
@@ -156,6 +154,12 @@ const core_parts = {
 				}
 				add_install(each, _parts[parts[i]].dependencies[each], _parts[parts[i]].__root);
 			}
+		}
+		for(let each in config.dependencies){
+			if (fs.existsSync(process.cwd()+'/node_modules/'+each)) {
+				continue;
+			}
+			add_install(each, config.dependencies[each], process.cwd());
 		}
 		parallel(installs, execute_runners);
 	}

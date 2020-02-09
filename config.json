@@ -4,12 +4,11 @@
 		"express":"git@github.com:WebArtWork/express.git",
 		"mongo":"git@github.com:WebArtWork/mongo.git",
 		"socket":"git@github.com:WebArtWork/socket.io.git",
-		
+
 		"nodemon":"git@github.com:WebArtWork/nodemon.git",
 		"passport":"git@github.com:WebArtWork/passport.git",
 		"derer":"git@github.com:WebArtWork/derer-part.git",
 		"session":"git@github.com:WebArtWork/session.git",
-
 
 		"crud":"git@github.com:WebArtWork/crud.git",
 		

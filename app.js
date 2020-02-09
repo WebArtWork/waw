@@ -8,6 +8,7 @@ const waw = {};
 *	Supportive
 */
 	const fs = require('fs');
+	waw.fs = fs;
 	waw.isDirectory = source => fs.lstatSync(source).isDirectory();
 	waw.getDirectories = source => {
 		if (!fs.existsSync(source)) {
@@ -83,6 +84,8 @@ const waw = {};
 		}
 	}
 	waw.parts.sort(function(a, b){
+		if(!a.priority) a.priority=0;
+		if(!b.priority) b.priority=0;
 		if(a.priority < b.priority) return 1;
 		return -1;
 	});
