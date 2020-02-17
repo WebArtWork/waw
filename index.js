@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const core_parts = {
-	core: 'git@github.com:WebArtWork/core.git',
+	core: 'https://github.com/WebArtWork/core.git',
 	sem: 'https://github.com/WebArtWork/sem.git'
 };
 /*
@@ -74,6 +74,11 @@ const core_parts = {
 						for(let each in runners){
 							if(each.toLowerCase() == command.toLowerCase()){
 								let stop = runners[each]({
+									git: git,
+									npmi: npmi,
+									nodemon: nodemon,
+									parts: parts,
+									_parts: _parts,
 									argv: argv,
 									config: config,
 									part_config: _parts[parts[i]],
