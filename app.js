@@ -78,7 +78,13 @@ const waw = {};
 				routers = part.router.split(' ');
 			}
 			for (var i = 0; i < routers.length; i++) {
-				let route = require(part.__root+'/'+routers[i])
+				if (!fs.existsSync(part.__root+'/'+routers[i])) {
+					var data = `module.exports = function(waw) {\n\t// add your router code\n};`;
+					data = data.split('CNAME').join(part.name.toString().charAt(0).toUpperCase() + part.name.toString().substr(1).toLowerCase());
+					data = data.split('NAME').join(part.name.toLowerCase());
+					fs.writeFileSync(part.__root+'/'+routers[i], data, 'utf8');
+				}
+				let route = require(part.__root+'/'+routers[i]);
 				if(typeof route == 'function') route(waw);
 			}
 		}

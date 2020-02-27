@@ -73,7 +73,7 @@ const core_parts = {
 					if(typeof runners == 'object' && !Array.isArray(runners)){
 						for(let each in runners){
 							if(each.toLowerCase() == command.toLowerCase()){
-								let stop = runners[each]({
+								let stop_process = runners[each]({
 									git: git,
 									npmi: npmi,
 									nodemon: nodemon,
@@ -86,7 +86,7 @@ const core_parts = {
 									part_root: _parts[parts[i]].__root,
 									waw_root: __dirname
 								});
-								if(stop) return;
+								if(!stop_process) return;
 								done = true;
 								break;
 							}
@@ -96,6 +96,9 @@ const core_parts = {
 				}
 			}
 		}
+
+		// remove nodemon from package.json and install it if it's not installed
+
 		nodemon({
 			script: __dirname+'/app.js',
 			watch: [process.cwd()+'/server', __dirname+'/server', __dirname+'/app.js'],
@@ -114,7 +117,12 @@ const core_parts = {
 		for (let i = parts.length-1; i >= 0; i--) {
 			parts[i] = parts[i].split('\\').pop();
 			if (fs.existsSync(process.cwd()+'/server/'+parts[i]+'/part.json')) {
-				_parts[parts[i]] = JSON.parse(fs.readFileSync(process.cwd()+'/server/'+parts[i]+'/part.json'));
+				try{
+					_parts[parts[i]] = JSON.parse(fs.readFileSync(process.cwd()+'/server/'+parts[i]+'/part.json'));
+				}catch(err){
+					console.log('Review your part.json at '+parts[i]+' part.');
+					process.exit(0);
+				}
 				_parts[parts[i]].__root = process.cwd()+'/server/'+parts[i];
 			}else{
 				parts.splice(i, 1);
