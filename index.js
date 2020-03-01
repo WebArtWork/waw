@@ -65,6 +65,7 @@ const core_parts = {
 		argv.shift();
 		argv.shift();
 		if(argv.length){
+			let origin_argv = argv.slice();
 			let command = argv.shift();
 			let done = false;
 			for (var i = 0; i < parts.length; i++) {
@@ -74,12 +75,13 @@ const core_parts = {
 						for(let each in runners){
 							if(each.toLowerCase() == command.toLowerCase()){
 								let stop_process = runners[each]({
+									origin_argv: origin_argv,
+									argv: argv,
 									git: git,
 									npmi: npmi,
 									nodemon: nodemon,
 									parts: parts,
 									_parts: _parts,
-									argv: argv,
 									config: config,
 									part_config: _parts[parts[i]],
 									project_root: process.cwd(),
