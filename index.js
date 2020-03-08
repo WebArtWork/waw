@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 const core_parts = {
-	core: 'https://github.com/WebArtWork/core.git',
-	sem: 'https://github.com/WebArtWork/sem.git'
+	core: 'https://github.com/WebArtWork/core.git'
 };
+const orgs = {
+	waw: 'https://github.com/WebArtWork/NAME.git'
+}
 /*
 *	Supportive
 */
@@ -98,9 +100,7 @@ const core_parts = {
 				}
 			}
 		}
-
 		// remove nodemon from package.json and install it if it's not installed
-
 		nodemon({
 			script: __dirname+'/app.js',
 			watch: [process.cwd()+'/server', __dirname+'/server', __dirname+'/app.js'],
@@ -131,12 +131,10 @@ const core_parts = {
 			}
 		}
 		for(let each in config.parts){
-			if (fs.existsSync(__dirname+'/server/'+each)) {
-				if (fs.existsSync(__dirname+'/server/'+each+'/part.json')) {
-					parts.unshift(each);
-					_parts[each] = JSON.parse(fs.readFileSync(__dirname+'/server/'+each+'/part.json'));
-					_parts[each].__root = __dirname+'/server/'+each;
-				}
+			if (fs.existsSync(__dirname+'/server/'+each) && fs.existsSync(__dirname+'/server/'+each+'/part.json')) {
+				parts.unshift(each);
+				_parts[each] = JSON.parse(fs.readFileSync(__dirname+'/server/'+each+'/part.json'));
+				_parts[each].__root = __dirname+'/server/'+each;
 			}
 		}
 		if(!parts.length){
@@ -182,11 +180,24 @@ const core_parts = {
 *	Read and Install Common Parts
 */
 	let installs = [];
+	const installs_add = function(folder, repo){
+		installs.push(function(next){
+			fetch(folder, repo, next);
+		});
+	}
 	for(let each in core_parts){
 		if (!fs.existsSync(__dirname+'/server/'+each)) {
-			installs.push(function(next){
-				fetch(__dirname+'/server/'+each, core_parts[each], next);
-			});
+			installs_add(__dirname+'/server/'+each, core_parts[each]);
+		}
+	}
+	for(let each in config.parts){
+		if (!fs.existsSync(__dirname+'/server/'+each)) {
+			for(let org in orgs){
+				if(config.parts[each].toLowerCase()==org){
+					installs_add(__dirname+'/server/'+each, orgs[org].replace('NAME', each));
+					break;
+				}	
+			}
 		}
 	}
 	parallel(installs, read_project_parts);
