@@ -50,7 +50,6 @@ const orgs = {
 	let config = {};
 	if (fs.existsSync(process.cwd()+'/config.json')) {
 		config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
-		fs.mkdirSync(process.cwd()+'/client', { recursive: true });
 		fs.mkdirSync(process.cwd()+'/server', { recursive: true });
 	}
 	if (fs.existsSync(process.cwd()+'/server.json')) {
