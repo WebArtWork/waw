@@ -8,6 +8,7 @@ const waw = {};
 *	Supportive
 */
 	const fs = require('fs');
+	const path = require('path');
 	waw.fs = fs;
 	waw.isDirectory = source => fs.lstatSync(source).isDirectory();
 	waw.getDirectories = source => {
@@ -36,7 +37,7 @@ const waw = {};
 */
 	waw.parts = waw.getDirectories(process.cwd()+'/server');
 	for (let i = waw.parts.length-1; i >= 0; i--) {
-		waw.parts[i] = waw.parts[i].split('\\').pop();
+		waw.parts[i] = waw.parts[i].split(path.sep).pop();
 		let name = waw.parts[i];
 		if (fs.existsSync(process.cwd()+'/server/'+name+'/part.json')) {
 			waw.parts[i] = JSON.parse(fs.readFileSync(process.cwd()+'/server/'+name+'/part.json'));
