@@ -9,6 +9,7 @@ const orgs = {
 *	Supportive
 */
 	const fs = require('fs');
+	const path = require('path');
 	const git = require('gitty');
 	const npmi = require('npmi');
 	const nodemon = require('nodemon');
@@ -116,7 +117,7 @@ const orgs = {
 */
 	const read_project_parts = function(){
 		for (let i = parts.length-1; i >= 0; i--) {
-			parts[i] = parts[i].split('\\').pop();
+			parts[i] = parts[i].split(path.sep).pop();
 			if (fs.existsSync(process.cwd()+'/server/'+parts[i]+'/part.json')) {
 				try{
 					_parts[parts[i]] = JSON.parse(fs.readFileSync(process.cwd()+'/server/'+parts[i]+'/part.json'));
