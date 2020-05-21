@@ -91,7 +91,7 @@ const orgs = {
 									part_root: _parts[parts[i]].__root,
 									waw_root: __dirname
 								});
-								if(continue_process !== true) return process.exit(1);
+								if(continue_process !== true) return;
 								done = true;
 								break;
 							}
