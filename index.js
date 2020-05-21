@@ -76,7 +76,7 @@ const orgs = {
 					if(typeof runners == 'object' && !Array.isArray(runners)){
 						for(let each in runners){
 							if(each.toLowerCase() == command.toLowerCase()){
-								let stop_process = runners[each]({
+								let continue_process = runners[each]({
 									origin_argv: origin_argv,
 									argv: argv,
 									git: git,
@@ -90,7 +90,7 @@ const orgs = {
 									part_root: _parts[parts[i]].__root,
 									waw_root: __dirname
 								});
-								if(!stop_process) return;
+								if(continue_process !== true) return process.exit(1);
 								done = true;
 								break;
 							}
