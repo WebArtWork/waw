@@ -54,7 +54,7 @@ const orgs = {
 		fs.mkdirSync(process.cwd()+'/server', { recursive: true });
 	}
 	if (fs.existsSync(process.cwd()+'/server.json')) {
-		let serverConfig = fs.readFileSync(process.cwd()+'/server.json');
+		let serverConfig = JSON.parse(fs.readFileSync(process.cwd()+'/server.json'));
 		for(let each in serverConfig){
 			config[each] = serverConfig[each];
 		}

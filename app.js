@@ -27,7 +27,7 @@ const waw = {};
 		fs.mkdirSync(process.cwd()+'/server', { recursive: true });
 	}
 	if (fs.existsSync(process.cwd()+'/server.json')) {
-		let serverConfig = fs.readFileSync(process.cwd()+'/server.json');
+		let serverConfig = JSON.parse(fs.readFileSync(process.cwd()+'/server.json'));
 		for(let each in serverConfig){
 			waw.config[each] = serverConfig[each];
 		}
