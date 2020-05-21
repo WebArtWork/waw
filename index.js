@@ -48,6 +48,7 @@ const orgs = {
 /*
 *	Read Project Config
 */
+	fs.mkdirSync(__dirname+'/server', { recursive: true });
 	let config = {};
 	if (fs.existsSync(process.cwd()+'/config.json')) {
 		config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
