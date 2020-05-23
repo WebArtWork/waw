@@ -51,6 +51,7 @@ const orgs = {
 	fs.mkdirSync(__dirname+'/server', { recursive: true });
 	let config = {};
 	if (fs.existsSync(process.cwd()+'/config.json')) {
+		config.__waw_project = true;
 		config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
 		fs.mkdirSync(process.cwd()+'/server', { recursive: true });
 	}
@@ -67,6 +68,16 @@ const orgs = {
 		const argv = process.argv.slice();
 		argv.shift();
 		argv.shift();
+		/*
+		*	Testing Wipe
+		*/
+			if(argv.length && argv[0].toLowerCase()=='wipe'){
+				fs.rmdirSync(__dirname+'/server', { recursive: true });
+				process.exit(1);
+			}
+		/*
+		*	Start Runners
+		*/
 		if(argv.length){
 			let origin_argv = argv.slice();
 			let command = argv.shift();
@@ -100,6 +111,10 @@ const orgs = {
 					}
 				}
 			}
+		}
+		if(!config.__waw_project){
+			console.log('This is not waw project or runner was not executed.');
+			process.exit(0);
 		}
 		// remove nodemon from package.json and install it if it's not installed
 		nodemon({
