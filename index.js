@@ -50,8 +50,9 @@ const orgs = {
 */
 	fs.mkdirSync(__dirname+'/server', { recursive: true });
 	let config = {};
+	let waw_project
 	if (fs.existsSync(process.cwd()+'/config.json')) {
-		config.__waw_project = true;
+		waw_project = true;
 		config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
 		fs.mkdirSync(process.cwd()+'/server', { recursive: true });
 	}
@@ -112,7 +113,7 @@ const orgs = {
 				}
 			}
 		}
-		if(!config.__waw_project){
+		if(!waw_project){
 			console.log('This is not waw project or runner was not executed.');
 			process.exit(0);
 		}
