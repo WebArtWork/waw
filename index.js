@@ -70,49 +70,66 @@ const orgs = {
 		argv.shift();
 		argv.shift();
 		/*
-		*	Testing Wipe
+		*	Start Runners
+		*/
+			if(argv.length){
+				let origin_argv = argv.slice();
+				let command = argv.shift();
+				let done = false;
+				for (var i = 0; i < parts.length; i++) {
+					if(_parts[parts[i]].runner){
+						let runners = require(_parts[parts[i]].__root+'/'+_parts[parts[i]].runner);
+						if(typeof runners == 'object' && !Array.isArray(runners)){
+							for(let each in runners){
+								if(each.toLowerCase() == command.toLowerCase()){
+									let continue_process = runners[each]({
+										origin_argv: origin_argv,
+										argv: argv,
+										git: git,
+										npmi: npmi,
+										nodemon: nodemon,
+										parts: parts,
+										_parts: _parts,
+										config: config,
+										part_config: _parts[parts[i]],
+										project_root: process.cwd(),
+										part_root: _parts[parts[i]].__root,
+										waw_root: __dirname
+									});
+									if(continue_process !== true) return;
+									done = true;
+									break;
+								}
+							}
+							if(done) break;
+						}
+					}
+				}
+			}
+		/*
+		*	Frameworks Runners
 		*/
 			if(argv.length && argv[0].toLowerCase()=='wipe'){
 				fs.rmdirSync(__dirname+'/server', { recursive: true });
 				process.exit(1);
 			}
-		/*
-		*	Start Runners
-		*/
-		if(argv.length){
-			let origin_argv = argv.slice();
-			let command = argv.shift();
-			let done = false;
-			for (var i = 0; i < parts.length; i++) {
-				if(_parts[parts[i]].runner){
-					let runners = require(_parts[parts[i]].__root+'/'+_parts[parts[i]].runner);
-					if(typeof runners == 'object' && !Array.isArray(runners)){
-						for(let each in runners){
-							if(each.toLowerCase() == command.toLowerCase()){
-								let continue_process = runners[each]({
-									origin_argv: origin_argv,
-									argv: argv,
-									git: git,
-									npmi: npmi,
-									nodemon: nodemon,
-									parts: parts,
-									_parts: _parts,
-									config: config,
-									part_config: _parts[parts[i]],
-									project_root: process.cwd(),
-									part_root: _parts[parts[i]].__root,
-									waw_root: __dirname
-								});
-								if(continue_process !== true) return;
-								done = true;
-								break;
-							}
-						}
-						if(done) break;
-					}
-				}
+			if(argv.length && argv[0].toLowerCase()=='renew'){
+				let framework = git(__dirname);
+				return framework.init(function(){
+					framework.addRemote('origin', 'https://github.com/WebArtWork/waw.git', function(err){
+						framework.fetch('--all', function(err){
+							framework.reset('origin/dev', function(){
+								fs.rmdirSync(__dirname+'/server', { recursive: true });
+								console.log('Framework has been updated');
+								process.exit(1);
+							});
+						});
+					});
+				});
 			}
-		}
+		/*
+		*	End of runners
+		*/
 		if(!waw_project){
 			console.log('This is not waw project or runner was not executed.');
 			process.exit(0);
