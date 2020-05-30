@@ -69,12 +69,13 @@ const orgs = {
 		const argv = process.argv.slice();
 		argv.shift();
 		argv.shift();
+		let command;
 		/*
 		*	Start Runners
 		*/
 			if(argv.length){
 				let origin_argv = argv.slice();
-				let command = argv.shift();
+				command = argv.shift();
 				let done = false;
 				for (var i = 0; i < parts.length; i++) {
 					if(_parts[parts[i]].runner){
@@ -109,11 +110,11 @@ const orgs = {
 		/*
 		*	Frameworks Runners
 		*/
-			if(argv.length && argv[0].toLowerCase()=='wipe'){
+			if(command.toLowerCase()=='wipe'){
 				fs.rmdirSync(__dirname+'/server', { recursive: true });
 				process.exit(1);
 			}
-			if(argv.length && argv[0].toLowerCase()=='renew'){
+			if(command.toLowerCase()=='renew'){
 				let framework = git(__dirname);
 				return framework.init(function(){
 					framework.addRemote('origin', 'https://github.com/WebArtWork/waw.git', function(err){
