@@ -110,11 +110,11 @@ const orgs = {
 		/*
 		*	Frameworks Runners
 		*/
-			if(command.toLowerCase()=='wipe'){
+			if(command && command.toLowerCase()=='wipe'){
 				fs.rmdirSync(__dirname+'/server', { recursive: true });
 				process.exit(1);
 			}
-			if(command.toLowerCase()=='renew'){
+			if(command && command.toLowerCase()=='renew'){
 				let framework = git(__dirname);
 				return framework.init(function(){
 					framework.addRemote('origin', 'https://github.com/WebArtWork/waw.git', function(err){
