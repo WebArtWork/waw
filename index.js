@@ -62,6 +62,9 @@ const orgs = {
 			config[each] = serverConfig[each];
 		}
 	}
+	if (fs.existsSync(process.cwd()+'/angular.json')) {
+		core_parts.angular = 'git@github.com:WebArtWork/angular.git';
+	}
 /*
 *	Execute runners
 */
