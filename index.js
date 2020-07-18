@@ -65,6 +65,9 @@ const orgs = {
 	if (fs.existsSync(process.cwd()+'/angular.json')) {
 		core_parts.angular = 'git@github.com:WebArtWork/angular.git';
 	}
+	if (fs.existsSync(process.cwd()+'/template.json')) {
+		core_parts.template = 'git@github.com:WebArtWork/template.git';
+	}
 /*
 *	Execute runners
 */
