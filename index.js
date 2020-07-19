@@ -50,6 +50,7 @@
 	if (fs.existsSync(process.cwd()+'/template.json')) {
 		waw_project = true;
 		core_parts.template = 'git@github.com:WebArtWork/template.git';
+		core_parts.sem = 'git@github.com:WebArtWork/sem.git';
 	}
 	const parts = getDirectories(process.cwd()+'/server');
 	const _parts = {};
