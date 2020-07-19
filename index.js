@@ -92,6 +92,7 @@
 							for(let each in runners){
 								if(each.toLowerCase() == command.toLowerCase()){
 									let continue_process = runners[each]({
+										getDirectories: getDirectories,
 										origin_argv: origin_argv,
 										argv: argv,
 										git: git,
@@ -146,7 +147,7 @@
 		// remove nodemon from package.json and install it if it's not installed
 		nodemon({
 			script: __dirname+'/app.js',
-			watch: [process.cwd()+'/server', __dirname+'/server', __dirname+'/app.js'],
+			watch: [process.cwd()+'/server', __dirname+'/server', __dirname+'/pages', __dirname+'/config.json', __dirname+'/template.json', __dirname+'/app.js'],
 			ext: 'js json'
 		});
 		nodemon.on('start', function () {
