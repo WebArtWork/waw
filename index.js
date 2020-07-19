@@ -1,10 +1,4 @@
 #!/usr/bin/env node
-const core_parts = {
-	core: 'https://github.com/WebArtWork/core.git'
-};
-const orgs = {
-	waw: 'https://github.com/WebArtWork/NAME.git'
-}
 /*
 *	Supportive
 */
@@ -43,6 +37,20 @@ const orgs = {
 /*
 *	Variables
 */
+	let waw_project = false;
+	const core_parts = {
+		core: 'https://github.com/WebArtWork/core.git'
+	};
+	const orgs = {
+		waw: 'https://github.com/WebArtWork/NAME.git'
+	}
+	if (fs.existsSync(process.cwd()+'/angular.json')) {
+		core_parts.angular = 'git@github.com:WebArtWork/angular.git';
+	}
+	if (fs.existsSync(process.cwd()+'/template.json')) {
+		waw_project = true;
+		core_parts.template = 'git@github.com:WebArtWork/template.git';
+	}
 	const parts = getDirectories(process.cwd()+'/server');
 	const _parts = {};
 /*
@@ -50,7 +58,6 @@ const orgs = {
 */
 	fs.mkdirSync(__dirname+'/server', { recursive: true });
 	let config = {};
-	let waw_project
 	if (fs.existsSync(process.cwd()+'/config.json')) {
 		waw_project = true;
 		config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
@@ -61,12 +68,6 @@ const orgs = {
 		for(let each in serverConfig){
 			config[each] = serverConfig[each];
 		}
-	}
-	if (fs.existsSync(process.cwd()+'/angular.json')) {
-		core_parts.angular = 'git@github.com:WebArtWork/angular.git';
-	}
-	if (fs.existsSync(process.cwd()+'/template.json')) {
-		core_parts.template = 'git@github.com:WebArtWork/template.git';
 	}
 /*
 *	Execute runners

@@ -1,21 +1,25 @@
 #!/usr/bin/env node
-const core_parts = {
-	core: 'git@github.com:WebArtWork/core.git',
-	sem: 'git@github.com:WebArtWork/sem.git'
-};
-const waw = {};
 /*
 *	Supportive
 */
+	const waw = {};
 	const fs = require('fs');
 	const path = require('path');
 	waw.fs = fs;
+	waw.path = path;
 	waw.isDirectory = source => fs.lstatSync(source).isDirectory();
 	waw.getDirectories = source => {
 		if (!fs.existsSync(source)) {
 			return []; 
 		}
 		return fs.readdirSync(source).map(name => require('path').join(source, name)).filter(waw.isDirectory);
+	}
+	const core_parts = {
+		core: 'git@github.com:WebArtWork/core.git'
+	};
+	if (fs.existsSync(process.cwd()+'/template.json')) {
+		core_parts.template = 'git@github.com:WebArtWork/template.git';
+		core_parts.sem = 'git@github.com:WebArtWork/sem.git';
 	}
 /*
 *	Read Project Config
