@@ -14,6 +14,21 @@
 		}
 		return fs.readdirSync(source).map(name => require('path').join(source, name)).filter(waw.isDirectory);
 	}
+	waw.isFile = source => fs.lstatSync(source).isFile();  
+	waw.getFiles = source => fs.readdirSync(source).map(name => path.join(source, name)).filter(waw.isFile);
+	waw.getFilesRecursively = (source, opts={}) => {
+		let dirs = waw.getDirectories(source);
+		let files = dirs.map(dir => waw.getFilesRecursively(dir)).reduce((a,b) => a.concat(b), []);
+		files = files.concat(waw.getFiles(source));
+		if(opts.end){
+			for (var i = files.length - 1; i >= 0; i--) {
+				if(!files[i].endsWith(opts.end)){
+					files.splice(i, 1);
+				}
+			}
+		}
+		return files;
+	};
 	const core_parts = {
 		core: 'git@github.com:WebArtWork/core.git'
 	};
