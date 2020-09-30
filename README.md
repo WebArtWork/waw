@@ -4,7 +4,7 @@ build top quality web apps with web technologies.
 
 ## Getting Started
 ### Framework installation which require node.js
-`npm i -g waw-dev`
+`npm i -g waw`
 ### Create new waw project
 `waw new`
 ### Add new part, which represent piece of back-end

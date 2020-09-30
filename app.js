@@ -5,7 +5,9 @@
 	const waw = {};
 	const fs = require('fs');
 	const path = require('path');
+	const git = require('gitty');
 	waw.fs = fs;
+	waw.git = git;
 	waw.path = path;
 	waw.isDirectory = source => fs.lstatSync(source).isDirectory();
 	waw.getDirectories = source => {
