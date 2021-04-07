@@ -44,8 +44,8 @@
 	waw.config = {};
 	if (fs.existsSync(process.cwd()+'/config.json')) {
 		waw.config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
-		fs.mkdirSync(process.cwd()+'/client', { recursive: true });
-		fs.mkdirSync(process.cwd()+'/server', { recursive: true });
+		//fs.mkdirSync(process.cwd()+'/client', { recursive: true });
+		//fs.mkdirSync(process.cwd()+'/server', { recursive: true });
 	}
 	if (fs.existsSync(process.cwd()+'/server.json')) {
 		let serverConfig = JSON.parse(fs.readFileSync(process.cwd()+'/server.json'));

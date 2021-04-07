@@ -57,12 +57,12 @@
 /*
 *	Read Project Config
 */
-	fs.mkdirSync(__dirname+'/server', { recursive: true });
+	//fs.mkdirSync(__dirname+'/server', { recursive: true });
 	let config = {};
 	if (fs.existsSync(process.cwd()+'/config.json')) {
 		waw_project = true;
 		config = JSON.parse(fs.readFileSync(process.cwd()+'/config.json'));
-		fs.mkdirSync(process.cwd()+'/server', { recursive: true });
+		//fs.mkdirSync(process.cwd()+'/server', { recursive: true });
 	}
 	if (fs.existsSync(process.cwd()+'/server.json')) {
 		let serverConfig = JSON.parse(fs.readFileSync(process.cwd()+'/server.json'));
