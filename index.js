@@ -5,12 +5,12 @@
 	const fs = require('fs');
 	const path = require('path');
 	const git = require('gitty');
-	const npmi = require('npmi');
+	const exec = require('child_process').exec;
 	const nodemon = require('nodemon');
 	const isDirectory = source => fs.lstatSync(source).isDirectory();
 	const getDirectories = source => {
 		if (!fs.existsSync(source)) {
-			return []; 
+			return [];
 		}
 		return fs.readdirSync(source).map(name => require('path').join(source, name)).filter(isDirectory);
 	}
@@ -32,6 +32,49 @@
 			arr[i](function(){
 				if(--counter===0) callback();
 			});
+		}
+	}
+	let lock = false;
+	const npmi = (opts, next)=>{
+		if(lock){
+			return setTimeout(()=>{
+				npmi(opts, next);
+			}, 100);
+		}
+		lock = true;
+		opts.name = path.normalize(opts.name);
+		if (fs.existsSync(path.resolve(opts.path, opts.name))) {
+			return next();
+		}
+		let cmdString = "npm install " + opts.name;
+		if (opts.version == '*') opts.version = '';
+		cmdString += (opts.version ? "@" + opts.version : "");
+		cmdString += ' --prefix '+opts.path;
+		cmdString += (opts.global ? " -g" : "");
+		cmdString += (opts.save ? " --save" : "");
+		cmdString += (opts.saveDev ? " --save-dev" : "");
+		cmdString += (opts.legacyBundling ? " --legacy-bundling" : "");
+		cmdString += (opts.noOptional ? " --no-optional" : "");
+		cmdString += (opts.ignoreScripts ? " --ignore-scripts" : "");
+		const cmd = exec(cmdString, {
+			cwd: opts.path ? opts.path : "/",
+			maxBuffer: opts.maxBuffer ? opts.maxBuffer : 200 * 1024
+		}, (error, stdout, stderr) => {
+			if (error) {
+				console.log("I cloudn't install " + opts.name + " on path " + opts.path);
+				process.exit();
+			}else{
+				lock = false;
+				console.log("Module installed: " + opts.name);
+				next();
+			}
+		});
+		if (opts.output) {
+			var consoleOutput = function (msg) {
+				console.log('npm: ' + msg);
+			};
+			cmd.stdout.on('data', consoleOutput);
+			cmd.stderr.on('data', consoleOutput);
 		}
 	}
 /*
@@ -96,6 +139,7 @@
 										origin_argv: origin_argv,
 										argv: argv,
 										git: git,
+										exec: exec,
 										npmi: npmi,
 										nodemon: nodemon,
 										parts: parts,
@@ -240,7 +284,7 @@
 				if(config.parts[each].toLowerCase()==org){
 					installs_add(__dirname+'/server/'+each, orgs[org].replace('NAME', each));
 					break;
-				}	
+				}
 			}
 		}
 	}
