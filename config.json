@@ -1,20 +1,16 @@
 {
-	"packages": {
-		
-		"express":"git@github.com:WebArtWork/express.git",
-		"mongo":"git@github.com:WebArtWork/mongo.git",
-		"socket":"git@github.com:WebArtWork/socket.io.git",
-
-		"nodemon":"git@github.com:WebArtWork/nodemon.git",
-		"passport":"git@github.com:WebArtWork/passport.git",
-		"derer":"git@github.com:WebArtWork/derer-part.git",
-		"session":"git@github.com:WebArtWork/session.git",
-
-		"crud":"git@github.com:WebArtWork/crud.git",
-		
-		"git":"git@github.com:WebArtWork/git.git",
-
-		"ngx":"git@github.com:WebArtWork/ngx.git",
-		"angular":"git@github.com:WebArtWork/angular.git"
-	}
+  "packages": {
+    "express": "git@github.com:WebArtWork/express.git",
+    "mongo": "git@github.com:WebArtWork/mongo.git",
+    "socket": "git@github.com:WebArtWork/socket.io.git",
+    "nodemon": "git@github.com:WebArtWork/nodemon.git",
+    "passport": "git@github.com:WebArtWork/passport.git",
+    "derer": "git@github.com:WebArtWork/derer-part.git",
+    "session": "git@github.com:WebArtWork/session.git",
+    "crud": "git@github.com:WebArtWork/crud.git",
+    "git": "git@github.com:WebArtWork/git.git",
+    "ngx": "git@github.com:WebArtWork/ngx.git",
+    "angular": "git@github.com:WebArtWork/angular.git"
+  },
+  "token": "61a4729c55e6c0379d9d9b3a"
 }

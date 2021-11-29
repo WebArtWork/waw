@@ -14,6 +14,21 @@
 		}
 		return fs.readdirSync(source).map(name => require('path').join(source, name)).filter(isDirectory);
 	}
+	const isFile = source => fs.lstatSync(source).isFile();  
+	const getFiles = source => fs.readdirSync(source).map(name => path.join(source, name)).filter(isFile);
+	const getFilesRecursively = (source, opts={}) => {
+		let dirs = getDirectories(source);
+		let files = dirs.map(dir => getFilesRecursively(dir)).reduce((a,b) => a.concat(b), []);
+		files = files.concat(getFiles(source));
+		if(opts.end){
+			for (var i = files.length - 1; i >= 0; i--) {
+				if(!files[i].endsWith(opts.end)){
+					files.splice(i, 1);
+				}
+			}
+		}
+		return files;
+	};
 	const fetch = (folder, repo, cb, branch='master')=>{
 		fs.mkdirSync(folder, { recursive: true });
 		folder = git(folder);
@@ -135,6 +150,9 @@
 							for(let each in runners){
 								if(each.toLowerCase() == command.toLowerCase()){
 									let continue_process = runners[each]({
+										isFile: isFile,
+										getFiles: getFiles,
+										getFilesRecursively: getFilesRecursively,
 										getDirectories: getDirectories,
 										origin_argv: origin_argv,
 										argv: argv,
