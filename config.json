@@ -11,5 +11,6 @@
     "git": "git@github.com:WebArtWork/git.git",
     "ngx": "git@github.com:WebArtWork/ngx.git",
     "angular": "git@github.com:WebArtWork/angular.git"
-  }
+  },
+  "token": "61a4c78a55e6c0379d9d9b3b"
 }

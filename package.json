@@ -4,7 +4,7 @@
 		"framework",
 		"waw"
 	],
-	"version": "1.2.5",
+	"version": "1.3.0",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
 	"author": {
@@ -14,7 +14,7 @@
 	},
 	"contributors": [],
 	"engines": {
-		"node": ">=12.0.0"
+		"node": ">=14.0.0"
 	},
 	"main": "./index.js",
 	"bin": {
@@ -22,7 +22,7 @@
 	},
 	"preferGlobal": "true",
 	"dependencies": {
-		"gitty": "^3.7.1",
-		"nodemon": "^2.0.2"
+		"gitty": "^3.7.2",
+		"nodemon": "^2.0.15"
 	}
 }
