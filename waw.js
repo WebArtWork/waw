@@ -11,20 +11,18 @@ const serial = function(i, arr, callback){
 	});
 }
 const signals = {};
-const lock = false;
+let lock = false;
 const node_file = `module.exports.command = function(waw) {\n\t// add your Run code\n};`;
 const waw = {
-	project_root: process.cwd(),
 	waw_root: __dirname,
+	project_root: process.cwd(),
 	core_modules: {
 		core: 'https://github.com/WebArtWork/core.git'
 	},
 	core_orgs: {
 		waw: 'https://github.com/WebArtWork/NAME.git'
 	},
-	core_module: function(name){
-		this.core_orgs.waw.replace('NAME', name)
-	},
+	core_module: name => waw.core_orgs.waw.replace('NAME', name),
 	isDirectory: source => fs.lstatSync(source).isDirectory(),
 	getDirectories: function(source) {
 		if (!fs.existsSync(source)) {
@@ -163,10 +161,7 @@ const waw = {
 				}
 				fs.writeFileSync(path.resolve(source, files[i]), code, 'utf8');
 			}
-
-			console.log('require: ', path.resolve(source, files[i]));
 			files[i] = require(path.resolve(source, files[i]));
-			console.log('route: ', files[i]);
 		}
 		return files;
 	},
@@ -225,7 +220,6 @@ const waw = {
 		npmi: function(source, dependencies, callback=()=>{}){
 			waw.each(dependencies, (name, version, next)=>{
 				if(fs.existsSync(path.resolve(source, 'node_modules', name))) return next();
-				console.log('Installing Dependency', name, 'on', path.basename(source), 'version', version);
 				waw.npmi(source, { name, version }, next);
 			}, callback);
 		}

@@ -9,7 +9,6 @@ waw.modules.sort(function(a, b){
 for (var i = 0; i < waw.modules.length; i++) {
 	if(!waw.modules[i].router) continue;
 	const routers = waw.node_files(waw.modules[i].__root, waw.modules[i].router, true);
-	console.log(routers);
 	waw.each(routers, router => {
 		console.log(router);
 		if( typeof router === 'function' ) router(waw);
