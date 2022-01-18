@@ -37,8 +37,6 @@ if(argv.length){
 		if(done) break;
 	}
 }
-console.log('we passed runners');
-process.exit(1);
 nodemon({
 	script: __dirname+'/app.js',
 	watch: [process.cwd()+'/server', __dirname+'/server', __dirname+'/pages', __dirname+'/config.json', __dirname+'/template.json', __dirname+'/app.js'],

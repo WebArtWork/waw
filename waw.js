@@ -154,6 +154,9 @@ const waw = {
 			files = files.split(' ');
 		}
 		for (var i = files.length - 1; i >= 0; i--) {
+			if (typeof files[i] === 'object' ) {
+				files[i] = files[i].src;
+			}
 			if (!fs.existsSync(source+'/'+files[i])) {
 				let code = node_file;
 				if(isRouter){
