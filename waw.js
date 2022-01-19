@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const git = require('gitty');
 const exec = require('child_process').exec;
-const modules_root = process.cwd()+'/server';
 const serial = function(i, arr, callback){
 	if(i>=arr.length) return callback();
 	arr[i](function(){
@@ -12,6 +11,11 @@ const serial = function(i, arr, callback){
 }
 const signals = {};
 let lock = false;
+let count = 1;
+const inc = ()=>++count;
+const dec = ()=>{
+	if(--count===0) waw.done('modules installed');
+};
 const node_file = `module.exports.command = function(waw) {\n\t// add your Run code\n};`;
 const waw = {
 	waw_root: __dirname,
@@ -169,8 +173,8 @@ const waw = {
 		return files;
 	},
 	npmi: function(opts, next=()=>{}) {
-		if(lock){
-			return setTimeout(()=>{
+		if (lock) {
+			return setTimeout(() => {
 				waw.npmi(opts, next);
 			}, 100);
 		}
@@ -182,7 +186,7 @@ const waw = {
 		let cmdString = "npm install " + opts.name;
 		if (opts.version == '*') opts.version = '';
 		cmdString += (opts.version ? "@" + opts.version : "");
-		cmdString += ' --prefix '+opts.path;
+		cmdString += ' --prefix ' + opts.path;
 		cmdString += (opts.global ? " -g" : "");
 		cmdString += (opts.save ? " --save" : "");
 		cmdString += (opts.saveDev ? " --save-dev" : "");
@@ -196,7 +200,7 @@ const waw = {
 			if (error) {
 				console.log("I cloudn't install " + opts.name + " on path " + opts.path);
 				process.exit();
-			}else{
+			} else {
 				lock = false;
 				console.log("Module installed: " + opts.name);
 				next();
@@ -211,30 +215,60 @@ const waw = {
 		}
 	},
 	install: {
-		global: function(name, callback){
+		global: function(name, callback, branch = 'master'){
 			const source = path.resolve(__dirname, 'server', name);
 			if(fs.existsSync(source)){
 				waw.modules.push(read_module(source, name));
 			} else {
 				console.log('Installing Global Module', name);
-				waw.fetch(source, waw.core_module(name), err => waw.modules.push(read_module(source, name)) );
+				waw.fetch(source, waw.core_module(name), () => {
+					waw.modules.push(read_module(source, name));
+					callback();
+				}, branch);
 			}
 		},
 		npmi: function(source, dependencies, callback=()=>{}){
-			waw.each(dependencies, (name, version, next)=>{
-				if(fs.existsSync(path.resolve(source, 'node_modules', name))) return next();
-				waw.npmi(source, { name, version }, next);
-			}, callback);
+			if (typeof dependencies !== 'object' || !Object.keys(dependencies)) return callback();
+			inc();
+			waw.each(dependencies, (name, version, next) => {
+				if (fs.existsSync(path.resolve(source, 'node_modules', name))) {
+					return next();
+				}
+				inc();
+				waw.npmi({
+					path: source,
+					name,
+					version
+				}, ()=>{
+					dec();
+					next();
+				});
+			}, () => {
+				dec();
+				callback();
+			});
 		}
 	},
-	emit: function(signal){
+	emit: function (signal) {
 		for (var i = 0; i < signals[signal].length; i++) {
 			signals[signal][i]();
 		}
 	},
-	on: function(signal, callback){
-		if(!signals[signal]) signals[signal]=[];
-		if(typeof callback === 'function') signals[signal].push(callback);
+	on: function (signal, callback) {
+		if (!signals[signal]) signals[signal] = [];
+		if (typeof callback === 'function') signals[signal].push(callback);
+	},
+	done: function (signal) {
+		signals['done' + signal] = true;
+	},
+	ready: function (signal, callback) {
+		if (signals['done' + signal]) {
+			callback();
+		} else {
+			setTimeout(()=>{
+				waw.ready(signal, callback);
+			}, 100);
+		}
 	}
 }
 waw.config = waw.readJson(process.cwd()+'/config.json');
@@ -255,10 +289,17 @@ const read_module = (source, name) => {
 	waw._modules[config.__name] = config;
 	return config;
 }
+if (typeof waw.config.server !== 'string') {
+	waw.config.server = 'server';
+}
+waw.install.npmi(process.cwd(), waw.config.dependencies, dec);
+const modules_root = process.cwd() + path.sep + waw.config.server;
 waw.modules = [];
 waw._modules = {};
 if(waw.isDirectory(modules_root)){
-	waw.uniteArray(waw.modules, waw.getDirectories(modules_root));
+	waw.uniteArray(waw.modules, waw.getDirectories(modules_root).filter(path => {
+		return !path.endsWith('.git') && !path.endsWith('node_modules')
+	}));
 	waw.module = name => waw._modules[name];
 	for (let i = 0; i < waw.modules.length; i++) {
 		waw.modules[i] = read_module(waw.modules[i], path.basename(waw.modules[i]));
