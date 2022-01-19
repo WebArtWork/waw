@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const git = require('gitty');
 const exec = require('child_process').exec;
+const { type } = require('os');
 const serial = function(i, arr, callback){
 	if(i>=arr.length) return callback();
 	arr[i](function(){
@@ -215,7 +216,7 @@ const waw = {
 		}
 	},
 	install: {
-		global: function(name, callback, branch = 'master'){
+		global: function(name, callback=()=>{}, branch = 'master'){
 			const source = path.resolve(__dirname, 'server', name);
 			if(fs.existsSync(source)){
 				waw.modules.push(read_module(source, name));
@@ -223,7 +224,7 @@ const waw = {
 				console.log('Installing Global Module', name);
 				waw.fetch(source, waw.core_module(name), () => {
 					waw.modules.push(read_module(source, name));
-					callback();
+					if(typeof callback === 'function') callback();
 				}, branch);
 			}
 		},
