@@ -3,21 +3,16 @@ const fs = require('fs');
 const argv = process.argv.slice();
 argv.shift();
 argv.shift();
-if(argv.length && argv[0].toLowerCase()=='wipe'){
-	fs.rmdirSync(__dirname+'/server', { recursive: true });
-	process.exit(1);
+if(argv.length && argv[0].toLowerCase()=='update'){
+	waw.fetch(__dirname, 'https://github.com/WebArtWork/waw.git', err => {
+		fs.rmdirSync(__dirname + '/server', { recursive: true });
+		console.log('Framework has been updated and global modules removed');
+		process.exit(1);
+	}, waw.argv.length > 1 && waw.argv[1] || 'master');
 }
 const waw = require(__dirname + '/waw.js');
+waw.argv = argv;
 waw.ready('modules installed', ()=>{
-	waw.argv = argv;
-	if(waw.argv.length && waw.argv[0].toLowerCase()=='renew'){
-		return waw.fetch(__dirname, 'https://github.com/WebArtWork/waw.git', err => {
-			fs.rmdirSync(__dirname+'/server', { recursive: true });
-			console.log('Framework has been updated');
-			process.exit(1);
-		}, waw.argv.length > 1 && waw.argv[1] || 'master');
-	}
-	const nodemon = require('nodemon');
 	if(argv.length){
 		const command = argv.shift();
 		let done = false;
@@ -37,6 +32,7 @@ waw.ready('modules installed', ()=>{
 			if(done) break;
 		}
 	}
+	const nodemon = require('nodemon');
 	nodemon({
 		script: __dirname+'/app.js',
 		watch: [process.cwd()+'/server', __dirname+'/server', __dirname+'/pages', __dirname+'/config.json', __dirname+'/template.json', __dirname+'/app.js'],
