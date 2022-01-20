@@ -8,7 +8,6 @@ waw.ready('modules installed', () => {
 		return -1;
 	});
 	waw.parts = waw.modules;
-	console.log('we continue');
 	for (var i = 0; i < waw.modules.length; i++) {
 		if(!waw.modules[i].router) continue;
 		const routers = waw.node_files(waw.modules[i].__root, waw.modules[i].router, true);

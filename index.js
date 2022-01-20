@@ -18,12 +18,14 @@ waw.ready('modules installed', ()=>{
 		let done = false;
 		for (var i = 0; i < waw.modules.length; i++) {
 			if(!waw.modules[i].runner) continue;
-			let runners = waw.node_files(waw.modules[i].__root, waw.modules[i].router);
+			let runners = waw.node_files(waw.modules[i].__root, waw.modules[i].runner);
+			runners = runners[0];
 			if(typeof runners !== 'object' || Array.isArray(runners)) continue;
 			for(let each in runners){
 				if(each.toLowerCase() !== command.toLowerCase()) continue;
 				waw.part_config = waw.modules[i];
 				waw.part_root = waw.modules[i].__root;
+				waw.parts = waw.modules;
 				let continue_process = runners[each](waw);
 				if(continue_process !== true) return;
 				done = true;
