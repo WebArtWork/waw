@@ -5,10 +5,10 @@ build top quality web apps with web technologies.
 ## Getting Started
 ### Framework installation which require node.js
 `npm i -g waw`
+### Verify waw is installed and check waw version
+`waw version`
 ### Create new waw project
 `waw new`
-### Add new module, which represent piece of back-end
-`waw add`
 ### To update waw framework and global modules
 `waw update`
 ## Popular Modules
