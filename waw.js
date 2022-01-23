@@ -282,22 +282,27 @@ if (fs.existsSync(process.cwd()+'/template.json')) {
 	waw.core_modules.sem = waw.core_module('sem');
 }
 const read_module = (source, name) => {
+	if (fs.existsSync(source + '/part.json')) {
+		fs.renameSync(source + '/part.json', source + '/module.json');
+	}
+	if (!fs.existsSync(source + '/module.json')) {
+		return {};
+	}
 	config = waw.readJson(source+'/module.json');
-	waw.uniteJson(config, waw.readJson(source+'/part.json'));
 	waw.install.npmi(source, config.dependencies);
 	config.__root = path.normalize(source);
 	config.__name = name;
 	waw._modules[config.__name] = config;
 	return config;
 }
-if (typeof waw.config.server !== 'string') {
+if (typeof waw.config.server !== 'string' && fs.existsSync(process.cwd()+'/server')) {
 	waw.config.server = 'server';
 }
 waw.install.npmi(process.cwd(), waw.config.dependencies, dec);
 const modules_root = process.cwd() + path.sep + waw.config.server;
 waw.modules = [];
 waw._modules = {};
-if(waw.isDirectory(modules_root)){
+if (fs.existsSync(modules_root) && waw.isDirectory(modules_root)) {
 	waw.uniteArray(waw.modules, waw.getDirectories(modules_root).filter(path => {
 		return !path.endsWith('.git') && !path.endsWith('node_modules')
 	}));
@@ -315,4 +320,11 @@ if(waw.config.modules) {
 if(!waw.modules.length) {
 	waw.each(waw.core_modules, module => waw.install.global(module));
 }
+waw.modules = waw.modules.filter(module => Object.keys(module));
+waw.modules.sort(function (a, b) {
+	if (!a.priority) a.priority = 0;
+	if (!b.priority) b.priority = 0;
+	if (a.priority < b.priority) return -1;
+	return 1;
+});
 module.exports = waw;

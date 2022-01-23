@@ -23,9 +23,8 @@ waw.ready('modules installed', ()=>{
 			if(typeof runners !== 'object' || Array.isArray(runners)) continue;
 			for(let each in runners){
 				if(each.toLowerCase() !== command.toLowerCase()) continue;
-				waw.part_config = waw.modules[i];
-				waw.part_root = waw.modules[i].__root;
-				waw.parts = waw.modules;
+				waw.module_config = waw.modules[i];
+				waw.module_root = waw.modules[i].__root;
 				let continue_process = runners[each](waw);
 				if(continue_process !== true) return;
 				done = true;
