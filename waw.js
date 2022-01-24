@@ -282,8 +282,10 @@ if (fs.existsSync(process.cwd()+'/template.json')) {
 	waw.core_modules.sem = waw.core_module('sem');
 }
 const read_module = (source, name) => {
-	if (fs.existsSync(source + '/part.json')) {
-		fs.renameSync(source + '/part.json', source + '/module.json');
+	if (fs.existsSync(source + '/part.json') &&
+		!fs.existsSync(source + '/module.json')) {
+		fs.copyFileSync(source + '/part.json', source + '/module.json');
+		//fs.renameSync(source + '/part.json', source + '/module.json');
 	}
 	if (!fs.existsSync(source + '/module.json')) {
 		return {};
@@ -324,7 +326,7 @@ waw.modules = waw.modules.filter(module => Object.keys(module));
 waw.modules.sort(function (a, b) {
 	if (!a.priority) a.priority = 0;
 	if (!b.priority) b.priority = 0;
-	if (a.priority < b.priority) return -1;
-	return 1;
+	if (a.priority < b.priority) return 1;
+	return -1;
 });
 module.exports = waw;
