@@ -29,59 +29,7 @@ build top quality web apps with web technologies.
 | [**`Template`**](https://github.com/WebArtWork/wawTemplate) | Default Template project with basic structure. | [![GitHub issues](https://img.shields.io/github/issues/WebArtWork/wawTemplate)](https://github.com/WebArtWork/wawTemplate/issues) | [![GitHub forks](https://img.shields.io/github/forks/WebArtWork/wawTemplate)](https://github.com/WebArtWork/wawTemplate/network) | [![GitHub stars](https://img.shields.io/github/stars/WebArtWork/wawTemplate)](https://github.com/WebArtWork/wawTemplate/stargazers) | [![GitHub license](https://img.shields.io/github/license/WebArtWork/wawTemplate)](https://github.com/WebArtWork/wawTemplate/blob/master/LICENSE)
 | [**`Server`**](https://github.com/WebArtWork/wawServer) | Default waw Server project with basic structure. | [![GitHub issues](https://img.shields.io/github/issues/WebArtWork/wawServer)](https://github.com/WebArtWork/wawServer/issues) | [![GitHub forks](https://img.shields.io/github/forks/WebArtWork/wawServer)](https://github.com/WebArtWork/wawServer/network) | [![GitHub stars](https://img.shields.io/github/stars/WebArtWork/wawServer)](https://github.com/WebArtWork/wawServer/stargazers) | [![GitHub license](https://img.shields.io/github/license/WebArtWork/wawServer)](https://github.com/WebArtWork/wawServer/blob/master/LICENSE)
 | [**`Server with Angular and Template`**](https://github.com/WebArtWork/wawNgxPlatform) | Platform build with waw Angular, Server and Template. | [![GitHub issues](https://img.shields.io/github/issues/WebArtWork/wawNgxPlatform)](https://github.com/WebArtWork/wawNgxPlatform/issues) | [![GitHub forks](https://img.shields.io/github/forks/WebArtWork/wawNgxPlatform)](https://github.com/WebArtWork/wawNgxPlatform/network) | [![GitHub stars](https://img.shields.io/github/stars/WebArtWork/wawNgxPlatform)](https://github.com/WebArtWork/wawNgxPlatform/stargazers) | [![GitHub license](https://img.shields.io/github/license/WebArtWork/wawNgxPlatform)](https://github.com/WebArtWork/wawNgxPlatform/blob/master/LICENSE)
-## waw.js
-### waw.waw_root
-Location of global waw directory
-### waw.project_root
-Location of project directory
-### waw.core_modules
-Location of project directory
-### waw.core_orgs
-Location of project directory
-### waw.core_module
-Location of project directory
-### waw.isDirectory
-Location of project directory
-### waw.getDirectories
-Location of project directory
-### waw.isFile
-Location of project directory
-### waw.getFiles
-Location of project directory
-### waw.getFilesRecursively
-Location of project directory
-### waw.readJson
-Location of project directory
-### waw.writeJson
-Location of project directory
-### waw.uniteJson
-Location of project directory
-### waw.uniteArray
-Location of project directory
-### waw.fetch
-Location of project directory
-### waw.parallel
-Location of project directory
-### waw.each
-Location of project directory
-### waw.node_files
-Location of project directory
-### waw.npmi
-Location of project directory
-### waw.install
-Location of project directory
-### waw.emit
-Location of project directory
-### waw.on
-Location of project directory
-### waw.done
-Location of project directory
-### waw.ready
-Location of project directory
-### waw.config
-Location of project directory
-### waw.modules and waw._modules
-Location of project directory
+
 ## Contributing
 Thanks for your interest in contributing! Read up on our guidelines for
 [contributing](https://github.com/WebArtWork/waw/CONTRIBUTING.md)

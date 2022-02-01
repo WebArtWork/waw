@@ -282,10 +282,8 @@ if (fs.existsSync(process.cwd()+'/template.json')) {
 	waw.core_modules.sem = waw.core_module('sem');
 }
 const read_module = (source, name) => {
-	if (fs.existsSync(source + '/part.json') &&
-		!fs.existsSync(source + '/module.json')) {
-		fs.copyFileSync(source + '/part.json', source + '/module.json');
-		//fs.renameSync(source + '/part.json', source + '/module.json');
+	if (fs.existsSync(source + '/part.json')) {
+		fs.renameSync(source + '/part.json', source + '/module.json');
 	}
 	if (!fs.existsSync(source + '/module.json')) {
 		return {};
