@@ -1,16 +1,24 @@
 #!/usr/bin/env node
+const waw = require(__dirname + '/waw.js');
 const fs = require('fs');
 const argv = process.argv.slice();
 argv.shift();
 argv.shift();
-if(argv.length && argv[0].toLowerCase()=='update'){
-	waw.fetch(__dirname, 'https://github.com/WebArtWork/waw.git', err => {
+if (argv.length && argv[0].toLowerCase() == 'update') {
+	let json = waw.readJson(waw.waw_root + '/server.json');
+	json.branch = argv.length > 1 && argv[1] || 'master';
+	return waw.fetch(__dirname, 'https://github.com/WebArtWork/waw.git', err => {
+		if (err) {
+			console.log(err);
+			console.log('Framework could not be updated');
+			process.exit(1);
+		}
 		fs.rmdirSync(__dirname + '/server', { recursive: true });
+		waw.writeJson(waw.waw_root + '/server.json', json);
 		console.log('Framework has been updated and global modules removed');
 		process.exit(1);
-	}, waw.argv.length > 1 && waw.argv[1] || 'master');
+	}, json.branch);
 }
-const waw = require(__dirname + '/waw.js');
 waw.argv = argv;
 waw.ready('modules installed', ()=>{
 	if(argv.length){
