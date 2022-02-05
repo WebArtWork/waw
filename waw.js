@@ -52,28 +52,28 @@ const waw = {
 		}
 		return files;
 	},
-    readJson: function(source){
-    	if (fs.existsSync(source) && this.isFile(source)) {
-    		try {
-    			return JSON.parse(fs.readFileSync(source));
-    		} catch(e){
-    			return {};
-    		}
-    	} else return {};
-    },
-    writeJson: (path, json)=> fs.writeFileSync(path, JSON.stringify(json)),
-    uniteJson: (toObj, fromObj, replace = true)=>{
+	readJson: function(source){
+		if (fs.existsSync(source) && this.isFile(source)) {
+			try {
+				return JSON.parse(fs.readFileSync(source));
+			} catch(e){
+				return {};
+			}
+		} else return {};
+	},
+	writeJson: (path, json)=> fs.writeFileSync(path, JSON.stringify(json)),
+	uniteJson: (toObj, fromObj, replace = true)=>{
 		for(const each in fromObj){
 			if(replace || !toObj[each]) {
 				toObj[each] = fromObj[each];
 			}
 		}
-    },
-    uniteArray: (toArray, fromArray)=>{
-    	for (var i = 0; i < fromArray.length; i++) {
-    		toArray.push(fromArray[i]);
-    	}
-    },
+	},
+	uniteArray: (toArray, fromArray)=>{
+		for (var i = 0; i < fromArray.length; i++) {
+			toArray.push(fromArray[i]);
+		}
+	},
 	fetch: (folder, repo, callback, branch='master') => {
 		fs.mkdirSync(folder, { recursive: true });
 		folder = git(folder);
@@ -218,13 +218,16 @@ const waw = {
 	install: {
 		global: function(name, callback=()=>{}, branch = 'master'){
 			const source = path.resolve(__dirname, 'server', name);
-			if(fs.existsSync(source)){
+			if( fs.existsSync(source) ){
 				waw.modules.push(read_module(source, name));
+				if(typeof callback === 'function') callback();
 			} else {
 				console.log('Installing Global Module', name);
+				inc();
 				waw.fetch(source, waw.core_module(name), () => {
 					waw.modules.push(read_module(source, name));
 					if(typeof callback === 'function') callback();
+					dec();
 				}, branch);
 			}
 		},
@@ -298,7 +301,6 @@ const read_module = (source, name) => {
 if (typeof waw.config.server !== 'string' && fs.existsSync(process.cwd()+'/server')) {
 	waw.config.server = 'server';
 }
-waw.install.npmi(process.cwd(), waw.config.dependencies, dec);
 const modules_root = process.cwd() + path.sep + waw.config.server;
 waw.modules = [];
 waw._modules = {};
@@ -311,15 +313,13 @@ if (fs.existsSync(modules_root) && waw.isDirectory(modules_root)) {
 		waw.modules[i] = read_module(waw.modules[i], path.basename(waw.modules[i]));
 	}
 }
-if(waw.config.parts) {
-	waw.each(waw.config.parts, module => waw.install.global(module));
-}
 if(waw.config.modules) {
 	waw.each(waw.config.modules, module => waw.install.global(module));
 }
-if(!waw.modules.length) {
+if(!waw.modules.length) { 
 	waw.each(waw.core_modules, module => waw.install.global(module));
-}
+} 
+waw.install.npmi(process.cwd(), waw.config.dependencies, dec);
 waw.modules = waw.modules.filter(module => Object.keys(module));
 waw.modules.sort(function (a, b) {
 	if (!a.priority) a.priority = 0;
