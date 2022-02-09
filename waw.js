@@ -254,6 +254,7 @@ const waw = {
 		}
 	},
 	emit: function (signal) {
+		if (!signals[signal]) return;
 		for (var i = 0; i < signals[signal].length; i++) {
 			signals[signal][i]();
 		}
@@ -316,9 +317,9 @@ if (fs.existsSync(modules_root) && waw.isDirectory(modules_root)) {
 if(waw.config.modules) {
 	waw.each(waw.config.modules, module => waw.install.global(module));
 }
-if(!waw.modules.length) { 
+if(!waw.modules.length) {
 	waw.each(waw.core_modules, module => waw.install.global(module));
-} 
+}
 waw.install.npmi(process.cwd(), waw.config.dependencies, dec);
 waw.modules = waw.modules.filter(module => Object.keys(module));
 waw.modules.sort(function (a, b) {
