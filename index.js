@@ -24,7 +24,7 @@ waw.ready('modules installed', ()=>{
 	if(argv.length){
 		const command = argv.shift();
 		let done = false;
-		for (var i = 0; i < waw.modules.length; i++) {
+		for (var i = waw.modules.length-1; i >= 0; i--) {
 			if(!waw.modules[i].runner) continue;
 			let runners = waw.node_files(waw.modules[i].__root, waw.modules[i].runner);
 			runners = runners[0];
