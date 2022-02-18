@@ -1,12 +1,9 @@
 #!/usr/bin/env node
 const waw = require(__dirname + '/waw.js');
 const fs = require('fs');
-const argv = process.argv.slice();
-argv.shift();
-argv.shift();
-if (argv.length && argv[0].toLowerCase() == 'update') {
+if (waw.argv.length && waw.argv[0].toLowerCase() == 'update') {
 	let json = waw.readJson(waw.waw_root + '/server.json');
-	json.branch = argv.length > 1 && argv[1] || 'master';
+	json.branch = waw.argv.length > 1 && waw.argv[1] || 'master';
 	return waw.fetch(__dirname, 'https://github.com/WebArtWork/waw.git', err => {
 		if (err) {
 			console.log(err);
@@ -19,10 +16,8 @@ if (argv.length && argv[0].toLowerCase() == 'update') {
 		process.exit(1);
 	}, json.branch);
 }
-waw.argv = argv;
 waw.ready('modules installed', ()=>{
-	if(argv.length){
-		const command = argv.shift();
+	if(waw.argv.length){
 		let done = false;
 		for (var i = waw.modules.length-1; i >= 0; i--) {
 			if(!waw.modules[i].runner) continue;
@@ -30,7 +25,7 @@ waw.ready('modules installed', ()=>{
 			runners = runners[0];
 			if(typeof runners !== 'object' || Array.isArray(runners)) continue;
 			for(let each in runners){
-				if(each.toLowerCase() !== command.toLowerCase()) continue;
+				if (each.toLowerCase() !== waw.argv[0].toLowerCase()) continue;
 				waw.module_config = waw.modules[i];
 				waw.module_root = waw.modules[i].__root;
 				let continue_process = runners[each](waw);

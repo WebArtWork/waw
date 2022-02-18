@@ -19,6 +19,7 @@ const dec = ()=>{
 };
 const node_file = `module.exports.command = function(waw) {\n\t// add your Run code\n};`;
 const waw = {
+	argv: process.argv.splice(2, process.argv.length-2),
 	waw_root: __dirname,
 	project_root: process.cwd(),
 	core_modules: {
@@ -185,20 +186,21 @@ const waw = {
 			return next();
 		}
 		let cmdString = "npm install " + opts.name;
-		if (opts.version == '*') opts.version = '';
+		if (opts.version === '*') opts.version = '';
 		cmdString += (opts.version ? "@" + opts.version : "");
 		cmdString += ' --prefix ' + opts.path;
+		cmdString += ' --ignore-scripts true --package-lock false';
 		cmdString += (opts.global ? " -g" : "");
 		cmdString += (opts.save ? " --save" : "");
 		cmdString += (opts.saveDev ? " --save-dev" : "");
 		cmdString += (opts.legacyBundling ? " --legacy-bundling" : "");
 		cmdString += (opts.noOptional ? " --no-optional" : "");
-		cmdString += (opts.ignoreScripts ? " --ignore-scripts" : "");
 		const cmd = exec(cmdString, {
 			cwd: opts.path ? opts.path : "/",
 			maxBuffer: opts.maxBuffer ? opts.maxBuffer : 200 * 1024
 		}, (error, stdout, stderr) => {
 			if (error) {
+				console.log(cmdString);
 				console.log("I cloudn't install " + opts.name + " on path " + opts.path);
 				process.exit();
 			} else {
@@ -273,6 +275,14 @@ const waw = {
 			setTimeout(()=>{
 				waw.ready(signal, callback);
 			}, 100);
+		}
+	},
+	add_code: (opts) => {
+		if (!fs.existsSync(opts.file)) return;
+		let code = fs.readFileSync(opts.file, 'utf8');
+		if (code && code.indexOf(opts.search) > -1) {
+			code = code.replace(opts.search, opts.replace);
+			fs.writeFileSync(opts.file, code, 'utf8');
 		}
 	}
 }
