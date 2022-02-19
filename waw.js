@@ -281,16 +281,7 @@ const waw = {
 				waw.ready(signal, callback);
 			}, 100);
 		}
-	},
-	add_code: (opts) => {
-		if (!fs.existsSync(opts.file)) return;
-		let code = fs.readFileSync(opts.file, 'utf8');
-		if (code && code.indexOf(opts.search) > -1) {
-			code = code.replace(opts.search, opts.replace);
-			fs.writeFileSync(opts.file, code, 'utf8');
-		}
-	},
-
+	}
 }
 
 waw.config = waw.readJson(process.cwd()+'/config.json');
@@ -338,7 +329,7 @@ if(!waw.modules.length) {
 	waw.each(waw.core_modules, module => waw.install.global(module));
 }
 waw.install.npmi(process.cwd(), waw.config.dependencies, dec);
-waw.modules = waw.modules.filter(module => Object.keys(module));
+waw.modules = waw.modules.filter(module => Object.keys(module).length);
 waw.modules.sort(function (a, b) {
 	if (!a.priority) a.priority = 0;
 	if (!b.priority) b.priority = 0;

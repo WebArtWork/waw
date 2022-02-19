@@ -17,7 +17,7 @@ if (waw.argv.length && waw.argv[0].toLowerCase() == 'update') {
 		process.exit(1);
 	}, json.branch);
 }
-waw.ready('modules installed', ()=>{
+waw.ready('modules installed', () => {
 	if(waw.argv.length){
 		let done = false;
 		for (var i = waw.modules.length-1; i >= 0; i--) {
