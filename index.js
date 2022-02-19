@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const waw = require(__dirname + '/waw.js');
+require(__dirname + '/runner.js')(waw);
 const fs = require('fs');
 if (waw.argv.length && waw.argv[0].toLowerCase() == 'update') {
 	let json = waw.readJson(waw.waw_root + '/server.json');
@@ -39,7 +40,13 @@ waw.ready('modules installed', ()=>{
 	const nodemon = require('nodemon');
 	nodemon({
 		script: __dirname+'/app.js',
-		watch: [process.cwd()+'/server', __dirname+'/server', __dirname+'/pages', __dirname+'/config.json', __dirname+'/template.json', __dirname+'/app.js'],
+		watch: [
+			process.cwd() + '/server',
+			__dirname + '/server',
+			__dirname + '/pages',
+			__dirname + '/template.json',
+			__dirname + '/app.js'
+		],
 		ext: 'js json'
 	});
 	nodemon.on('start', function () {

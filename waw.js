@@ -75,13 +75,18 @@ const waw = {
 			toArray.push(fromArray[i]);
 		}
 	},
-	fetch: (folder, repo, callback, branch='master') => {
+	fetch: (folder, repo, callback, branch='master', removeGit = true) => {
 		fs.mkdirSync(folder, { recursive: true });
 		folder = git(folder);
-		folder.init(function(){
-			folder.addRemote('origin', repo, function(err){
-				folder.fetch('--all', function(err){
-					folder.reset('origin/'+branch, callback);
+		folder.init(() => {
+			folder.addRemote('origin', repo, err => {
+				folder.fetch('--all', err => {
+					folder.reset('origin/' + branch, err => {
+						if (removeGit) {
+							fs.rmdirSync(folder + '/.git', { recursive: true });
+						}
+						callback(err);
+					});
 				});
 			});
 		});
@@ -284,8 +289,10 @@ const waw = {
 			code = code.replace(opts.search, opts.replace);
 			fs.writeFileSync(opts.file, code, 'utf8');
 		}
-	}
+	},
+
 }
+
 waw.config = waw.readJson(process.cwd()+'/config.json');
 waw.uniteJson(waw.config, waw.readJson(process.cwd()+'/server.json'));
 if (fs.existsSync(process.cwd()+'/angular.json')) {
