@@ -194,7 +194,7 @@ const waw = {
 		if (opts.version === '*') opts.version = '';
 		cmdString += (opts.version ? "@" + opts.version : "");
 		cmdString += ' --prefix ' + opts.path;
-		cmdString += ' --ignore-scripts true --package-lock false';
+		cmdString += ' --ignore-scripts true --package-lock false --unsafe-perm';
 		cmdString += (opts.global ? " -g" : "");
 		cmdString += (opts.save ? " --save" : "");
 		cmdString += (opts.saveDev ? " --save-dev" : "");
