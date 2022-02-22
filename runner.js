@@ -40,9 +40,6 @@ module.exports = function(waw){
 			console.log(message_exists);
 			process.exit(0);
 		}
-		if (is_component) {
-			waw.base += '/' + waw.name;
-		}
 		if (waw.repo) {
 			fs.mkdirSync(waw.base);
 			waw.fetch(waw.base, waw.repo, (err) => {
@@ -51,6 +48,9 @@ module.exports = function(waw){
 				process.exit(1);
 			});
 		}
+		if (is_component) {
+			waw.base += '/' + waw.name;
+		}
 		return waw.repo;
 	};
 	waw.read_customization = (defaults, element, next) => {
@@ -58,7 +58,7 @@ module.exports = function(waw){
 		// for (var i = 0; i < elements.length; i++) {
 		// 	defaults[element][path.basename(elements[i])] = elements[i];
 		// }
-		if (Object.keys(defaults[element]).length > 1) {
+		if (defaults && Object.keys(defaults[element]).length > 1) {
 			waw.template = defaults[element];
 			let text = 'Which element you want to use?', counter = 0, repos = {};
 			for (let key in defaults[element]) {
