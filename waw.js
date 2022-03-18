@@ -38,7 +38,7 @@ const waw = {
 	},
 	isFile: source => fs.lstatSync(source).isFile(),
 	getFiles: function(source) {
-		fs.readdirSync(source).map(name => path.join(source, name)).filter(this.isFile)
+		return fs.readdirSync(source).map(name => path.join(source, name)).filter(this.isFile);
 	},
 	getFilesRecursively: function(source, opts={}) {
 		let dirs = this.getDirectories(source);
