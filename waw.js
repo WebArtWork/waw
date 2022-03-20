@@ -77,19 +77,24 @@ const waw = {
 	},
 	fetch: (folder, repo, callback, branch='master', removeGit = true) => {
 		fs.mkdirSync(folder, { recursive: true });
-		folder = git(folder);
-		folder.init(() => {
-			folder.addRemote('origin', repo, err => {
-				folder.fetch('--all', err => {
-					folder.reset('origin/' + branch, err => {
-						if (removeGit) {
-							fs.rmdirSync(folder + '/.git', { recursive: true });
-						}
+		const project = git(folder);
+		project.init(() => {
+			project.addRemote('origin', repo, err => {
+				project.fetch('--all', err => {
+					project.reset('origin/' + branch, err => {
 						callback(err);
+						if (removeGit) {
+							fs.rmdirSync(folder + '/.git', {recursive: true });
+						}
 					});
 				});
 			});
 		});
+	},
+	update: (folder, repo, callback, branch = 'master') => {
+		waw.fetch(folder+'/temp', repo, ()=>{
+
+		}, branch, false);
 	},
 	parallel: (arr, callback) => {
 		let counter = arr.length;
