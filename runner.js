@@ -19,7 +19,6 @@ module.exports = function(waw){
 			waw.repo = 'https://github.com/WebArtWork/' + waw.repo + '.git';
 		}
 		waw.name = waw.argv[waw.argv.length - 1].toLowerCase();
-		waw.Name = waw.name.slice(0, 1).toUpperCase() + waw.name.slice(1);
 		if (waw.argv.length > 2) {
 			waw.argv[1] = folder + '/' + waw.argv[1];
 		}
@@ -42,7 +41,7 @@ module.exports = function(waw){
 		}
 		if (waw.repo) {
 			fs.mkdirSync(waw.base);
-			waw.fetch(waw.base, waw.repo, (err) => {
+			return waw.fetch(waw.base, waw.repo, (err) => {
 				if (err) console.log('Repository was not found');
 				else console.log('Code is successfully installed');
 				process.exit(1);
@@ -51,6 +50,7 @@ module.exports = function(waw){
 		if (is_component) {
 			waw.base += '/' + waw.name;
 		}
+		waw.Name = waw.name.slice(0, 1).toUpperCase() + waw.name.slice(1);
 		return waw.repo;
 	};
 	waw.read_customization = (defaults, element, next) => {

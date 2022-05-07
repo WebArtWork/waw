@@ -77,6 +77,21 @@ const waw = {
 	},
 	fetch: (folder, repo, callback, branch='master', removeGit = true) => {
 		fs.mkdirSync(folder, { recursive: true });
+		/*
+		const base = 'cd ' + folder + ' && ';
+		waw.exe(base + 'git init', ()=>{
+			waw.exe(base + 'git remote add origin ' + repo, ()=>{
+				waw.exe(base + 'git fetch --all', ()=>{
+					waw.exe(base + 'git reset --hard origin/' + branch, ()=>{
+						callback(err);
+						if (removeGit) {
+							fs.rmdirSync(folder + '/.git', { recursive: true });
+						}
+					});
+				});
+			});
+		});
+		*/
 		const project = git(folder);
 		project.init(() => {
 			project.addRemote('origin', repo, err => {
