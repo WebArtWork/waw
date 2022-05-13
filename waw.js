@@ -280,10 +280,12 @@ const waw = {
 			});
 		}
 	},
-	emit: function (signal) {
+	emit: function (signal, doc) {
 		if (!signals[signal]) return;
 		for (var i = 0; i < signals[signal].length; i++) {
-			signals[signal][i]();
+			if (typeof signals[signal][i] === 'function') {
+				signals[signal][i](doc);
+			}
 		}
 	},
 	on: function (signal, callback) {
