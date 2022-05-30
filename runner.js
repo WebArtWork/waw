@@ -41,11 +41,12 @@ module.exports = function(waw){
 		}
 		if (waw.repo) {
 			fs.mkdirSync(waw.base);
-			return waw.fetch(waw.base, waw.repo, (err) => {
+			waw.fetch(waw.base, waw.repo, (err) => {
 				if (err) console.log('Repository was not found');
 				else console.log('Code is successfully installed');
 				process.exit(1);
 			});
+			return true;
 		}
 		if (is_component) {
 			waw.base += '/' + waw.name;
