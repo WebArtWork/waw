@@ -349,6 +349,7 @@ if (fs.existsSync(modules_root) && waw.isDirectory(modules_root)) {
 if(waw.config.modules) {
 	waw.each(waw.config.modules, module => waw.install.global(module));
 }
+waw.modules = waw.modules.filter(module => Object.keys(module).length);
 if(!waw.modules.length) {
 	waw.each(waw.core_modules, module => waw.install.global(module));
 }
