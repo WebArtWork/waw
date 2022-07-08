@@ -4,22 +4,22 @@ const path = require('path');
 const git = require('gitty');
 const exec = require('child_process').exec;
 const { type } = require('os');
-const serial = function(i, arr, callback){
-	if(i>=arr.length) return callback();
-	arr[i](function(){
+const serial = function (i, arr, callback) {
+	if (i >= arr.length) return callback();
+	arr[i](function () {
 		serial(++i, arr, callback);
 	});
 }
 const signals = {};
 let lock = false;
 let count = 1;
-const inc = ()=>++count;
-const dec = ()=>{
-	if(--count===0) waw.done('modules installed');
+const inc = () => ++count;
+const dec = () => {
+	if (--count === 0) waw.done('modules installed');
 };
 const node_file = `module.exports.command = function(waw) {\n\t// add your Run code\n};`;
 const waw = {
-	argv: process.argv.splice(2, process.argv.length-2),
+	argv: process.argv.splice(2, process.argv.length - 2),
 	waw_root: __dirname,
 	project_root: process.cwd(),
 	core_modules: {
@@ -30,52 +30,52 @@ const waw = {
 	},
 	core_module: name => waw.core_orgs.waw.replace('NAME', name),
 	isDirectory: source => fs.lstatSync(source).isDirectory(),
-	getDirectories: function(source) {
+	getDirectories: function (source) {
 		if (!fs.existsSync(source)) {
 			return [];
 		}
 		return fs.readdirSync(source).map(name => require('path').join(source, name)).filter(this.isDirectory);
 	},
 	isFile: source => fs.lstatSync(source).isFile(),
-	getFiles: function(source) {
+	getFiles: function (source) {
 		return fs.readdirSync(source).map(name => path.join(source, name)).filter(this.isFile);
 	},
-	getFilesRecursively: function(source, opts={}) {
+	getFilesRecursively: function (source, opts = {}) {
 		let dirs = this.getDirectories(source);
-		let files = dirs.map(dir => this.getFilesRecursively(dir)).reduce((a,b) => a.concat(b), []);
+		let files = dirs.map(dir => this.getFilesRecursively(dir)).reduce((a, b) => a.concat(b), []);
 		files = files.concat(this.getFiles(source));
-		if(opts.end){
+		if (opts.end) {
 			for (var i = files.length - 1; i >= 0; i--) {
-				if(!files[i].endsWith(opts.end)){
+				if (!files[i].endsWith(opts.end)) {
 					files.splice(i, 1);
 				}
 			}
 		}
 		return files;
 	},
-	readJson: function(source){
+	readJson: function (source) {
 		if (fs.existsSync(source) && this.isFile(source)) {
 			try {
 				return JSON.parse(fs.readFileSync(source));
-			} catch(e){
+			} catch (e) {
 				return {};
 			}
 		} else return {};
 	},
-	writeJson: (path, json)=> fs.writeFileSync(path, JSON.stringify(json)),
-	uniteJson: (toObj, fromObj, replace = true)=>{
-		for(const each in fromObj){
-			if(replace || !toObj[each]) {
+	writeJson: (path, json) => fs.writeFileSync(path, JSON.stringify(json)),
+	uniteJson: (toObj, fromObj, replace = true) => {
+		for (const each in fromObj) {
+			if (replace || !toObj[each]) {
 				toObj[each] = fromObj[each];
 			}
 		}
 	},
-	uniteArray: (toArray, fromArray)=>{
+	uniteArray: (toArray, fromArray) => {
 		for (var i = 0; i < fromArray.length; i++) {
 			toArray.push(fromArray[i]);
 		}
 	},
-	fetch: (folder, repo, callback, branch='master', removeGit = true) => {
+	fetch: (folder, repo, callback, branch = 'master', removeGit = true) => {
 		fs.mkdirSync(folder, { recursive: true });
 		/*
 		const base = 'cd ' + folder + ' && ';
@@ -109,50 +109,50 @@ const waw = {
 		});
 	},
 	update: (folder, repo, callback, branch = 'master') => {
-		waw.fetch(folder+'/temp', repo, ()=>{
+		waw.fetch(folder + '/temp', repo, () => {
 
 		}, branch, false);
 	},
 	parallel: (arr, callback) => {
 		let counter = arr.length;
-		if(counter===0) return callback();
+		if (counter === 0) return callback();
 		for (let i = 0; i < arr.length; i++) {
-			arr[i](function(){
-				if(--counter===0) callback();
+			arr[i](function () {
+				if (--counter === 0) callback();
 			});
 		}
 	},
-	each: function(arrOrObj, func, callback=()=>{}, isSerial=false){
-		if(typeof callback == 'boolean'){
+	each: function (arrOrObj, func, callback = () => { }, isSerial = false) {
+		if (typeof callback == 'boolean') {
 			isSerial = callback;
-			callback = ()=>{};
+			callback = () => { };
 		}
-		if(Array.isArray(arrOrObj)){
+		if (Array.isArray(arrOrObj)) {
 			let counter = arrOrObj.length;
-			if(counter===0) return callback();
-			if(isSerial){
+			if (counter === 0) return callback();
+			if (isSerial) {
 				let serialArr = [];
 				for (let i = 0; i < arrOrObj.length; i++) {
-					serialArr.push(function(next){
-						func(arrOrObj[i], function(){
-							if(--counter===0) callback();
+					serialArr.push(function (next) {
+						func(arrOrObj[i], function () {
+							if (--counter === 0) callback();
 							else next();
 						}, i);
 					});
 				}
 				serial(0, serialArr, callback);
-			}else{
+			} else {
 				for (let i = 0; i < arrOrObj.length; i++) {
-					func(arrOrObj[i], function(){
-						if(--counter===0) callback();
+					func(arrOrObj[i], function () {
+						if (--counter === 0) callback();
 					}, i);
 				}
 			}
-		}else if(typeof arrOrObj == 'object'){
-			if(isSerial){
+		} else if (typeof arrOrObj == 'object') {
+			if (isSerial) {
 				let serialArr = [];
 				let arr = [];
-				for(let each in arrOrObj){
+				for (let each in arrOrObj) {
 					arr.push({
 						value: arrOrObj[each],
 						each: each
@@ -160,39 +160,39 @@ const waw = {
 				}
 				let counter = arr.length;
 				for (let i = 0; i < arr.length; i++) {
-					serialArr.push(function(next){
-						func(arr[i].each, arr[i].value, function(){
-							if(--counter===0) callback();
+					serialArr.push(function (next) {
+						func(arr[i].each, arr[i].value, function () {
+							if (--counter === 0) callback();
 							else next();
 						}, i);
 					});
 				}
 				serial(0, serialArr, callback);
-			}else{
+			} else {
 				let counter = 1;
-				for(let each in arrOrObj){
+				for (let each in arrOrObj) {
 					counter++;
-					func(each, arrOrObj[each], function(){
-						if(--counter===0) callback();
+					func(each, arrOrObj[each], function () {
+						if (--counter === 0) callback();
 					});
 				}
-				if(--counter===0) callback();
+				if (--counter === 0) callback();
 			}
-		}else callback();
+		} else callback();
 	},
 	node_files: (source, files, isRouter = false) => {
-		if(typeof files == 'object' && files.src){
+		if (typeof files == 'object' && files.src) {
 			files = [files.src];
-		}else if(typeof files === 'string'){
+		} else if (typeof files === 'string') {
 			files = files.split(' ');
 		}
 		for (var i = files.length - 1; i >= 0; i--) {
-			if (typeof files[i] === 'object' ) {
+			if (typeof files[i] === 'object') {
 				files[i] = files[i].src;
 			}
-			if (!fs.existsSync(source+'/'+files[i])) {
+			if (!fs.existsSync(source + '/' + files[i])) {
 				let code = node_file;
-				if(isRouter){
+				if (isRouter) {
 					code = code.replace('.command', '').replace('Run', 'Router');
 				}
 				fs.writeFileSync(path.resolve(source, files[i]), code, 'utf8');
@@ -201,14 +201,13 @@ const waw = {
 		}
 		return files;
 	},
-	npmi: function(opts, next=()=>{}) {
+	npmi: function (opts, next = () => { }) {
 		if (lock) {
 			return setTimeout(() => {
 				waw.npmi(opts, next);
 			}, 100);
 		}
 		lock = true;
-		opts.name = path.normalize(opts.name);
 		if (fs.existsSync(path.resolve(opts.path, opts.name))) {
 			return next();
 		}
@@ -245,22 +244,22 @@ const waw = {
 		}
 	},
 	install: {
-		global: function(name, callback=()=>{}, branch = 'master'){
+		global: function (name, callback = () => { }, branch = 'master') {
 			const source = path.resolve(__dirname, 'server', name);
-			if( fs.existsSync(source) ){
+			if (fs.existsSync(source)) {
 				waw.modules.push(read_module(source, name));
-				if(typeof callback === 'function') callback();
+				if (typeof callback === 'function') callback();
 			} else {
 				console.log('Installing Global Module', name);
 				inc();
 				waw.fetch(source, waw.core_module(name), () => {
 					waw.modules.push(read_module(source, name));
-					if(typeof callback === 'function') callback();
+					if (typeof callback === 'function') callback();
 					dec();
 				}, branch);
 			}
 		},
-		npmi: function(source, dependencies, callback=()=>{}){
+		npmi: function (source, dependencies, callback = () => { }, opts = {}) {
 			if (typeof dependencies !== 'object' || !Object.keys(dependencies)) return callback();
 			inc();
 			waw.each(dependencies, (name, version, next) => {
@@ -272,7 +271,7 @@ const waw = {
 					path: source,
 					name,
 					version
-				}, ()=>{
+				}, () => {
 					dec();
 					next();
 				});
@@ -301,19 +300,22 @@ const waw = {
 		if (signals['done' + signal]) {
 			callback();
 		} else {
-			setTimeout(()=>{
+			setTimeout(() => {
 				waw.ready(signal, callback);
 			}, 100);
 		}
 	}
 }
 
-waw.config = waw.readJson(process.cwd()+'/config.json');
-waw.uniteJson(waw.config, waw.readJson(process.cwd()+'/server.json'));
-if (fs.existsSync(process.cwd()+'/angular.json')) {
+waw.config = waw.readJson(process.cwd() + '/config.json');
+waw.uniteJson(waw.config, waw.readJson(process.cwd() + '/server.json'));
+if (fs.existsSync(process.cwd() + '/angular.json')) {
 	waw.core_modules.angular = waw.core_module('angular');
 }
-if (fs.existsSync(process.cwd()+'/template.json')) {
+if (fs.existsSync(process.cwd() + '/react.json')) {
+	waw.core_modules.react = waw.core_module('react');
+}
+if (fs.existsSync(process.cwd() + '/template.json')) {
 	waw.core_modules.template = waw.core_module('template');
 	waw.core_modules.sem = waw.core_module('sem');
 }
@@ -324,14 +326,14 @@ const read_module = (source, name) => {
 	if (!fs.existsSync(source + '/module.json')) {
 		return {};
 	}
-	config = waw.readJson(source+'/module.json');
+	config = waw.readJson(source + '/module.json');
 	waw.install.npmi(source, config.dependencies);
 	config.__root = path.normalize(source);
 	config.__name = name;
 	waw._modules[config.__name] = config;
 	return config;
 }
-if (typeof waw.config.server !== 'string' && fs.existsSync(process.cwd()+'/server')) {
+if (typeof waw.config.server !== 'string' && fs.existsSync(process.cwd() + '/server')) {
 	waw.config.server = 'server';
 }
 const modules_root = process.cwd() + path.sep + waw.config.server;
@@ -346,11 +348,11 @@ if (fs.existsSync(modules_root) && waw.isDirectory(modules_root)) {
 		waw.modules[i] = read_module(waw.modules[i], path.basename(waw.modules[i]));
 	}
 }
-if(waw.config.modules) {
+if (waw.config.modules) {
 	waw.each(waw.config.modules, module => waw.install.global(module));
 }
 waw.modules = waw.modules.filter(module => Object.keys(module).length);
-if(!waw.modules.length) {
+if (!waw.modules.length) {
 	waw.each(waw.core_modules, module => waw.install.global(module));
 }
 waw.install.npmi(process.cwd(), waw.config.dependencies, dec);
