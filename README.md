@@ -1,6 +1,7 @@
-# waw love
-[waw](https://webart.work) is the open-source web, mobile and desktop app development framework that makes it easy to
-build top quality web apps with web technologies.
+<p align="center">
+  <a href="https://wawjs.wiki/" target="_blank"><img src="https://webart.work/waw/img/spider.svg" width="120" alt="waw Logo" /></a>
+</p>
+<p align="center"><a href="https://wawjs.wiki" target="_blank">waw</a> is the open-source web, mobile and desktop app development framework that makes it easy building efficient and scalable applications</p>
 
 ## Getting Started
 ### Framework installation which require node.js
