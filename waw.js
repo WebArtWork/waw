@@ -85,7 +85,7 @@ const waw = {
 					waw.exe(base + 'git reset --hard origin/' + branch, ()=>{
 						callback(err);
 						if (removeGit) {
-							fs.rmdirSync(folder + '/.git', { recursive: true });
+							fs.rmSync(folder + '/.git', { recursive: true });
 						}
 					});
 				});
@@ -98,7 +98,7 @@ const waw = {
 				project.fetch('--all', err => {
 					project.reset('origin/' + branch, err => {
 						if (removeGit) {
-							fs.rmdirSync(folder + '/.git', {
+							fs.rmSync(folder + '/.git', {
 								recursive: true
 							});
 						}

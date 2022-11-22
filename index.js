@@ -11,7 +11,7 @@ if (waw.argv.length && waw.argv[0].toLowerCase() == 'update') {
 			console.log('Framework could not be updated');
 			process.exit(1);
 		}
-		fs.rmdirSync(__dirname + '/server', { recursive: true });
+		fs.rmSync(__dirname + '/server', { recursive: true });
 		waw.writeJson(waw.waw_root + '/server.json', json);
 		console.log('Framework has been updated and global modules removed');
 		process.exit(1);
