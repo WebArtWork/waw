@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://wawjs.wiki/" target="_blank"><img src="https://webart.work/waw/img/spider.svg" width="120" alt="waw Logo" /></a>
+  <a href="https://wawjs.wiki/" target="_blank"><img src="https://wawjs.wiki/wiki/img/logo.svg" width="120" alt="waw Logo" /></a>
 </p>
 <p align="center"><a href="https://wawjs.wiki" target="_blank">waw</a> is the open-source web, mobile and desktop app development framework that makes it easy building efficient and scalable applications</p>
 
