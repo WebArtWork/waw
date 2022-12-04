@@ -6,12 +6,22 @@
 ## Getting Started
 ### Framework installation which require node.js
 `npm i -g waw`
+
 ### Verify waw is installed and check waw version
 `waw version`
+
 ### Create new waw project
 `waw new`
+
 ### To update waw framework and global modules
 `waw update`
+
+### To start project with nodemon
+`waw`
+
+### To start project with pm2
+`waw start`
+
 ## Popular Modules
 | Part | Description | Issues | Forks | Stars | License |
 | ------- | ------- | ------- | ------- | ------- |:-----:|
