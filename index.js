@@ -28,7 +28,6 @@ if (waw.argv.length && waw.argv[0].toLowerCase() == 'update') {
 	}, json.branch);
 } else {
 	waw.ready('modules installed', () => {
-		console.log('modules installed');
 		if (waw.argv.length) {
 			let done = false;
 
