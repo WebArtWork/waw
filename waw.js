@@ -117,7 +117,7 @@ const waw = {
 			project.addRemote('origin', repo, err => {
 				project.fetch('--all', err => {
 					project.reset('origin/' + branch, err => {
-						if (removeGit) {
+						if (removeGit && fs.existsSync(path.join(folder, '.git'))) {
 							fs.rmSync(folder + '/.git', {
 								recursive: true
 							});
