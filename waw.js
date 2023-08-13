@@ -37,10 +37,10 @@ const waw = {
 	waw_root: __dirname,
 	project_root: process.cwd(),
 	core_modules: {
-		core: 'https://github.com/WebArtWork/core.git'
+		core: 'https://github.com/WebArtWork/waw-core.git'
 	},
 	core_orgs: {
-		waw: 'https://github.com/WebArtWork/NAME.git'
+		waw: 'https://github.com/WebArtWork/waw-NAME.git'
 	},
 	core_module: name => waw.core_orgs.waw.replace('NAME', name),
 	isDirectory: source => fs.lstatSync(source).isDirectory(),

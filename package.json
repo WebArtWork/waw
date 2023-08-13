@@ -4,7 +4,7 @@
 		"framework",
 		"waw"
 	],
-	"version": "23.0.0",
+	"version": "23.1.0",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
 	"author": {
@@ -14,7 +14,7 @@
 	},
 	"contributors": [],
 	"engines": {
-		"node": ">=14.0.0"
+		"node": ">=16.0.0"
 	},
 	"main": "./index.js",
 	"bin": {
