@@ -371,6 +371,20 @@ const waw = {
 				waw.ready(signal, callback);
 			}, 100);
 		}
+	},
+	each_file: async function (callback, ext) {
+		await waw.wait(500);
+		for (const module of waw.modules) {
+			const files = waw.getFiles(module.__root);
+			for (const file of files) {
+				if (
+					!ext ||
+					file.endsWith(ext)
+				) {
+					callback(file);
+				}
+			}
+		}
 	}
 }
 
