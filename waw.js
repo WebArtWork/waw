@@ -212,7 +212,7 @@ const waw = {
 		if (!fs.existsSync(path.resolve(opts.path, 'node_modules', opts.name.split('@')[0]))) {
 			if (opts.version === '*') opts.version = '';
 			else opts.version = '@' + opts.version;
-			const base = 'npm i --legacy-peer-deps --no-package-lock --no-save';
+			const base = 'npm i --legacy-peer-deps --no-package-lock ' + (opts.save ? '--save' : '--no-save');
 			execSync(`cd ${opts.path} && ${base} ${opts.name}${opts.version}`);
 		}
 		next();
