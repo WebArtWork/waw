@@ -8,6 +8,8 @@ const git = require('gitty');
 
 const exec = require('child_process').exec;
 
+const { execSync } = require("child_process");
+
 const serial = function (i, arr, callback) {
 	if (i >= arr.length) return callback();
 
@@ -96,43 +98,20 @@ const waw = {
 	},
 	fetch: (folder, repo, callback, branch = 'master', removeGit = true) => {
 		fs.mkdirSync(folder, { recursive: true });
-		/*
 		const base = 'cd ' + folder + ' && ';
-		waw.exe(base + 'git init', ()=>{
-			waw.exe(base + 'git remote add origin ' + repo, ()=>{
-				waw.exe(base + 'git fetch --all', ()=>{
-					waw.exe(base + 'git reset --hard origin/' + branch, ()=>{
-						callback(err);
-						if (removeGit) {
-							fs.rmSync(folder + '/.git', { recursive: true });
-						}
-					});
-				});
-			});
-		});
-		*/
-		const project = git(folder);
-
-		project.init(() => {
-			project.addRemote('origin', repo, err => {
-				project.fetch('--all', err => {
-					project.reset('origin/' + branch, err => {
-						if (removeGit && fs.existsSync(path.join(folder, '.git'))) {
-							fs.rmSync(folder + '/.git', {
-								recursive: true
-							});
-						}
-
-						callback(err);
-					});
-				});
-			});
-		});
+		if (!fs.existsSync(path.join(folder, '.git'))) {
+			execSync(base + 'git init');
+			execSync(base + 'git remote add origin ' + repo);
+		}
+		execSync(base + 'git fetch --all > NUL 2>&1');
+		execSync(base + 'git reset --hard origin/' + branch);
+		callback();
+		if (removeGit) {
+			fs.rmSync(folder + '/.git', { recursive: true });
+		}
 	},
 	update: (folder, repo, callback, branch = 'master') => {
-		waw.fetch(folder + '/temp', repo, () => {
-
-		}, branch, false);
+		waw.fetch(folder + '/temp', repo, callback, branch, false);
 	},
 	parallel: (arr, callback) => {
 		let counter = arr.length;
@@ -236,65 +215,13 @@ const waw = {
 		return files;
 	},
 	npmi: function (opts, next = () => { }) {
-		if (lock) {
-			return setTimeout(() => {
-				waw.npmi(opts, next);
-			}, 100);
+		if (!fs.existsSync(path.resolve(opts.path, 'node_modules', opts.name.split('@')[0]))) {
+			if (opts.version === '*') opts.version = '';
+			else opts.version = '@' + opts.version;
+			const base = 'npm i --legacy-peer-deps --no-package-lock --no-save';
+			execSync(`cd ${opts.path} && ${base} ${opts.name}${opts.version}`);
 		}
-
-		lock = true;
-
-		if (fs.existsSync(path.resolve(opts.path, opts.name))) {
-			return next();
-		}
-
-		let cmdString = "npm install " + opts.name;
-
-		if (opts.version === '*') opts.version = '';
-
-		cmdString += (opts.version ? "@" + opts.version : "");
-
-		cmdString += ' --prefix ' + opts.path;
-
-		cmdString += ' --ignore-scripts true --package-lock false --unsafe-perm';
-
-		cmdString += (opts.global ? " -g" : "");
-
-		cmdString += (opts.save ? " --save" : "");
-
-		cmdString += (opts.saveDev ? " --save-dev" : "");
-
-		cmdString += (opts.legacyBundling ? " --legacy-bundling" : "");
-
-		cmdString += (opts.noOptional ? " --no-optional" : "");
-
-		const cmd = exec(cmdString, {
-			cwd: opts.path ? opts.path : "/",
-			maxBuffer: opts.maxBuffer ? opts.maxBuffer : 200 * 1024
-		}, (error, stdout, stderr) => {
-			if (error) {
-				console.log(cmdString);
-
-				console.log("I cloudn't install " + opts.name + " on path " + opts.path);
-
-				process.exit();
-			} else {
-				lock = false;
-
-				console.log("Module installed: " + opts.name);
-
-				next();
-			}
-		});
-		if (opts.output) {
-			const consoleOutput = function (msg) {
-				console.log('npm: ' + msg);
-			};
-
-			cmd.stdout.on('data', consoleOutput);
-
-			cmd.stderr.on('data', consoleOutput);
-		}
+		next();
 	},
 	install: {
 		global: function (name, callback = () => { }, branch = 'master') {
