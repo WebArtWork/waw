@@ -215,12 +215,6 @@ const waw = {
 			opts.name.split('@')[0]
 		);
 		if (!fs.existsSync(modulePath)) {
-			if (this._npmi_installing) {
-				return setTimeout(() => {
-					waw.npmi(opts, next, shutdown);
-				}, 100);
-			}
-			this._npmi_installing = true;
 			if (opts.version === '*') opts.version = '';
 			else opts.version = '@' + opts.version;
 			const base = 'npm i -prefix . --legacy-peer-deps --no-package-lock ' + (opts.save ? '--save' : '--no-save');
@@ -228,7 +222,6 @@ const waw = {
 			exec(`${base} ${opts.name}${opts.version}`, {
 				cwd: opts.path
 			}, (err) => {
-				this._npmi_installing = false;
 				if (err) {
 					fs.rmSync(modulePath, { recursive: true });
 
@@ -258,7 +251,7 @@ const waw = {
 
 				if (typeof callback === 'function') callback();
 			} else {
-				console.log(`Installing Global Module \x1b[38;2;255;165;0m${name}\x1b[0m`);
+				console.log(`Installing global module \x1b[38;2;255;165;0m${name}\x1b[0m`);
 
 				inc();
 
