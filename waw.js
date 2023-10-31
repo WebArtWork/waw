@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const path = require('path');
 
-const { execSync } = require("child_process");
+const { execSync, exec } = require("child_process");
 
 const serial = function (i, arr, callback) {
 	if (i >= arr.length) return callback();
@@ -208,14 +208,21 @@ const waw = {
 		}
 		return files;
 	},
-	npmi: function (opts, next = () => { }) {
-		if (!fs.existsSync(path.resolve(opts.path, 'node_modules', opts.name.split('@')[0]))) {
+	npmi: async function (opts, next = () => { }) {
+		if (
+			!fs.existsSync(
+				path.join(opts.path, 'node_modules', opts.name.split('@')[0])
+			)
+		) {
 			if (opts.version === '*') opts.version = '';
 			else opts.version = '@' + opts.version;
-			const base = 'npm i --legacy-peer-deps --no-package-lock ' + (opts.save ? '--save' : '--no-save');
-			execSync(`cd ${opts.path} && ${base} ${opts.name}${opts.version}`);
+			const base = 'npm i -prefix . --legacy-peer-deps --no-package-lock ' + (opts.save ? '--save' : '--no-save');
+			exec(`${base} ${opts.name}${opts.version}`, {
+				cwd: opts.path
+			}, next);
+		} else {
+			next();
 		}
-		next();
 	},
 	install: {
 		global: function (name, callback = () => { }, branch = 'master') {
