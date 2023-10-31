@@ -208,18 +208,44 @@ const waw = {
 		}
 		return files;
 	},
-	npmi: async function (opts, next = () => { }) {
-		if (
-			!fs.existsSync(
-				path.join(opts.path, 'node_modules', opts.name.split('@')[0])
-			)
-		) {
+	npmi: function (opts, next = () => { }, shutdown = 3) {
+		const modulePath = path.join(
+			opts.path,
+			'node_modules',
+			opts.name.split('@')[0]
+		);
+		if (!fs.existsSync(modulePath)) {
+			if (this._npmi_installing) {
+				return setTimeout(() => {
+					waw.npmi(opts, next, shutdown);
+				}, 100);
+			}
+			this._npmi_installing = true;
 			if (opts.version === '*') opts.version = '';
 			else opts.version = '@' + opts.version;
 			const base = 'npm i -prefix . --legacy-peer-deps --no-package-lock ' + (opts.save ? '--save' : '--no-save');
+			console.log(`${shutdown === 3 ? 'Installing' : 'Re-installing'} node module \x1b[38;2;255;165;0m${opts.name}\x1b[0m at module \x1b[38;2;255;165;0m${path.basename(opts.path)}\x1b[0m`);
 			exec(`${base} ${opts.name}${opts.version}`, {
 				cwd: opts.path
-			}, next);
+			}, (err, out) => {
+				this._npmi_installing = false;
+
+				if (err) {
+					fs.rmSync(modulePath, { recursive: true });
+
+					if (--shutdown) {
+						waw.npmi(opts, next, shutdown);
+					} else {
+						console.error(err);
+
+						console.log('Probably internet is not stable');
+
+						process.exit(1);
+					}
+				} else {
+					next();
+				}
+			});
 		} else {
 			next();
 		}
