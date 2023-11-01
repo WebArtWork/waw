@@ -28,6 +28,8 @@ const dec = () => {
 
 const node_file = `module.exports.command = function(waw) {\n\t// add your Run code\n};`;
 
+let installing_node_module = false;
+
 const waw = {
 	argv: process.argv.splice(2, process.argv.length - 2),
 	waw_root: __dirname,
@@ -209,32 +211,48 @@ const waw = {
 		return files;
 	},
 	npmi: function (opts, next = () => { }, shutdown = 3) {
-		const modulePath = path.join(
+		opts.name = opts.name.split('@')[0];
+		const modulePath = path.resolve(
 			opts.path,
 			'node_modules',
-			opts.name.split('@')[0]
+			opts.name
 		);
 		if (!fs.existsSync(modulePath)) {
-			if (opts.version === '*') opts.version = '';
-			else opts.version = '@' + opts.version;
-			const base = 'npm i -prefix . --legacy-peer-deps --no-package-lock ' + (opts.save ? '--save' : '--no-save');
+			if (installing_node_module) {
+				return setTimeout(()=>waw.npmi(opts, next, shutdown), 100);
+			}
+			installing_node_module = true;
+			const version = opts.version === '*' ? '' : '@' + opts.version;
+			const base = 'npm i';
 			console.log(`${shutdown === 3 ? 'Installing' : 'Re-installing'} node module \x1b[38;2;255;165;0m${opts.name}\x1b[0m at module \x1b[38;2;255;165;0m${path.basename(opts.path)}\x1b[0m`);
-			exec(`${base} ${opts.name}${opts.version}`, {
+			exec(`${base} ${opts.name}${version}`, {
 				cwd: opts.path
 			}, (err) => {
+				installing_node_module = false;
+
 				if (err) {
-					fs.rmSync(modulePath, { recursive: true });
+					if (fs.existsSync(modulePath)) {
+						fs.rmSync(modulePath, { recursive: true });
+					}
 
 					if (--shutdown) {
 						waw.npmi(opts, next, shutdown);
 					} else {
-						console.error(err);
-
-						console.log('Probably internet is not stable');
+						console.log('Probably internet is not stable, check your connection and try \x1b[38;2;255;165;0mwaw update\x1b[0m');
 
 						process.exit(1);
 					}
 				} else {
+					if (!opts.save) {
+						if (fs.existsSync(path.join(modulePath, 'package.json'))) {
+							fs.rmSync(path.join(modulePath, 'package.json'), { recursive: true });
+						}
+
+						if (fs.existsSync(path.join(modulePath, 'package-lock.json'))) {
+							fs.rmSync(path.join(modulePath, 'package-lock.json'), { recursive: true });
+						}
+					}
+
 					next();
 				}
 			});
