@@ -287,7 +287,7 @@ const waw = {
 
 			inc(); // start
 
-			let command = 'npm i -prefix .', install = false, names = '';
+			let command = 'npm i -prefix . --no-save --no-package-lock', install = false, names = '';
 
 			waw.each(dependencies, (name, version, next) => {
 				if (!fs.existsSync(path.join(source, 'node_modules', name))) {
