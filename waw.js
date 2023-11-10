@@ -269,7 +269,7 @@ const waw = {
 
 				if (typeof callback === 'function') callback();
 			} else {
-				console.log(`Installing global module \x1b[38;2;255;165;0m${name}\x1b[0m`);
+				console.log(`Installing module \x1b[38;2;255;165;0m${name}\x1b[0m`);
 
 				inc();
 
@@ -283,30 +283,36 @@ const waw = {
 			}
 		},
 		npmi: function (source, dependencies, callback = () => { }, opts = {}) {
-			if (typeof dependencies !== 'object' || !Object.keys(dependencies)) return
+			if (typeof dependencies !== 'object' || !Object.keys(dependencies).length) return;
 
 			inc(); // start
 
+			let command = 'npm i -prefix .', install = false, names = '';
+
 			waw.each(dependencies, (name, version, next) => {
-				if (fs.existsSync(path.resolve(source, 'node_modules', name))) {
-					return next();
+				if (!fs.existsSync(path.join(source, 'node_modules', name))) {
+					install = true;
 				}
 
-				inc();
+				command += ' ' + name + (version && version !== '*' ? '@' + version : '');
 
-				waw.npmi({
-					path: source,
-					name,
-					version
-				}, () => {
-					dec();
+				names += (names ? ', ' : '') + name;
 
-					next();
-				});
+				next();
 			}, () => {
-				dec(); // finish
+				if (install) {
+					console.log(`Installing node module \x1b[38;2;255;165;0m${names}\x1b[0m at module \x1b[38;2;255;165;0m${path.basename(source)}\x1b[0m`);
 
-				callback();
+					exec(command, { cwd: source }, () => {
+						callback();
+
+						dec(); // finish
+					});
+				} else {
+					callback();
+
+					dec(); // finish
+				}
 			});
 		}
 	},
