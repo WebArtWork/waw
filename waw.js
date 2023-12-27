@@ -442,7 +442,7 @@ if (!waw.modules.length) {
 	});
 }
 
-if (waw.config.dependencies) {
+if (waw.config.dependencies && Object.keys(waw.config.dependencies).length) {
 	waw.install.npmi(process.cwd(), waw.config.dependencies, dec);
 } else {
 	dec();
