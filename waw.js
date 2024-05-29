@@ -38,7 +38,8 @@ const waw = {
 		core: 'https://github.com/WebArtWork/waw-core.git'
 	},
 	core_orgs: {
-		waw: 'https://github.com/WebArtWork/waw-NAME.git'
+		waw: 'https://github.com/WebArtWork/waw-NAME.git',
+		itkp: 'https://github.com/IT-Kamianets/waw-NAME.git'
 	},
 	core_module: name => waw.core_orgs.waw.replace('NAME', name),
 	isDirectory: source => fs.lstatSync(source).isDirectory(),
