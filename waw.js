@@ -95,17 +95,24 @@ const waw = {
 	},
 	fetch: (cwd, repo, callback, branch = 'master', removeGit = true) => {
 		cwd = cwd.split('\\').join('/');
+
 		fs.mkdirSync(cwd, { recursive: true });
+
 		if (!fs.existsSync(path.join(cwd, '.git'))) {
 			execSync('git init', { cwd });
+
 			execSync('git remote add origin ' + repo, { cwd });
 		}
+
 		execSync('git fetch --all > NUL 2>&1', { cwd });
+
 		execSync('git reset --hard origin/' + branch, { cwd });
-		callback();
+
 		if (removeGit) {
-			fs.rmSync(cwd + '/.git', { recursive: true });
+			fs.rmdirSync(path.join(cwd, '.git'), { recursive: true });
 		}
+
+		callback();
 	},
 	update: (folder, repo, callback, branch = 'master') => {
 		waw.fetch(folder + '/temp', repo, callback, branch, false);
