@@ -109,7 +109,7 @@ const waw = {
 		execSync('git reset --hard origin/' + branch, { cwd });
 
 		if (removeGit) {
-			fs.rmdirSync(path.join(cwd, '.git'), { recursive: true });
+			fs.rmSync(path.join(cwd, '.git'), { recursive: true });
 		}
 
 		callback();
