@@ -411,7 +411,7 @@ if (typeof waw.config.server !== 'string' && fs.existsSync(process.cwd() + '/ser
 	waw.config.server = 'server';
 }
 
-const modules_root = path.join(process.cwd(), waw.config.server);
+const modules_root = path.join(process.cwd(), waw.config.server || '');
 
 waw.modules = [];
 
