@@ -93,19 +93,26 @@ const waw = {
 			toArray.push(fromArray[i]);
 		}
 	},
-	fetch: (folder, repo, callback, branch = 'master', removeGit = true) => {
-		fs.mkdirSync(folder, { recursive: true });
-		const base = 'cd ' + folder + ' && ';
-		if (!fs.existsSync(path.join(folder, '.git'))) {
-			execSync(base + 'git init');
-			execSync(base + 'git remote add origin ' + repo);
+	fetch: (cwd, repo, callback, branch = 'master', removeGit = true) => {
+		cwd = cwd.split('\\').join('/');
+
+		fs.mkdirSync(cwd, { recursive: true });
+
+		if (!fs.existsSync(path.join(cwd, '.git'))) {
+			execSync('git init', { cwd });
+
+			execSync('git remote add origin ' + repo, { cwd });
 		}
-		execSync(base + 'git fetch --all > NUL 2>&1');
-		execSync(base + 'git reset --hard origin/' + branch);
-		callback();
+
+		execSync('git fetch --all > NUL 2>&1', { cwd });
+
+		execSync('git reset --hard origin/' + branch, { cwd });
+
 		if (removeGit) {
-			fs.rmSync(folder + '/.git', { recursive: true });
+			fs.rmSync(path.join(cwd, '.git'), { recursive: true });
 		}
+
+		callback();
 	},
 	update: (folder, repo, callback, branch = 'master') => {
 		waw.fetch(folder + '/temp', repo, callback, branch, false);
@@ -220,7 +227,7 @@ const waw = {
 		);
 		if (!fs.existsSync(modulePath)) {
 			if (installing_node_module) {
-				return setTimeout(()=>waw.npmi(opts, next, shutdown), 100);
+				return setTimeout(() => waw.npmi(opts, next, shutdown), 100);
 			}
 			installing_node_module = true;
 			const version = opts.version === '*' ? '' : '@' + opts.version;
