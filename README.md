@@ -1,48 +1,124 @@
-<p align="center">
-  <a href="https://wawjs.wiki/" target="_blank"><img src="https://wawjs.wiki/wiki/img/logo.svg" width="120" alt="waw Logo" /></a>
-</p>
-<p align="center"><a href="https://wawjs.wiki" target="_blank">waw</a> is the open-source web, mobile and desktop app development framework that makes it easy building efficient and scalable applications</p>
+# waw Framework
+
+waw is a minimalistic Node.js framework that serves as a foundation for building various types of projects. The core framework itself contains almost no code—its functionality is driven entirely by the modules you choose to include, making it highly flexible and adaptable to different use cases.
+
+## Key Features
+
+-   **Minimal Core** – The framework itself is extremely lightweight, containing only the essential bootstrapping logic. All functionality is added through modules, keeping the core clean and adaptable.
+-   **Modular Architecture** – Functionality is added via modules, allowing you to build projects tailored to your specific needs.
+-   **Full-Stack Support** – Supports modern front-end frameworks and powerful back-end technologies.
+-   **Flexible Integration** – Can be extended to work with any front-end or back-end technology by developing custom modules.
+
+## Supported Frameworks
+
+-   Angular
+-   React
+-   Vue
+-   Unity
+
+## Default Back-End Setup
+
+By default, waw uses the following technologies for back-end development:
+
+-   **Express.js** – A fast, minimalist web framework for Node.js.
+-   **Socket.io** – Real-time, bidirectional event-based communication.
+-   **MongoDB** – A flexible, scalable NoSQL database.
+
+However, waw is designed to be flexible, and you can integrate any other back-end technologies or databases by writing custom modules.
 
 ## Getting Started
-### Framework installation which require node.js
-`npm i -g waw`
 
-### Verify waw is installed and check waw version
-`waw version`
+### 1. Install waw
 
-### Create new waw project
-`waw new`
+Ensure you have Node.js installed, then install waw globally:
 
-### To update waw framework and global modules
-`waw update`
+```sh
+npm install -g waw
+```
 
-### To start project with nodemon
-`waw`
+### 2. Verify Installation
 
-### To start project with pm2
-`waw start`
+Check if waw is installed correctly by running:
 
-### Change css framework
-`waw css`
+```sh
+waw version
+```
 
-## Popular Modules
-| Part | Description | Issues | Forks | Stars | License |
-| ------- | ------- | ------- | ------- | ------- |:-----:|
-| [**`Core`**](https://github.com/WebArtWork/waw-core) | Core waw functionalities for handling project | [![GitHub issues](https://img.shields.io/github/issues/WebArtWork/waw-core)](https://github.com/WebArtWork/waw-core/issues) | [![GitHub forks](https://img.shields.io/github/forks/WebArtWork/waw-core)](https://github.com/WebArtWork/waw-core/network) | [![GitHub stars](https://img.shields.io/github/stars/WebArtWork/waw-core)](https://github.com/WebArtWork/waw-core/stargazers) | [![GitHub license](https://img.shields.io/github/license/WebArtWork/waw-core)](https://github.com/WebArtWork/waw-core/blob/master/LICENSE)
-| [**`SEM`**](https://github.com/WebArtWork/waw-sem) | Sockets, Express and Mongodb tech stack | [![GitHub issues](https://img.shields.io/github/issues/WebArtWork/sem)](https://github.com/WebArtWork/waw-sem/issues) | [![GitHub forks](https://img.shields.io/github/forks/WebArtWork/sem)](https://github.com/WebArtWork/waw-sem/network) | [![GitHub stars](https://img.shields.io/github/stars/WebArtWork/sem)](https://github.com/WebArtWork/waw-sem/stargazers) | [![GitHub license](https://img.shields.io/github/license/WebArtWork/sem)](https://github.com/WebArtWork/waw-sem/blob/master/LICENSE)
-| [**`Angular`**](https://github.com/WebArtWork/waw-angular) | waw module to support Angular clinet | [![GitHub issues](https://img.shields.io/github/issues/WebArtWork/waw-angular)](https://github.com/WebArtWork/waw-angular/issues) | [![GitHub forks](https://img.shields.io/github/forks/WebArtWork/waw-angular)](https://github.com/WebArtWork/waw-angular/network) | [![GitHub stars](https://img.shields.io/github/stars/WebArtWork/waw-angular)](https://github.com/WebArtWork/waw-angular/stargazers) | [![GitHub license](https://img.shields.io/github/license/WebArtWork/waw-angular)](https://github.com/WebArtWork/waw-angular/blob/master/LICENSE)
-| [**`Template`**](https://github.com/WebArtWork/waw-template) | Server Side Render for crawlers | [![GitHub issues](https://img.shields.io/github/issues/WebArtWork/waw-template)](https://github.com/WebArtWork/waw-template/issues) | [![GitHub forks](https://img.shields.io/github/forks/WebArtWork/waw-template)](https://github.com/WebArtWork/waw-template/network) | [![GitHub stars](https://img.shields.io/github/stars/WebArtWork/waw-template)](https://github.com/WebArtWork/waw-template/stargazers) | [![GitHub license](https://img.shields.io/github/license/WebArtWork/waw-template)](https://github.com/WebArtWork/waw-template/blob/master/LICENSE)
+### 3. Create a New Project
 
-## Popular Projects
-| Part | Description | Issues | Forks | Stars | License |
-| ------- | ------- | ------- | ------- | ------- |:-----:|
-| [**`Angular`**](https://github.com/WebArtWork/ngx-default) | Default Angular project with basic structure and wacom module. | [![GitHub issues](https://img.shields.io/github/issues/WebArtWork/ngx-default)](https://github.com/WebArtWork/ngx-default/issues) | [![GitHub forks](https://img.shields.io/github/forks/WebArtWork/ngx-default)](https://github.com/WebArtWork/ngx-default/network) | [![GitHub stars](https://img.shields.io/github/stars/WebArtWork/ngx-default)](https://github.com/WebArtWork/ngx-default/stargazers) | [![GitHub license](https://img.shields.io/github/license/WebArtWork/ngx-default)](https://github.com/WebArtWork/ngx-default/blob/master/LICENSE)
-| [**`Template`**](https://github.com/WebArtWork/wjst-default) | Default Template project with basic structure. | [![GitHub issues](https://img.shields.io/github/issues/WebArtWork/wjst-default)](https://github.com/WebArtWork/wjst-default/issues) | [![GitHub forks](https://img.shields.io/github/forks/WebArtWork/wjst-default)](https://github.com/WebArtWork/wjst-default/network) | [![GitHub stars](https://img.shields.io/github/stars/WebArtWork/wjst-default)](https://github.com/WebArtWork/wjst-default/stargazers) | [![GitHub license](https://img.shields.io/github/license/WebArtWork/wjst-default)](https://github.com/WebArtWork/wjst-default/blob/master/LICENSE)
-| [**`Server`**](https://github.com/WebArtWork/waw-default) | Default waw Server project with basic structure. | [![GitHub issues](https://img.shields.io/github/issues/WebArtWork/waw-default)](https://github.com/WebArtWork/waw-default/issues) | [![GitHub forks](https://img.shields.io/github/forks/WebArtWork/waw-default)](https://github.com/WebArtWork/waw-default/network) | [![GitHub stars](https://img.shields.io/github/stars/WebArtWork/waw-default)](https://github.com/WebArtWork/waw-default/stargazers) | [![GitHub license](https://img.shields.io/github/license/WebArtWork/waw-default)](https://github.com/WebArtWork/waw-default/blob/master/LICENSE)
-| [**`Server with Angular and Template`**](https://github.com/WebArtWork/ngx-platform) | Platform build with waw Angular, Server and Template. | [![GitHub issues](https://img.shields.io/github/issues/WebArtWork/ngx-platform)](https://github.com/WebArtWork/ngx-platform/issues) | [![GitHub forks](https://img.shields.io/github/forks/WebArtWork/ngx-platform)](https://github.com/WebArtWork/ngx-platform/network) | [![GitHub stars](https://img.shields.io/github/stars/WebArtWork/ngx-platform)](https://github.com/WebArtWork/ngx-platform/stargazers) | [![GitHub license](https://img.shields.io/github/license/WebArtWork/ngx-platform)](https://github.com/WebArtWork/ngx-platform/blob/master/LICENSE)
+To initialize a new project, use the command:
+
+```sh
+waw new project-name
+```
+
+### 4. Start Your Project
+
+Run the project using:
+
+```sh
+waw
+```
+
+For production environments, use PM2:
+
+```sh
+waw start
+```
+
+### 5. Sync Modules
+
+To fetch modules from GitHub based on their repository link in the `module.json` file, use:
+
+```sh
+waw sync
+```
+
+### 6. Update waw
+
+To ensure you're using the latest version of waw and its modules, update it with:
+
+```sh
+waw update
+```
+
+## Module System
+
+waw supports two types of modules:
+
+-   **Global Modules** – These modules are shared across multiple projects. Each project decides which global modules to include.
+-   **Local Modules** – These modules exist only within a specific project and can be modified as needed. A global module can also be converted into a local module for customization.
+
+## Default Modules
+
+waw comes with some foundational modules that provide essential functionality for different types of projects. These default modules help streamline development, but they are not mandatory—developers can choose to use different modules or create their own based on project requirements. You are not restricted to these modules and can swap them for other technologies depending on the needs of your project.
+
+## CLI Modules
+
+waw also provides CLI tools for generating back-end projects and modules:
+
+-   [waw-core](https://github.com/WebArtWork/waw-core) – CLI tool for generating projects, fetching code from repositories, and creating basic modules.
+-   [waw-sem](https://github.com/WebArtWork/waw-sem) – CLI tool for generating back-end modules using Express, Socket.io, and Mongoose.
+
+For front-end integrations, waw provides dedicated CLI modules:
+
+-   [waw-angular](https://github.com/WebArtWork/waw-angular) – CLI support for Angular projects.
+-   [waw-react](https://github.com/WebArtWork/waw-react) – CLI support for React projects.
+-   [waw-vue](https://github.com/WebArtWork/waw-vue) – CLI support for Vue projects.
+-   [waw-unity](https://github.com/WebArtWork/waw-unity) – CLI support for Unity-based applications.
+
+## Why Use waw?
+
+-   **Lightweight and Fast** – You only include what you need, avoiding unnecessary bloat.
+-   **Highly Scalable** – Perfect for small projects and large-scale applications alike.
+-   **Modular Flexibility** – Swap and combine modules to fit your project’s requirements.
+-   **Full-Stack Ready** – Easily integrate with the latest front-end frameworks and back-end services.
+-   **Extendable** – Can be connected to any front-end or back-end technology by writing the necessary modules.
 
 ## Contributing
-Thanks for your interest in contributing! Read up on our guidelines for
-[contributing](https://github.com/WebArtWork/waw/CONTRIBUTING.md)
-and then look through our issues with a [help wanted](https://github.com/WebArtWork/waw/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)
-label.
+
+We welcome contributions! Whether it's improving the waw framework or enhancing any of our public modules, your help is greatly appreciated. Feel free to fork the repository, submit issues, or create pull requests. If you have an idea for a new module, we'd love to see it!
+
+## License
+
+waw is open-source and available under the MIT License.

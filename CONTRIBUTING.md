@@ -1,60 +1,34 @@
-# To Do
-## 1) Add eslint
-## 2) Support react and vue
-## 3) Support cordova/capacitor
-## 4) Support other back-ends besides node
-## 5) Rewrite framework on Typescript
-## 6) Write readme for waw.js
-## waw.js
-### waw.waw_root
-Location of global waw directory
-### waw.project_root
-Location of project directory
-### waw.core_modules
-Location of project directory
-### waw.core_orgs
-Location of project directory
-### waw.core_module
-Location of project directory
-### waw.isDirectory
-Location of project directory
-### waw.getDirectories
-Location of project directory
-### waw.isFile
-Location of project directory
-### waw.getFiles
-Location of project directory
-### waw.getFilesRecursively
-Location of project directory
-### waw.readJson
-Location of project directory
-### waw.writeJson
-Location of project directory
-### waw.uniteJson
-Location of project directory
-### waw.uniteArray
-Location of project directory
-### waw.fetch
-Location of project directory
-### waw.parallel
-Location of project directory
-### waw.each
-Location of project directory
-### waw.node_files
-Location of project directory
-### waw.npmi
-Location of project directory
-### waw.install
-Location of project directory
-### waw.emit
-Location of project directory
-### waw.on
-Location of project directory
-### waw.done
-Location of project directory
-### waw.ready
-Location of project directory
-### waw.config
-Location of project directory
-### waw.modules and waw._modules
-Location of project directory
+# Contributing to waw
+
+Thank you for your interest in contributing to waw! We welcome all contributions, whether it's fixing bugs, improving documentation, creating new modules, or enhancing existing ones.
+
+## How to Contribute
+
+### 1. Reporting Issues
+
+-   If you find a bug or have a feature request, please open an issue in the repository.
+-   Provide clear and detailed information about the problem or suggestion.
+
+### 2. Submitting Pull Requests
+
+-   Fork the repository and create a new branch for your contribution.
+-   Follow the existing code style and structure.
+-   Make sure your changes do not break existing functionality.
+-   Submit a pull request with a clear description of the changes.
+
+### 3. Contributing to Modules
+
+-   waw supports both **global** and **local** modules.
+-   If you improve a global module, please update the respective repository.
+-   If you create a new module, ensure it follows the waw module structure.
+
+### 4. Syncing Modules
+
+-   Use `waw sync` to fetch modules from GitHub if they are listed in `module.json`.
+
+### 5. Code of Conduct
+
+-   Be respectful and constructive in discussions.
+-   Ensure your contributions align with the project's goals.
+
+We appreciate your contributions and look forward to building waw together!

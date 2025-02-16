@@ -2,9 +2,22 @@
 	"name": "waw",
 	"keywords": [
 		"framework",
-		"waw"
+		"waw",
+		"nodejs",
+		"modular",
+		"backend",
+		"cli",
+		"express",
+		"socket",
+		"mongodb",
+		"mongoose",
+		"sockets",
+		"fullstack",
+		"front-end",
+		"back-end",
+		"development"
 	],
-	"version": "24.0.4",
+	"version": "25.0.1",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
 	"author": {
