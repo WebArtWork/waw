@@ -1,9 +1,17 @@
 const fs = require("fs");
+
+// Main module export: adds functions to the waw object
 module.exports = function (waw) {
+	// Create readline interface for CLI user input
 	waw.readline = require("readline").createInterface({
 		input: process.stdin,
 		output: process.stdout,
 	});
+
+	/**
+	 * Ensures the creation of a new module/component, sets up paths, checks for existing folders,
+	 * handles git repo input, and processes CLI arguments.
+	 */
 	waw.ensure = (base, folder, message_exists, is_component = true) => {
 		if (waw.argv.length < 2) {
 			console.log("Provide name");
@@ -54,6 +62,11 @@ module.exports = function (waw) {
 		waw.Name = waw.name.slice(0, 1).toUpperCase() + waw.name.slice(1);
 		return waw.repo;
 	};
+
+	/**
+	 * Reads and lets the user select a customization/template element,
+	 * asks the user which template to use if multiple are available.
+	 */
 	waw.read_customization = (defaults, element, next) => {
 		// let elements = waw.getDirectories(process.cwd() + '/template/' + element);
 		// for (var i = 0; i < elements.length; i++) {
@@ -81,6 +94,10 @@ module.exports = function (waw) {
 			next();
 		}
 	};
+
+	/**
+	 * Modifies a file in place: replaces code matching opts.search with opts.replace if present.
+	 */
 	waw.add_code = (opts) => {
 		if (!fs.existsSync(opts.file)) return;
 		let code = fs.readFileSync(opts.file, "utf8");

@@ -2,6 +2,8 @@
 
 waw is a minimalistic Node.js framework that serves as a foundation for building various types of projects. The core framework itself contains almost no code—its functionality is driven entirely by the modules you choose to include, making it highly flexible and adaptable to different use cases.
 
+![npm](https://img.shields.io/npm/v/waw) ![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
+
 ## Key Features
 
 -   **Minimal Core** – The framework itself is extremely lightweight, containing only the essential bootstrapping logic. All functionality is added through modules, keeping the core clean and adaptable.

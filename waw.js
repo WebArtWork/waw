@@ -1,74 +1,104 @@
 #!/usr/bin/env node
 
 const fs = require("fs");
-
 const path = require("path");
-
 const { execSync, exec } = require("child_process");
 
+/**
+ * Runs an array of async functions serially (one after another).
+ */
 const serial = function (i, arr, callback) {
 	if (i >= arr.length) return callback();
-
 	arr[i](function () {
 		serial(++i, arr, callback);
 	});
 };
 
+// Signals for pub/sub event system
 const signals = {};
 
+// Counter for module installation tasks
 let count = 1;
 
+/**
+ * Increments the global counter.
+ */
 const inc = () => ++count;
 
+/**
+ * Decrements the global counter and marks install as done if zero.
+ */
 const dec = () => {
 	if (--count === 0) {
 		waw.done("modules installed");
 	}
 };
 
+// Default node command file template
 const node_file = `module.exports.command = function(waw) {\n\t// add your Run code\n};`;
 
+// Flag to avoid multiple concurrent npm installs
 let installing_node_module = false;
 
+/**
+ * Main waw utility object with helper methods and module handling.
+ */
 const waw = {
+	// CLI arguments (excluding node and script)
 	argv: process.argv.splice(2, process.argv.length - 2),
+
+	// Absolute path to waw script
 	waw_root: __dirname,
+
+	// Current working directory
 	project_root: process.cwd(),
+
+	// Predefined core module repo URLs
 	core_modules: {
 		core: "https://github.com/WebArtWork/waw-core.git",
 	},
+
+	// Organization repo URL templates
 	core_orgs: {
 		waw: "https://github.com/WebArtWork/waw-NAME.git",
 		itkp: "https://github.com/IT-Kamianets/waw-NAME.git",
 	},
+
+	// Get waw org repo URL for a given module name
 	core_module: (name) => waw.core_orgs.waw.replace("NAME", name),
+
+	// Returns true if the path is a directory
 	isDirectory: (source) => fs.lstatSync(source).isDirectory(),
+
+	// Lists all directories in the given source folder
 	getDirectories: function (source) {
 		if (!fs.existsSync(source)) {
 			return [];
 		}
-
 		return fs
 			.readdirSync(source)
 			.map((name) => require("path").join(source, name))
 			.filter(this.isDirectory);
 	},
+
+	// Returns true if the path is a file
 	isFile: (source) => fs.lstatSync(source).isFile(),
+
+	// Lists all files in the given source folder
 	getFiles: function (source) {
 		return fs
 			.readdirSync(source)
 			.map((name) => path.join(source, name))
 			.filter(this.isFile);
 	},
+
+	// Recursively gets all files (optionally filter by extension)
 	getFilesRecursively: function (source, opts = {}) {
 		let dirs = this.getDirectories(source);
-
 		let files = dirs
 			.map((dir) => this.getFilesRecursively(dir))
 			.reduce((a, b) => a.concat(b), []);
-
 		files = files.concat(this.getFiles(source));
-
 		if (opts.end) {
 			for (var i = files.length - 1; i >= 0; i--) {
 				if (!files[i].endsWith(opts.end)) {
@@ -76,9 +106,10 @@ const waw = {
 				}
 			}
 		}
-
 		return files;
 	},
+
+	// Reads and parses a JSON file (returns {} on error)
 	readJson: function (source) {
 		if (fs.existsSync(source) && this.isFile(source)) {
 			try {
@@ -88,7 +119,11 @@ const waw = {
 			}
 		} else return {};
 	},
+
+	// Writes a JSON object to a file
 	writeJson: (path, json) => fs.writeFileSync(path, JSON.stringify(json)),
+
+	// Merges properties from fromObj into toObj (optionally only if missing)
 	uniteJson: (toObj, fromObj, replace = true) => {
 		for (const each in fromObj) {
 			if (replace || !toObj[each]) {
@@ -96,61 +131,57 @@ const waw = {
 			}
 		}
 	},
+
+	// Pushes all elements from fromArray into toArray
 	uniteArray: (toArray, fromArray) => {
 		for (var i = 0; i < fromArray.length; i++) {
 			toArray.push(fromArray[i]);
 		}
 	},
+
+	// Clones/updates a git repo to a folder (optionally removes .git)
 	fetch: (cwd, repo, callback, branch = "master", removeGit = true) => {
 		cwd = cwd.split("\\").join("/");
-
 		fs.mkdirSync(cwd, { recursive: true });
-
 		if (!fs.existsSync(path.join(cwd, ".git"))) {
 			execSync("git init", { cwd });
-
 			execSync("git remote add origin " + repo, { cwd });
 		}
-
 		execSync("git fetch --all > NUL 2>&1", { cwd });
-
 		execSync("git reset --hard origin/" + branch, { cwd });
-
 		if (removeGit) {
 			fs.rmSync(path.join(cwd, ".git"), { recursive: true });
 		}
-
 		callback();
 	},
+
+	// Fetches repo into a temp subfolder (used for update)
 	update: (folder, repo, callback, branch = "master") => {
 		waw.fetch(folder + "/temp", repo, callback, branch, false);
 	},
+
+	// Runs all functions in arr in parallel, then calls callback
 	parallel: (arr, callback) => {
 		let counter = arr.length;
-
 		if (counter === 0) return callback();
-
 		for (let i = 0; i < arr.length; i++) {
 			arr[i](function () {
 				if (--counter === 0) callback();
 			});
 		}
 	},
+
+	// Iterates array/object, runs func (serial or parallel mode)
 	each: function (arrOrObj, func, callback = () => {}, isSerial = false) {
 		if (typeof callback == "boolean") {
 			isSerial = callback;
-
 			callback = () => {};
 		}
-
 		if (Array.isArray(arrOrObj)) {
 			let counter = arrOrObj.length;
-
 			if (counter === 0) return callback();
-
 			if (isSerial) {
 				let serialArr = [];
-
 				for (let i = 0; i < arrOrObj.length; i++) {
 					serialArr.push(function (next) {
 						func(
@@ -178,18 +209,14 @@ const waw = {
 		} else if (typeof arrOrObj == "object") {
 			if (isSerial) {
 				let serialArr = [];
-
 				let arr = [];
-
 				for (let each in arrOrObj) {
 					arr.push({
 						value: arrOrObj[each],
 						each: each,
 					});
 				}
-
 				let counter = arr.length;
-
 				for (let i = 0; i < arr.length; i++) {
 					serialArr.push(function (next) {
 						func(
@@ -216,6 +243,8 @@ const waw = {
 			}
 		} else callback();
 	},
+
+	// Loads node command files, creates template if missing
 	node_files: (source, files, isRouter = false) => {
 		if (typeof files == "object" && files.src) {
 			files = [files.src];
@@ -228,19 +257,19 @@ const waw = {
 			}
 			if (!fs.existsSync(source + "/" + files[i])) {
 				let code = node_file;
-
 				if (isRouter) {
 					code = code
 						.replace(".command", "")
 						.replace("Run", "Router");
 				}
-
 				fs.writeFileSync(path.resolve(source, files[i]), code, "utf8");
 			}
 			files[i] = require(path.resolve(source, files[i]));
 		}
 		return files;
 	},
+
+	// Installs a node module using npm, with retries on failure
 	npmi: function (opts, next = () => {}, shutdown = 3) {
 		opts.name = opts.name.split("@")[0];
 		const modulePath = path.resolve(opts.path, "node_modules", opts.name);
@@ -267,19 +296,16 @@ const waw = {
 				},
 				(err) => {
 					installing_node_module = false;
-
 					if (err) {
 						if (fs.existsSync(modulePath)) {
 							fs.rmSync(modulePath, { recursive: true });
 						}
-
 						if (--shutdown) {
 							waw.npmi(opts, next, shutdown);
 						} else {
 							console.log(
 								"Probably internet is not stable, check your connection and try \x1b[38;2;255;165;0mwaw update\x1b[0m"
 							);
-
 							process.exit(1);
 						}
 					} else {
@@ -294,7 +320,6 @@ const waw = {
 									{ recursive: true }
 								);
 							}
-
 							if (
 								fs.existsSync(
 									path.join(modulePath, "package-lock.json")
@@ -306,7 +331,6 @@ const waw = {
 								);
 							}
 						}
-
 						next();
 					}
 				}
@@ -315,48 +339,43 @@ const waw = {
 			next();
 		}
 	},
+
 	install: {
+		// Installs waw module globally, fetches from remote if not exists locally
 		global: function (name, callback = () => {}, branch = "master") {
 			const source = path.resolve(__dirname, "server", name);
-
 			if (fs.existsSync(source)) {
 				waw.modules.push(read_module(source, name));
-
 				if (typeof callback === "function") callback();
 			} else {
 				console.log(
 					`Installing module \x1b[38;2;255;165;0m${name}\x1b[0m`
 				);
-
 				inc();
-
 				waw.fetch(
 					source,
 					waw.core_module(name),
 					() => {
 						waw.modules.push(read_module(source, name));
-
 						if (typeof callback === "function") callback();
-
 						dec();
 					},
 					branch
 				);
 			}
 		},
+
+		// Installs multiple npm dependencies for a given folder
 		npmi: function (source, dependencies, callback = () => {}, opts = {}) {
 			if (
 				typeof dependencies !== "object" ||
 				!Object.keys(dependencies).length
 			)
 				return;
-
 			inc(); // start
-
 			let command = "npm i -prefix . --no-save --no-package-lock",
 				install = false,
 				names = "";
-
 			waw.each(
 				dependencies,
 				(name, version, next) => {
@@ -365,14 +384,11 @@ const waw = {
 					) {
 						install = true;
 					}
-
 					command +=
 						" " +
 						name +
 						(version && version !== "*" ? "@" + version : "");
-
 					names += (names ? ", " : "") + name;
-
 					next();
 				},
 				() => {
@@ -382,38 +398,41 @@ const waw = {
 								source
 							)}\x1b[0m`
 						);
-
 						exec(command, { cwd: source }, () => {
 							callback();
-
 							dec(); // finish
 						});
 					} else {
 						callback();
-
 						dec(); // finish
 					}
 				}
 			);
 		},
 	},
+
+	// Triggers all registered callbacks for a given signal
 	emit: function (signal, doc) {
 		if (!signals[signal]) return;
-
 		for (var i = 0; i < signals[signal].length; i++) {
 			if (typeof signals[signal][i] === "function") {
 				signals[signal][i](doc);
 			}
 		}
 	},
+
+	// Registers a callback for a signal
 	on: function (signal, callback) {
 		if (!signals[signal]) signals[signal] = [];
-
 		if (typeof callback === "function") signals[signal].push(callback);
 	},
+
+	// Marks a signal as done (used for event/ready tracking)
 	done: function (signal) {
 		signals["done" + signal] = true;
 	},
+
+	// Waits until a signal is done, then calls callback
 	ready: function (signal, callback) {
 		if (signals["done" + signal]) {
 			callback();
@@ -423,6 +442,8 @@ const waw = {
 			}, 100);
 		}
 	},
+
+	// Calls callback for each file in all modules (optionally by extension)
 	each_file: async function (callback, ext) {
 		await waw.wait(500);
 		for (const module of waw.modules) {
@@ -436,47 +457,44 @@ const waw = {
 	},
 };
 
-waw.config = waw.readJson(process.cwd() + "/config.json");
+// ----- Config and bootstrapping -----
 
+// Load config from project and merge with server.json
+waw.config = waw.readJson(process.cwd() + "/config.json");
 waw.uniteJson(waw.config, waw.readJson(process.cwd() + "/server.json"));
 
+// Detect angular/react/template and add their modules to core_modules
 if (fs.existsSync(process.cwd() + "/angular.json")) {
 	waw.core_modules.angular = waw.core_module("angular");
 }
-
 if (fs.existsSync(process.cwd() + "/react.json")) {
 	waw.core_modules.react = waw.core_module("react");
 }
-
 if (fs.existsSync(process.cwd() + "/template.json")) {
 	waw.core_modules.template = waw.core_module("template");
-
 	waw.core_modules.sem = waw.core_module("sem");
 }
 
+/**
+ * Loads a waw module's config and dependencies from disk.
+ */
 const read_module = (source, name) => {
-	// remove this in 23.x.x version
+	// Remove this in 23.x.x version
 	if (fs.existsSync(source + "/part.json")) {
 		fs.renameSync(source + "/part.json", source + "/module.json");
 	}
-
 	if (!fs.existsSync(source + "/module.json")) {
 		return {};
 	}
-
 	config = waw.readJson(source + "/module.json");
-
 	waw.install.npmi(source, config.dependencies);
-
 	config.__root = path.normalize(source);
-
 	config.__name = name;
-
 	waw._modules[config.__name] = config;
-
 	return config;
 };
 
+// Set server root dir in config if not already set
 if (
 	typeof waw.config.server !== "string" &&
 	fs.existsSync(process.cwd() + "/server")
@@ -484,10 +502,9 @@ if (
 	waw.config.server = "server";
 }
 
+// Bootstrap modules and attach to waw.modules/_modules
 const modules_root = path.join(process.cwd(), waw.config.server || "");
-
 waw.modules = [];
-
 waw._modules = {};
 
 if (fs.existsSync(modules_root) && waw.isDirectory(modules_root)) {
@@ -497,9 +514,7 @@ if (fs.existsSync(modules_root) && waw.isDirectory(modules_root)) {
 			return !path.endsWith(".git") && !path.endsWith("node_modules");
 		})
 	);
-
 	waw.module = (name) => waw._modules[name];
-
 	for (let i = 0; i < waw.modules.length; i++) {
 		waw.modules[i] = read_module(
 			waw.modules[i],
@@ -508,12 +523,15 @@ if (fs.existsSync(modules_root) && waw.isDirectory(modules_root)) {
 	}
 }
 
+// Install modules defined in config.modules
 if (waw.config.modules) {
 	waw.each(waw.config.modules, (module) => waw.install.global(module));
 }
 
+// Filter out empty modules
 waw.modules = waw.modules.filter((module) => Object.keys(module).length);
 
+// If no modules found, install all from core_modules
 if (!waw.modules.length) {
 	waw.each(waw.core_modules, (module) => {
 		if (
@@ -530,21 +548,19 @@ if (!waw.modules.length) {
 	});
 }
 
+// Install global dependencies from config if any
 if (waw.config.dependencies && Object.keys(waw.config.dependencies).length) {
 	waw.install.npmi(process.cwd(), waw.config.dependencies, dec);
 } else {
 	dec();
 }
 
+// Filter again, sort modules by priority (desc)
 waw.modules = waw.modules.filter((module) => Object.keys(module).length);
-
 waw.modules.sort(function (a, b) {
 	if (!a.priority) a.priority = 0;
-
 	if (!b.priority) b.priority = 0;
-
 	if (a.priority < b.priority) return 1;
-
 	return -1;
 });
 
