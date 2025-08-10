@@ -470,8 +470,11 @@ if (fs.existsSync(process.cwd() + "/angular.json")) {
 if (fs.existsSync(process.cwd() + "/react.json")) {
 	waw.core_modules.react = waw.core_module("react");
 }
-if (fs.existsSync(process.cwd() + "/template.json")) {
-	waw.core_modules.template = waw.core_module("template");
+if (fs.existsSync(process.cwd() + "/vue.json")) {
+	waw.core_modules.vue = waw.core_module("vue");
+}
+if (fs.existsSync(process.cwd() + "/wjst.json")) {
+	waw.core_modules.wjst = waw.core_module("wjst");
 	waw.core_modules.sem = waw.core_module("sem");
 }
 
