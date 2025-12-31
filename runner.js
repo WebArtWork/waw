@@ -1,6 +1,16 @@
 const fs = require("fs");
 
-// Main module export: adds functions to the waw object
+/**
+ * runner.js
+ * ---------
+ * Attaches CLI helper utilities to the `waw` object.
+ *
+ * Added members:
+ * - waw.readline: readline interface (interactive prompts)
+ * - waw.ensure(): parses CLI args and prepares folders for new module/component
+ * - waw.read_customization(): prompts to select template/customization option
+ * - waw.add_code(): simple in-place string replacement helper for codegen
+ */
 module.exports = function (waw) {
 	// Create readline interface for CLI user input
 	waw.readline = require("readline").createInterface({
@@ -9,14 +19,38 @@ module.exports = function (waw) {
 	});
 
 	/**
-	 * Ensures the creation of a new module/component, sets up paths, checks for existing folders,
-	 * handles git repo input, and processes CLI arguments.
+	 * Prepares filesystem + naming context for generators.
+	 *
+	 * Typical usage:
+	 * - Called by a module runner (CLI command) before generating files.
+	 *
+	 * Behaviour:
+	 * - Requires at least 2 CLI args (command + name/path)
+	 * - Supports repo shortcut:
+	 *   • last arg endsWith ".git" → use as repo URL
+	 *   • last arg like "org-repo" → assumes WebArtWork org and builds URL
+	 * - Builds:
+	 *   • waw.name  (lowercase leaf name)
+	 *   • waw.Name  (capitalized)
+	 *   • waw.path  (folder + arg path)
+	 *   • waw.base  (absolute base path where code will be placed)
+	 *
+	 * Repo install behaviour:
+	 * - If repo is provided, it clones into waw.base and exits the process.
+	 *
+	 * @param {string} base Absolute base path for the project generation root
+	 * @param {string} folder Folder name under base (e.g. "server" or "modules")
+	 * @param {string} message_exists Console message when target already exists
+	 * @param {boolean} [is_component=true] If true, appends "/{name}" to waw.base
+	 * @returns {boolean|string|undefined} true when repo cloning is triggered, otherwise repo value (if any)
 	 */
 	waw.ensure = (base, folder, message_exists, is_component = true) => {
 		if (waw.argv.length < 2) {
 			console.log("Provide name");
 			process.exit(0);
 		}
+
+		// Repo URL resolution (explicit .git or shorthand "waw-xyz" style)
 		if (waw.argv[waw.argv.length - 1].endsWith(".git")) {
 			waw.repo = waw.argv.pop();
 		} else if (waw.argv[waw.argv.length - 1].split("-").length === 2) {
@@ -26,6 +60,8 @@ module.exports = function (waw) {
 			}
 			waw.repo = "https://github.com/WebArtWork/" + waw.repo + ".git";
 		}
+
+		// Normalize name and path arguments
 		waw.name = waw.argv[waw.argv.length - 1].toLowerCase();
 		if (waw.argv.length > 2) {
 			waw.argv[1] = folder + "/" + waw.argv[1];
@@ -33,20 +69,30 @@ module.exports = function (waw) {
 		while (waw.argv.length > 2) {
 			waw.argv[1] += "/" + waw.argv.splice(2, 1);
 		}
+
+		// Ensure folder root exists
 		if (!fs.existsSync(base + folder)) {
 			fs.mkdirSync(base + folder);
 		}
+
+		// Resolve final target path and name (supports nested paths)
 		if (waw.argv[1].indexOf("/") >= 0) {
 			waw.path = waw.argv[1];
 			waw.name = waw.name.split("/").pop();
 		} else {
 			waw.path = folder + "/" + waw.argv[1];
 		}
+
+		// Absolute target base folder
 		waw.base = base + waw.path;
+
+		// Guard: do not overwrite existing folder
 		if (fs.existsSync(waw.base)) {
 			console.log(message_exists);
 			process.exit(0);
 		}
+
+		// Repo install shortcut (clone + exit)
 		if (waw.repo) {
 			fs.mkdirSync(waw.base);
 			waw.fetch(waw.base, waw.repo, (err) => {
@@ -56,22 +102,33 @@ module.exports = function (waw) {
 			});
 			return true;
 		}
+
+		// Component generators usually create an extra folder for the component name
 		if (is_component) {
 			waw.base += "/" + waw.name;
 		}
+
+		// Capitalized name helper for templates
 		waw.Name = waw.name.slice(0, 1).toUpperCase() + waw.name.slice(1);
 		return waw.repo;
 	};
 
 	/**
-	 * Reads and lets the user select a customization/template element,
-	 * asks the user which template to use if multiple are available.
+	 * Lets the user choose between multiple customization/template options.
+	 *
+	 * If defaults[element] has more than one key:
+	 * - Print a numbered list
+	 * - Ask user to select option number
+	 * - Stores selected template into `waw.template`
+	 *
+	 * If only one option exists:
+	 * - Uses defaults[element].default
+	 *
+	 * @param {Record<string, Record<string, string>>} defaults e.g. { page: { default: "/path" , alt:"/path2" } }
+	 * @param {string} element Key in defaults to choose from
+	 * @param {Function} next Callback invoked after `waw.template` is set
 	 */
 	waw.read_customization = (defaults, element, next) => {
-		// let elements = waw.getDirectories(process.cwd() + '/template/' + element);
-		// for (var i = 0; i < elements.length; i++) {
-		// 	defaults[element][path.basename(elements[i])] = elements[i];
-		// }
 		if (defaults && Object.keys(defaults[element]).length > 1) {
 			waw.template = defaults[element];
 			let text = "Which element you want to use?",
@@ -96,7 +153,14 @@ module.exports = function (waw) {
 	};
 
 	/**
-	 * Modifies a file in place: replaces code matching opts.search with opts.replace if present.
+	 * In-place code patch helper.
+	 *
+	 * Reads opts.file and replaces the first occurrence of opts.search with opts.replace.
+	 * Does nothing if:
+	 * - file does not exist
+	 * - search string is not found
+	 *
+	 * @param {{ file: string, search: string, replace: string }} opts
 	 */
 	waw.add_code = (opts) => {
 		if (!fs.existsSync(opts.file)) return;

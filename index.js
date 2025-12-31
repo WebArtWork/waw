@@ -1,5 +1,22 @@
 #!/usr/bin/env node
 
+/**
+ * index.js
+ * --------
+ * Main waw CLI entrypoint (the `waw` binary).
+ *
+ * Two modes:
+ * 1) `waw update [branch]`
+ *    - Pulls latest waw framework code from GitHub into the global install folder
+ *    - Removes previously installed global modules (server/*) after update
+ *
+ * 2) Default (no update)
+ *    - Waits for modules to be installed
+ *    - Tries to find a "runner" command in any module that provides one
+ *    - If no runner handles the command (or runner returns `true` to continue),
+ *      starts nodemon to run app.js and watch important folders/files
+ */
+
 // Import waw core utilities
 const waw = require(__dirname + "/waw.js");
 
@@ -18,6 +35,11 @@ if (waw.argv.length && waw.argv[0].toLowerCase() == "update") {
 	let json = waw.readJson(waw.waw_root + "/server.json");
 	json.branch = (waw.argv.length > 1 && waw.argv[1]) || "master";
 
+	/**
+	 * Updates the waw global install directory in-place.
+	 * - Repo is fetched into __dirname (global install folder)
+	 * - Then `server/` is removed to force fresh global module installs later
+	 */
 	waw.fetch(
 		__dirname,
 		"https://github.com/WebArtWork/waw.git",
@@ -44,6 +66,16 @@ if (waw.argv.length && waw.argv[0].toLowerCase() == "update") {
 	 */
 } else {
 	waw.ready("modules installed", () => {
+		/**
+		 * Runner resolution:
+		 * - A module can expose a `runner` entry in module.json
+		 * - That entry points to a file exporting an object: { commandName: (waw) => ... }
+		 * - We match by `waw.argv[0]` (case-insensitive)
+		 *
+		 * Runner contract:
+		 * - If runner returns `true` → continue into nodemon startup
+		 * - Otherwise → stop (runner fully handled the process)
+		 */
 		if (waw.argv.length) {
 			let done = false;
 			// Search each module for a runner matching the CLI command
@@ -59,17 +91,31 @@ if (waw.argv.length && waw.argv[0].toLowerCase() == "update") {
 				for (let each in runners) {
 					if (each.toLowerCase() !== waw.argv[0].toLowerCase())
 						continue;
+
+					// Context helpers for runner implementations
 					waw.module_config = waw.modules[i];
 					waw.module_root = waw.modules[i].__root;
+
 					let continue_process = runners[each](waw);
 					if (continue_process !== true) return;
+
 					done = true;
 					break;
 				}
 				if (done) break;
 			}
 		}
-		// Start app in development mode with nodemon (auto-reloads on changes)
+
+		/**
+		 * Development runtime:
+		 * nodemon runs app.js and restarts when watched paths change.
+		 *
+		 * Watch targets include:
+		 * - project server folder (process.cwd()/server)
+		 * - global install server folder (__dirname/server)
+		 * - global pages folder (__dirname/pages)
+		 * - template.json and app.js inside global install folder
+		 */
 		const nodemon = require("nodemon");
 		nodemon({
 			script: __dirname + "/app.js",
