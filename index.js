@@ -109,22 +109,18 @@ if (waw.argv.length && waw.argv[0].toLowerCase() == "update") {
 		/**
 		 * Development runtime:
 		 * nodemon runs app.js and restarts when watched paths change.
-		 *
-		 * Watch targets include:
-		 * - project server folder (process.cwd()/server)
-		 * - global install server folder (__dirname/server)
-		 * - global pages folder (__dirname/pages)
-		 * - template.json and app.js inside global install folder
 		 */
 		const nodemon = require("nodemon");
 		nodemon({
 			script: __dirname + "/app.js",
 			watch: [
 				process.cwd() + "/server",
+				process.cwd() + "/angular.json",
+				process.cwd() + "/react.json",
+				process.cwd() + "/vue.json",
+				process.cwd() + "/config.json",
 				__dirname + "/server",
-				__dirname + "/pages",
-				__dirname + "/template.json",
-				__dirname + "/app.js",
+				__dirname + "/config.json",
 			],
 			ext: "js json",
 		});
