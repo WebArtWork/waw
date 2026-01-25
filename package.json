@@ -1,6 +1,23 @@
 {
 	"name": "waw",
 	"version": "26.0.0",
+	"license": "MIT",
+	"repository": "WebArtWork/waw",
+	"author": {
+		"name": "Honchar Denys",
+		"email": "crackeraki@gmail.com",
+		"url": "https://github.com/CrackerakiUA"
+	},
+	"engines": {
+		"node": ">=24"
+	},
+	"main": "./index.js",
+	"bin": {
+		"waw": "index.js"
+	},
+	"dependencies": {
+		"nodemon": "3.1.11"
+	},
 	"keywords": [
 		"waw",
 		"framework",
@@ -20,23 +37,5 @@
 		"mongoose",
 		"api",
 		"rest"
-	],
-	"license": "MIT",
-	"repository": "WebArtWork/waw",
-	"author": {
-		"name": "Honchar Denys",
-		"email": "crackeraki@gmail.com",
-		"url": "https://github.com/CrackerakiUA"
-	},
-	"contributors": [],
-	"engines": {
-		"node": ">=16.0.0"
-	},
-	"main": "./index.js",
-	"bin": {
-		"waw": "index.js"
-	},
-	"dependencies": {
-		"nodemon": "3.1.11"
-	}
+	]
 }

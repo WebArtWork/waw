@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+console.log(require('./util.modules').map(m => m.name));
+
+
+
+
 /**
  * index.js
  * --------
