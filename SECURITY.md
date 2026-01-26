@@ -15,8 +15,8 @@ We release security updates for the latest major version of waw. Users are encou
 
 | Version  | Supported              |
 | -------- | ---------------------- |
-| 25.x.x   | ✅ Active support      |
-| < 25.0.0 | ❌ No longer supported |
+| 26.x.x   | ✅ Active support      |
+| < 26.1.0 | ❌ No longer supported |
 
 ## Security Best Practices
 

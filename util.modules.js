@@ -1,6 +1,7 @@
 // util.modules.js
 const fs = require("node:fs");
 const path = require("node:path");
+const { execSync } = require("node:child_process");
 
 const j = (p) => {
 	try {
@@ -20,6 +21,79 @@ const walk = (dir, out = []) => {
 	return out;
 };
 
+// --- tiny semver helpers (enough for waw-style deps) ---
+const parseVer = (v) => {
+	const m = ("" + v).trim().match(/^(\d+)\.(\d+)\.(\d+)/);
+	return m ? [parseInt(m[1]), parseInt(m[2]), parseInt(m[3])] : null;
+};
+const cmp = (a, b) => {
+	for (let i = 0; i < 3; i++) if (a[i] !== b[i]) return a[i] > b[i] ? 1 : -1;
+	return 0;
+};
+const satisfies = (installed, wanted) => {
+	if (!wanted || wanted === "*" || wanted === "latest") return true;
+	const i = parseVer(installed);
+	if (!i) return false;
+
+	const w = ("" + wanted).trim();
+	if (/^\d+\.\d+\.\d+$/.test(w)) return installed.startsWith(w);
+
+	const wv = parseVer(w.replace(/^[^\d]*/, ""));
+	if (!wv) return false;
+
+	if (w.startsWith("^")) {
+		// ^1.2.3 => same major, >= 1.2.3
+		return i[0] === wv[0] && cmp(i, wv) >= 0;
+	}
+	if (w.startsWith("~")) {
+		// ~1.2.3 => same major+minor, >= 1.2.3
+		return i[0] === wv[0] && i[1] === wv[1] && cmp(i, wv) >= 0;
+	}
+	if (w.startsWith(">=")) return cmp(i, wv) >= 0;
+
+	// fallback: if it contains a number, treat it as exact prefix match
+	return installed.startsWith(wv.join("."));
+};
+
+const installedVersion = (moduleRoot, name) => {
+	try {
+		const pj = path.join(moduleRoot, "node_modules", name, "package.json");
+		return j(pj).version || "";
+	} catch {
+		return "";
+	}
+};
+
+const orange = (s) => `\x1b[38;2;255;165;0m${s}\x1b[0m`;
+
+const ensureDeps = (moduleRoot, deps) => {
+	if (!deps || typeof deps !== "object") return;
+
+	const toInstall = [];
+	const namesPretty = [];
+
+	for (const name of Object.keys(deps)) {
+		const wanted = deps[name];
+		const has = installedVersion(moduleRoot, name);
+		if (has && satisfies(has, wanted)) continue;
+
+		namesPretty.push(name);
+		if (!wanted || wanted === "*" || wanted === "latest") toInstall.push(name);
+		else toInstall.push(`${name}@${wanted}`);
+	}
+
+	if (!toInstall.length) return;
+
+	console.log(
+		`Installing node module ${orange(namesPretty.join(", "))} at module ${orange(
+			path.basename(moduleRoot)
+		)}`
+	);
+
+	const cmd = `npm i --no-save --no-package-lock --no-fund --no-audit --loglevel=error ${toInstall.join(" ")}`;
+	execSync(cmd, { cwd: moduleRoot, stdio: "inherit" });
+};
+
 const load = (dir, name, isGlobal) => {
 	const part = path.join(dir, "part.json");
 	const mod = path.join(dir, "module.json");
@@ -30,16 +104,19 @@ const load = (dir, name, isGlobal) => {
 	m.__root = path.normalize(dir);
 	m.__name = name;
 	m.__global = !!isGlobal;
+
+	// install deps declared by module itself
+	ensureDeps(m.__root, m.dependencies);
+
+	// files snapshot (after install; still excludes node_modules)
 	m.files = walk(m.__root);
 	return m;
 };
 
 const orderModules = (modules) => {
-	// case-insensitive name map
-	const byLower = Object.fromEntries(
-		modules.map((m) => [(m.__name || "").toLowerCase(), m])
-	);
-	const names = Object.keys(byLower); // lowercased names
+	// case-insensitive names
+	const by = Object.fromEntries(modules.map((m) => [(m.__name || "").toLowerCase(), m]));
+	const names = Object.keys(by);
 
 	const adj = Object.fromEntries(names.map((n) => [n, new Set()]));
 	const indeg = Object.fromEntries(names.map((n) => [n, 0]));
@@ -51,55 +128,43 @@ const orderModules = (modules) => {
 		}
 	};
 	const norm = (v) => (v ? (Array.isArray(v) ? v : [v]) : []);
+	const normNames = (v) => norm(v).map((x) => ("" + x).toLowerCase()).filter(Boolean);
 
-	// precompute explicit before/after sets (lowercased, without "*")
-	const explicitAfter = {};
-	const explicitBefore = {};
-	for (const n of names) {
-		const m = byLower[n];
-		explicitAfter[n] = new Set(norm(m.after).map(x => (""+x).toLowerCase()).filter(x => x && x !== "*"));
-		explicitBefore[n] = new Set(norm(m.before).map(x => (""+x).toLowerCase()).filter(x => x && x !== "*"));
+	// explicit constraints (used to prevent "*" creating cycles)
+	const expAfter = {}, expBefore = {};
+	for (const me of names) {
+		const m = by[me];
+		expAfter[me] = new Set(normNames(m.after).filter((x) => x !== "*"));
+		expBefore[me] = new Set(normNames(m.before).filter((x) => x !== "*"));
 	}
 
 	for (const me of names) {
-		const m = byLower[me];
+		const m = by[me];
 
-		// BEFORE
-		for (const raw of norm(m.before)) {
-			const x = ("" + raw).toLowerCase();
-			if (!x) continue;
-
+		for (const x of normNames(m.before)) {
 			if (x === "*") {
-				// before all EXCEPT the ones I'm explicitly after
-				for (const other of names) {
-					if (other !== me && !explicitAfter[me].has(other)) add(me, other);
-				}
-			} else if (byLower[x]) {
-				add(me, x);
-			}
+				// before everyone except those I'm explicitly after
+				for (const other of names) if (other !== me && !expAfter[me].has(other)) add(me, other);
+			} else if (by[x]) add(me, x);
 		}
 
-		// AFTER
-		for (const raw of norm(m.after)) {
-			const x = ("" + raw).toLowerCase();
-			if (!x) continue;
-
+		for (const x of normNames(m.after)) {
 			if (x === "*") {
-				// after all EXCEPT the ones I'm explicitly before
-				for (const other of names) {
-					if (other !== me && !explicitBefore[me].has(other)) add(other, me);
-				}
-			} else if (byLower[x]) {
-				add(x, me);
-			}
+				// after everyone except those I'm explicitly before
+				for (const other of names) if (other !== me && !expBefore[me].has(other)) add(other, me);
+			} else if (by[x]) add(x, me);
 		}
 	}
 
-	// Kahn topo sort (stable-ish: queue in original discovery order)
-	const original = modules.map(m => (m.__name || "").toLowerCase()).filter(n => byLower[n]);
-	const q = original.filter((n) => indeg[n] === 0);
-	const seen = new Set(q);
-	for (const n of names) if (indeg[n] === 0 && !seen.has(n)) q.push(n);
+	// stable topo queue: keep discovery order
+	const original = modules
+		.map((m) => (m.__name || "").toLowerCase())
+		.filter((n) => by[n]);
+
+	const q = [];
+	const seen = new Set();
+	for (const n of original) if (indeg[n] === 0 && !seen.has(n)) q.push(n), seen.add(n);
+	for (const n of names) if (indeg[n] === 0 && !seen.has(n)) q.push(n), seen.add(n);
 
 	const out = [];
 	for (let i = 0; i < q.length; i++) {
@@ -119,6 +184,7 @@ const orderModules = (modules) => {
 	);
 };
 
+// ---- read project config ----
 const cwd = process.cwd();
 const config = Object.assign(j(path.join(cwd, "config.json")), j(path.join(cwd, "server.json")));
 if (typeof config.server !== "string" && fs.existsSync(path.join(cwd, "server"))) config.server = "server";
@@ -131,31 +197,27 @@ if (fs.existsSync(localRoot)) {
 	for (const n of fs.readdirSync(localRoot)) {
 		if (n === "node_modules" || n === ".git") continue;
 		const dir = path.join(localRoot, n);
-		if (!fs.lstatSync(dir).isDirectory()) continue;
+		if (!fs.existsSync(dir) || !fs.lstatSync(dir).isDirectory()) continue;
 		const m = load(dir, n, false);
 		if (m) modules.push(m);
 	}
 }
 
-// global waw install root (where waw's index.js is)
+// global waw root (where waw is installed)
 const wawRoot = path.dirname(require.resolve("waw"));
 
-// global modules required by project
-// supports both:
-//   modules: { core:"waw", sem:"waw" }
-//   modules: ["core","sem"]
-const required = config.modules;
-
-if (Array.isArray(required)) {
-	for (const name of required) {
+// required global modules (your config.modules object map)
+const req = config.modules;
+if (Array.isArray(req)) {
+	for (const name of req) {
 		const dir = path.join(wawRoot, "server", name);
 		if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) {
 			const m = load(dir, name, true);
 			if (m) modules.push(m);
 		}
 	}
-} else if (required && typeof required === "object") {
-	for (const name of Object.keys(required)) {
+} else if (req && typeof req === "object") {
+	for (const name of Object.keys(req)) {
 		const dir = path.join(wawRoot, "server", name);
 		if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) {
 			const m = load(dir, name, true);

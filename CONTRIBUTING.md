@@ -16,17 +16,7 @@ Thank you for your interest in contributing to waw! We welcome all contributions
 -   Make sure your changes do not break existing functionality.
 -   Submit a pull request with a clear description of the changes.
 
-### 3. Contributing to Modules
-
--   waw supports both **global** and **local** modules.
--   If you improve a global module, please update the respective repository.
--   If you create a new module, ensure it follows the waw module structure.
-
-### 4. Syncing Modules
-
--   Use `waw sync` to fetch modules from GitHub if they are listed in `module.json`.
-
-### 5. Code of Conduct
+### 3. Code of Conduct
 
 -   Be respectful and constructive in discussions.
 -   Ensure your contributions align with the project's goals.
