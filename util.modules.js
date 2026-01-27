@@ -206,6 +206,7 @@ if (fs.existsSync(localRoot)) {
 // global waw root (where waw is installed)
 const wawRoot = path.dirname(require.resolve("waw"));
 
+
 // required global modules (your config.modules object map)
 const req = config.modules;
 if (Array.isArray(req)) {
@@ -223,6 +224,16 @@ if (Array.isArray(req)) {
 			const m = load(dir, name, true);
 			if (m) modules.push(m);
 		}
+	}
+}
+
+// always include core module (needed when running outside a project)
+const hasCore = modules.some((m) => (m.__name || "").toLowerCase() === "core");
+if (!hasCore) {
+	const coreDir = path.join(wawRoot, "server", "core");
+	if (fs.existsSync(coreDir) && fs.lstatSync(coreDir).isDirectory()) {
+		const core = load(coreDir, "core", true);
+		if (core) modules.push(core);
 	}
 }
 

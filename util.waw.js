@@ -1,4 +1,5 @@
 const path = require("node:path");
+const fs = require("node:fs");
 
 const project_root = process.cwd();
 
@@ -17,6 +18,16 @@ const server_config_path = path.join(project_root, "server.json");
 const waw_server_root = path.join(waw_root, "server");
 const waw_config_path = path.join(waw_root, "config.json");
 
+const readJson = (p) => {
+	try {
+		if (!fs.existsSync(p)) return {};
+		return JSON.parse(fs.readFileSync(p, "utf8"));
+	} catch {
+		return {};
+	}
+};
+
+
 module.exports = {
 	argv,
 
@@ -27,6 +38,11 @@ module.exports = {
 	server_config_path,
 
 	waw_root,
-	waw_server_root,
 	waw_config_path,
+	waw_server_root,
+
+	config: {
+		...(fs.existsSync(config_path) ? readJson(config_path) : {}),
+		...(fs.existsSync(server_config_path) ? readJson(server_config_path) : {})
+	}
 };

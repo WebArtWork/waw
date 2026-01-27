@@ -2,6 +2,7 @@ const waw = require("./util.waw");
 
 module.exports = function runExe(modules) {
 	const cmdRaw = process.argv[2];
+
 	if (!cmdRaw) return false;
 
 	const cmd = String(cmdRaw).toLowerCase();
@@ -17,6 +18,7 @@ module.exports = function runExe(modules) {
 			// Only match exact filename: cli.js (not *.cli.js)
 			const normalized = f.replace(/\\/g, "/");
 			const base = normalized.split("/").pop();
+
 			if (base.toLowerCase() !== "cli.js") continue;
 
 			const ex = require(f);
