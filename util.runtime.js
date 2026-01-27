@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const modules = require('waw/util.modules');
 const waw = require('waw/util.waw');
+waw.modules = modules;
 
 (async () => {
 	for (const m of modules) {
