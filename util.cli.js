@@ -2,9 +2,7 @@ const waw = require("./util.waw");
 
 module.exports = function runExe(modules) {
 	const cmdRaw = process.argv[2];
-
 	if (!cmdRaw) return false;
-
 	const cmd = String(cmdRaw).toLowerCase();
 
 	for (let mi = modules.length - 1; mi >= 0; mi--) {

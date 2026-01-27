@@ -21,12 +21,12 @@ const waw_config_path = path.join(waw_root, "config.json");
 const readJson = (p) => {
 	try {
 		if (!fs.existsSync(p)) return {};
+
 		return JSON.parse(fs.readFileSync(p, "utf8"));
 	} catch {
 		return {};
 	}
 };
-
 
 module.exports = {
 	argv,
@@ -42,7 +42,7 @@ module.exports = {
 	waw_server_root,
 
 	config: {
-		...(fs.existsSync(config_path) ? readJson(config_path) : {}),
-		...(fs.existsSync(server_config_path) ? readJson(server_config_path) : {})
+		...readJson(config_path),
+		...readJson(server_config_path),
 	}
 };
