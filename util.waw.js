@@ -51,7 +51,7 @@ const writeJson = (p, obj, pretty = true) => {
 	writeText(p, json + "\n");
 };
 
-const readWrite = (fromPath, toPath, replace) => {
+const readWrite = (fromPath, toPath, replace = {}) => {
 	let code = readText(fromPath);
 	for (const from in replace) {
 		code = code.split(from).join(replace[from]);
