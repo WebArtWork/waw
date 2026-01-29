@@ -117,6 +117,7 @@ module.exports = {
 		exists(path.join(projectPath, "angular.json")) ? 'angular' :
 		exists(path.join(projectPath, "react.json")) ? 'react' :
 		exists(path.join(projectPath, "vue.json")) ? 'vue' :
+		exists(path.join(projectPath, "wjst.json")) ? 'wjst' :
 		exists(path.join(projectPath, "config.json")) ? 'waw' : '',
 
 	// fs helpers
