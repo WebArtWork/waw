@@ -1,48 +1,109 @@
-const path = require("node:path");
 const fs = require("node:fs");
+const path = require("node:path");
 
-const project_root = process.cwd();
+// ---------- tiny fs helpers ----------
+const exists = (p) => fs.existsSync(p);
 
-// where the globally installed `waw` package lives (folder that contains its index.js)
-const waw_root = path.dirname(require.resolve("waw"));
+const isFile = (p) => {
+	try {
+		return fs.existsSync(p) && fs.lstatSync(p).isFile();
+	} catch {
+		return false;
+	}
+};
+
+const isDir = (p) => {
+	try {
+		return fs.existsSync(p) && fs.lstatSync(p).isDirectory();
+	} catch {
+		return false;
+	}
+};
+
+const ensureDir = (p) => fs.mkdirSync(p, { recursive: true });
+
+const rm = (p) => fs.rmSync(p, { recursive: true, force: true });
+
+const readText = (p, fallback = "") => {
+	try {
+		return fs.readFileSync(p, "utf8");
+	} catch {
+		return fallback;
+	}
+};
+
+const writeText = (p, data) => {
+	ensureDir(path.dirname(p));
+	fs.writeFileSync(p, String(data ?? ""), "utf8");
+};
+
+const readJson = (p, fallback = {}) => {
+	try {
+		if (!fs.existsSync(p)) return fallback;
+		return JSON.parse(fs.readFileSync(p, "utf8"));
+	} catch {
+		return fallback;
+	}
+};
+
+const writeJson = (p, obj, pretty = true) => {
+	const json = pretty ? JSON.stringify(obj ?? {}, null, "\t") : JSON.stringify(obj ?? {});
+	writeText(p, json + "\n");
+};
 
 // cli args after `waw`
 const argv = process.argv.slice(2);
 
-// common project paths
-const server_root = path.join(project_root, "server");
-const config_path = path.join(project_root, "config.json");
-const server_config_path = path.join(project_root, "server.json");
+// where the globally installed `waw` package lives (folder that contains its index.js)
+const wawPath = path.dirname(require.resolve("waw"));
 
 // common waw global paths
-const waw_server_root = path.join(waw_root, "server");
-const waw_config_path = path.join(waw_root, "config.json");
+const wawModulesPath = path.join(wawPath, "server");
+const wawConfigPath = path.join(wawPath, "config.json");
+const wawConfigServerPath = path.join(wawPath, "server.json");
 
-const readJson = (p) => {
-	try {
-		if (!fs.existsSync(p)) return {};
+const projectPath = process.cwd();
+// common project paths (default; some projects may use config.server === "")
+const configPath = path.join(projectPath, "config.json");
+const configServerPath = path.join(projectPath, "server.json");
 
-		return JSON.parse(fs.readFileSync(p, "utf8"));
-	} catch {
-		return {};
-	}
-};
+const config = {
+	...readJson(wawConfigPath, {}),
+	...readJson(wawConfigServerPath, {}),
+	...readJson(configPath, {}),
+	...readJson(configServerPath, {}),
+}
 
+const modulesPath =
+	path.join(projectPath, Object.prototype.hasOwnProperty.call(config, "server") &&
+		typeof config.server === "string"
+		? config.server
+		: "server");
+
+// ---------- exported context ----------
 module.exports = {
 	argv,
 
-	project_root,
-	server_root,
+	wawPath,
+	wawModulesPath,
+	wawConfigPath,
+	wawConfigServerPath,
+	projectPath,
+	configPath,
+	configServerPath,
+	modulesPath,
 
-	config_path,
-	server_config_path,
+	// fs helpers
+	exists,
+	isFile,
+	isDir,
+	ensureDir,
+	rm,
+	readText,
+	writeText,
+	readJson,
+	writeJson,
 
-	waw_root,
-	waw_config_path,
-	waw_server_root,
-
-	config: {
-		...readJson(config_path),
-		...readJson(server_config_path),
-	}
+	// merged config snapshot (kept for compatibility)
+	config,
 };

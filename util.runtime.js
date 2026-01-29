@@ -2,8 +2,8 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
-const modules = require('waw/util.modules');
-const waw = require('waw/util.waw');
+const modules = require('./util.modules');
+const waw = require('./util.waw');
 waw.modules = modules;
 
 (async () => {
