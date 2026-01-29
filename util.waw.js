@@ -51,6 +51,14 @@ const writeJson = (p, obj, pretty = true) => {
 	writeText(p, json + "\n");
 };
 
+const readWrite = (fromPath, toPath, replace) => {
+	let code = readText(fromPath);
+	for (const from in replace) {
+		code = code.split(from).join(replace[from]);
+	}
+	writeText(toPath, code);
+}
+
 // cli args after `waw`
 const argv = process.argv.slice(2);
 
@@ -103,6 +111,7 @@ module.exports = {
 	writeText,
 	readJson,
 	writeJson,
+	readWrite,
 
 	// merged config snapshot (kept for compatibility)
 	config,
