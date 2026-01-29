@@ -88,6 +88,19 @@ const modulesPath =
 		? config.server
 		: "server");
 
+
+const detectProjectType = () => {
+	const cwd = process.cwd();
+	return {
+		isAngular: exists(path.join(cwd, "angular.json")),
+		isReact: fs.existsSync(path.join(cwd, "react.json")),
+		isVue: fs.existsSync(path.join(cwd, "vue.json")),
+		isWjst:
+			fs.existsSync(path.join(cwd, "template.json")) ||
+			fs.existsSync(path.join(cwd, "wjst.json")),
+	};
+};
+
 // ---------- exported context ----------
 module.exports = {
 	argv,
@@ -100,6 +113,11 @@ module.exports = {
 	configPath,
 	configServerPath,
 	modulesPath,
+	projectType:
+		exists(path.join(projectPath, "angular.json")) ? 'angular' :
+		exists(path.join(projectPath, "react.json")) ? 'react' :
+		exists(path.join(projectPath, "vue.json")) ? 'vue' :
+		exists(path.join(projectPath, "config.json")) ? 'waw' : '',
 
 	// fs helpers
 	exists,
