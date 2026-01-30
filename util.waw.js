@@ -134,4 +134,6 @@ module.exports = {
 
 	// merged config snapshot (kept for compatibility)
 	config,
+
+	terminal: require('./util.terminal')
 };
