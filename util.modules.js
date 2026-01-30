@@ -69,30 +69,45 @@ const orange = (s) => `\x1b[38;2;255;165;0m${s}\x1b[0m`;
 const ensureDeps = (moduleRoot, deps) => {
 	if (!deps || typeof deps !== "object") return;
 
-	const toInstall = [];
+	let needsInstall = false;
+
+	// 1) detect if anything is missing / incompatible
+	for (const name of Object.keys(deps)) {
+		const wanted = deps[name];
+		const has = installedVersion(moduleRoot, name);
+		if (!has || !satisfies(has, wanted)) {
+			needsInstall = true;
+			break;
+		}
+	}
+
+	if (!needsInstall) return;
+
+	// 2) install ALL declared deps in one shot (stable resolution)
+	const installAll = [];
 	const namesPretty = [];
 
 	for (const name of Object.keys(deps)) {
 		const wanted = deps[name];
-		const has = installedVersion(moduleRoot, name);
-		if (has && satisfies(has, wanted)) continue;
-
 		namesPretty.push(name);
-		if (!wanted || wanted === "*" || wanted === "latest") toInstall.push(name);
-		else toInstall.push(`${name}@${wanted}`);
+
+		if (!wanted || wanted === "*" || wanted === "latest") installAll.push(name);
+		else installAll.push(`${name}@${wanted}`);
 	}
 
-	if (!toInstall.length) return;
-
 	console.log(
-		`Installing node module ${orange(namesPretty.join(", "))} at module ${orange(
+		`Installing node module${namesPretty.length ? "s" : ''} ${orange(namesPretty.join(", "))} at module ${orange(
 			path.basename(moduleRoot)
 		)}`
 	);
 
-	const cmd = `npm i --no-save --no-package-lock --no-fund --no-audit --loglevel=error ${toInstall.join(" ")}`;
+	const cmd =
+		`npm i --no-save --no-package-lock --no-fund --no-audit --loglevel=error ` +
+		installAll.join(" ");
+
 	execSync(cmd, { cwd: moduleRoot, stdio: "inherit" });
 };
+
 
 const load = (dir, name, isGlobal) => {
 	const part = path.join(dir, "part.json");
