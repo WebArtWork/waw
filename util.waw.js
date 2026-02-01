@@ -3,9 +3,10 @@ const path = require("node:path");
 const { EventEmitter } = require("node:events");
 
 // ---------- tiny fs helpers ----------
-const exists = (p) => fs.existsSync(p);
+const exists = (...parts) => fs.existsSync(path.join(...parts));
 
-const isFile = (p) => {
+const isFile = (...parts) => {
+	const p = path.join(...parts);
 	try {
 		return fs.existsSync(p) && fs.lstatSync(p).isFile();
 	} catch {
@@ -13,7 +14,8 @@ const isFile = (p) => {
 	}
 };
 
-const isDir = (p) => {
+const isDir = (...parts) => {
+	const p = path.join(...parts);
 	try {
 		return fs.existsSync(p) && fs.lstatSync(p).isDirectory();
 	} catch {
@@ -21,9 +23,9 @@ const isDir = (p) => {
 	}
 };
 
-const ensureDir = (p) => fs.mkdirSync(p, { recursive: true });
+const ensureDir = (...parts) => fs.mkdirSync(path.join(...parts), { recursive: true });
 
-const rm = (p) => fs.rmSync(p, { recursive: true, force: true });
+const rm = (...parts) => fs.rmSync(path.join(...parts), { recursive: true, force: true });
 
 const readText = (p, fallback = "") => {
 	try {
