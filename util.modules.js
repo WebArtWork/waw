@@ -116,7 +116,7 @@ const load = (dir, name, isGlobal) => {
 	if (!fs.existsSync(mod)) return;
 
 	const m = j(mod);
-	m.__root = path.normalize(dir);
+	m.rootPath = m.__root = path.normalize(dir);
 	m.__name = name;
 	m.__global = !!isGlobal;
 
