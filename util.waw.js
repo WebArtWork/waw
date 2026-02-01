@@ -128,6 +128,7 @@ module.exports = {
 	config,
 
 	terminal: require('./util.terminal'),
+	git: require('./util.git'),
 
 	// events
 	emit: (...args) => bus.emit(...args),

@@ -2,6 +2,10 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { execSync } = require("node:child_process");
+const git = require("./util.git");
+
+// global waw root (where waw is installed)
+const wawRoot = path.dirname(require.resolve("waw"));
 
 const j = (p) => {
 	try {
@@ -199,6 +203,16 @@ const orderModules = (modules) => {
 	);
 };
 
+// ---- ensure global module exists (installs from github if missing) ----
+const ensureGlobalModuleExists = (name, repo, branch = "master") => {
+	const dir = path.join(wawRoot, "server", name);
+	if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) return dir;
+
+	git.forceSync(dir, { repo, branch, silent: true });
+	return dir;
+};
+
+
 // ---- read project config ----
 const cwd = process.cwd();
 const config = Object.assign(j(path.join(cwd, "config.json")), j(path.join(cwd, "server.json")));
@@ -218,36 +232,32 @@ if (fs.existsSync(localRoot)) {
 	}
 }
 
-// global waw root (where waw is installed)
-const wawRoot = path.dirname(require.resolve("waw"));
-
 
 // required global modules (your config.modules object map)
-const req = config.modules;
-if (Array.isArray(req)) {
-	for (const name of req) {
-		const dir = path.join(wawRoot, "server", name);
-		if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) {
-			const m = load(dir, name, true);
-			if (m) modules.push(m);
-		}
+const orgMocks = {
+	waw: 'https://github.com/WebArtWork/waw-{NAME}.git',
+	itkp: 'git@github.com:IT-Kamianets/waw-{NAME}.git'
+};
+config.modules ||= {};
+
+for (const name in config.modules) {
+	if (!orgMocks[config.modules[name]]) {
+		continue;
 	}
-} else if (req && typeof req === "object") {
-	for (const name of Object.keys(req)) {
-		const dir = path.join(wawRoot, "server", name);
-		if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) {
-			const m = load(dir, name, true);
-			if (m) modules.push(m);
-		}
+
+	const dir = ensureGlobalModuleExists(name, orgMocks[config.modules[name]].replace('{NAME}', name));
+
+	if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) {
+		const m = load(dir, name, true);
+		if (m) modules.push(m);
 	}
 }
 
-// always include core module (needed when running outside a project)
-const hasCore = modules.some((m) => (m.__name || "").toLowerCase() === "core");
-if (!hasCore) {
-	const coreDir = path.join(wawRoot, "server", "core");
-	if (fs.existsSync(coreDir) && fs.lstatSync(coreDir).isDirectory()) {
-		const core = load(coreDir, "core", true);
+if (!modules.length) {
+	const dir = ensureGlobalModuleExists('core', orgMocks['waw'].replace('{NAME}', 'core'));
+
+	if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) {
+		const core = load(dir, "core", true);
 		if (core) modules.push(core);
 	}
 }
