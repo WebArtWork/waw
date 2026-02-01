@@ -1,5 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
+const { EventEmitter } = require("node:events");
 
 // ---------- tiny fs helpers ----------
 const exists = (p) => fs.existsSync(p);
@@ -88,18 +89,9 @@ const modulesPath =
 		? config.server
 		: "server");
 
-
-const detectProjectType = () => {
-	const cwd = process.cwd();
-	return {
-		isAngular: exists(path.join(cwd, "angular.json")),
-		isReact: fs.existsSync(path.join(cwd, "react.json")),
-		isVue: fs.existsSync(path.join(cwd, "vue.json")),
-		isWjst:
-			fs.existsSync(path.join(cwd, "template.json")) ||
-			fs.existsSync(path.join(cwd, "wjst.json")),
-	};
-};
+// ---------- events ----------
+const bus = new EventEmitter();
+bus.setMaxListeners(0);
 
 // ---------- exported context ----------
 module.exports = {
@@ -135,5 +127,11 @@ module.exports = {
 	// merged config snapshot (kept for compatibility)
 	config,
 
-	terminal: require('./util.terminal')
+	terminal: require('./util.terminal'),
+
+	// events
+	emit: (...args) => bus.emit(...args),
+	on: (...args) => bus.on(...args),
+	once: (...args) => bus.once(...args),
+	off: (...args) => bus.off(...args),
 };

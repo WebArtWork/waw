@@ -102,7 +102,7 @@ const ensureDeps = (moduleRoot, deps) => {
 	);
 
 	const cmd =
-		`npm i --no-save --no-package-lock --no-fund --no-audit --loglevel=error ` +
+		`npm i --legacy-peer-deps --no-save --no-package-lock --no-fund --no-audit --loglevel=error ` +
 		installAll.join(" ");
 
 	execSync(cmd, { cwd: moduleRoot, stdio: "inherit" });
