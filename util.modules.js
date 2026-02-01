@@ -106,7 +106,9 @@ const ensureDeps = (moduleRoot, deps) => {
 	);
 
 	const cmd =
-		`npm i --legacy-peer-deps --no-save --no-package-lock --no-fund --no-audit --loglevel=error ` +
+		`npm i --prefix ${JSON.stringify(moduleRoot)} ` +
+		`--workspaces=false --include-workspace-root=false ` +
+		`--legacy-peer-deps --no-save --no-package-lock --no-fund --no-audit --loglevel=error ` +
 		installAll.join(" ");
 
 	execSync(cmd, { cwd: moduleRoot, stdio: "inherit" });
@@ -259,6 +261,24 @@ if (!modules.length) {
 	if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) {
 		const core = load(dir, "core", true);
 		if (core) modules.push(core);
+	}
+}
+
+const projectTypes = {
+	'angular.json': 'angular',
+	'react.json': 'react',
+	'vue.json': 'vue',
+	'wjst.json': 'wjst',
+}
+for (const jsonName in projectTypes) {
+	const name = projectTypes[jsonName];
+	if (fs.existsSync(path.join(cwd, jsonName)) && !modules.find(m => m.name === name)) {
+		const dir = ensureGlobalModuleExists(name, orgMocks['waw'].replace('{NAME}', name));
+
+		if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) {
+			const core = load(dir, name, true);
+			if (core) modules.push(core);
+		}
 	}
 }
 
