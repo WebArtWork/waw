@@ -16,7 +16,7 @@
 		"waw": "index.js"
 	},
 	"dependencies": {
-		"nodemon": "3.1.11",
+		"nodemon": "3.1.11"
 	},
 	"keywords": [
 		"waw",
