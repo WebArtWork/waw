@@ -1,5 +1,5 @@
 {
-	"name": "waw",
+	"name": "@wawjs/cli",
 	"version": "26.1.0",
 	"license": "MIT",
 	"repository": "WebArtWork/waw",
