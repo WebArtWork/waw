@@ -30,7 +30,7 @@ If a feature is not implemented by a module, it does not exist.
 ## Installation
 
 ```sh
-npm install -g waw
+npm install -g @wawjs/cli
 ````
 
 ---

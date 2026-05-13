@@ -4,8 +4,8 @@ const path = require("node:path");
 const { execSync } = require("node:child_process");
 const git = require("./util.git");
 
-// global waw root (where waw is installed)
-const wawRoot = path.dirname(require.resolve("waw"));
+// global waw root (where this CLI package is installed)
+const wawRoot = __dirname;
 
 const j = (p) => {
 	try {

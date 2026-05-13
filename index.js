@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+const cmd = process.argv[2];
+if (cmd === "-v" || cmd === "--version" || cmd === "version") {
+	console.log(require("./package.json").version);
+	process.exit(0);
+}
+
 const modules = require('./util.modules');
 
 const executed = require('./util.cli')(modules);
