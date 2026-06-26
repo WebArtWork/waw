@@ -70,7 +70,7 @@ const installedVersion = (moduleRoot, name) => {
 
 const orange = (s) => `\x1b[38;2;255;165;0m${s}\x1b[0m`;
 
-const ensureDeps = (moduleRoot, deps) => {
+const ensureDeps = (moduleRoot, deps, moduleName) => {
 	if (!deps || typeof deps !== "object") return;
 
 	let needsInstall = false;
@@ -101,7 +101,7 @@ const ensureDeps = (moduleRoot, deps) => {
 
 	console.log(
 		`Installing node module${namesPretty.length ? "s" : ''} ${orange(namesPretty.join(", "))} at module ${orange(
-			path.basename(moduleRoot)
+			moduleName || path.basename(moduleRoot)
 		)}`
 	);
 
@@ -127,7 +127,7 @@ const load = (dir, name, isGlobal) => {
 	m.__global = !!isGlobal;
 
 	// install deps declared by module itself
-	ensureDeps(m.__root, m.dependencies);
+	ensureDeps(m.__root, m.dependencies, name);
 
 	// files snapshot (after install; still excludes node_modules)
 	m.files = walk(m.__root);
@@ -214,6 +214,48 @@ const ensureGlobalModuleExists = (name, repo, branch = "master") => {
 	return dir;
 };
 
+// ---- ensure npm module exists (installs from npm if missing) ----
+const ensureNpmModule = (pkgName, installRoot) => {
+	const dir = path.join(installRoot, 'node_modules', pkgName);
+	if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) return dir;
+	console.log(`Installing waw module ${orange(pkgName)} at ${orange(path.basename(installRoot))}`);
+	const cmd =
+		`npm i --prefix ${JSON.stringify(installRoot)} ` +
+		`--no-save --no-package-lock --no-fund --no-audit --loglevel=error ${pkgName}`;
+	execSync(cmd, { cwd: installRoot, stdio: 'inherit' });
+	return dir;
+};
+
+// ---- process a modules:{} config block, loading and recursing into each entry ----
+const processModules = (modulesConfig, installRoot, collected) => {
+	if (!modulesConfig || typeof modulesConfig !== 'object') return;
+
+	for (const name in modulesConfig) {
+		const value = modulesConfig[name];
+		let dir;
+
+		if (orgMocks[value]) {
+			// git-based org — always cloned into wawRoot/server/ (unchanged)
+			dir = ensureGlobalModuleExists(name, orgMocks[value].replace('{NAME}', name));
+		} else {
+			// "npm" = shorthand for @wawjs/waw-{name}, anything else = literal package name
+			const pkgName = value === 'npm' ? `@wawjs/waw-${name}` : value;
+			dir = ensureNpmModule(pkgName, installRoot);
+		}
+
+		if (!dir || !fs.existsSync(dir) || !fs.lstatSync(dir).isDirectory()) continue;
+
+		const m = load(dir, name, !!orgMocks[value]);
+		if (!m) continue;
+
+		collected.push(m);
+
+		// recurse into sub-modules declared in the module's own module.json
+		if (m.modules && typeof m.modules === 'object') {
+			processModules(m.modules, m.__root, collected);
+		}
+	}
+};
 
 // ---- read project config ----
 const cwd = process.cwd();
@@ -241,25 +283,13 @@ const orgMocks = {
 	itkp: 'git@github.com:IT-Kamianets/waw-{NAME}.git'
 };
 config.modules ||= {};
-
-for (const name in config.modules) {
-	if (!orgMocks[config.modules[name]]) {
-		continue;
-	}
-
-	const dir = ensureGlobalModuleExists(name, orgMocks[config.modules[name]].replace('{NAME}', name));
-
-	if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) {
-		const m = load(dir, name, true);
-		if (m) modules.push(m);
-	}
-}
+processModules(config.modules, cwd, modules);
 
 if (!modules.length) {
 	const dir = ensureGlobalModuleExists('core', orgMocks['waw'].replace('{NAME}', 'core'));
 
 	if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) {
-		const core = load(dir, "core", true);
+		const core = load(dir, 'core', true);
 		if (core) modules.push(core);
 	}
 }

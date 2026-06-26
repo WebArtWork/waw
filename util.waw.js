@@ -66,7 +66,7 @@ const readWrite = (fromPath, toPath, replace = {}) => {
 const argv = process.argv.slice(2);
 
 // where the globally installed `waw` package lives (folder that contains its index.js)
-const wawPath = path.dirname(require.resolve("waw"));
+const wawPath = path.dirname(require.resolve("@wawjs/cli"));
 
 // common waw global paths
 const wawModulesPath = path.join(wawPath, "server");

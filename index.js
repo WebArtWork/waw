@@ -2,7 +2,16 @@
 
 const cmd = process.argv[2];
 if (cmd === "-v" || cmd === "--version" || cmd === "version") {
-	console.log(require("./package.json").version);
+	const { wawPath } = require('./util.waw');
+	const modules = require('./util.modules');
+	const version = require("./package.json").version;
+	console.log(`waw location: ${wawPath}`);
+	console.log(`waw: ${version}`);
+	const names = modules
+		.map(m => (m.__name || m.name || ''))
+		.filter(Boolean)
+		.map(n => n.charAt(0).toUpperCase() + n.slice(1));
+	console.log(`Accessible Modules: ${names.length ? names.join(', ') : 'none'}`);
 	process.exit(0);
 }
 
