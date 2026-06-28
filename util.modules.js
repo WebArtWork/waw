@@ -214,15 +214,26 @@ const ensureGlobalModuleExists = (name, repo, branch = "master") => {
 	return dir;
 };
 
-// ---- ensure npm module exists (installs from npm if missing) ----
-const ensureNpmModule = (pkgName, installRoot) => {
-	const dir = path.join(installRoot, 'node_modules', pkgName);
+// ---- ensure an npm module exists in its OWN isolated prefix ----
+// Each module gets a private dir under <installRoot>/node_modules/.waw/<name> so
+// installs are additive: `npm i --no-save` only ever reconciles the prefix it
+// targets, so installing one module can never prune another. (Sharing one
+// node_modules made each install delete the previously installed sibling — and
+// across the cli + nodemon-runtime processes the two modules ping-ponged,
+// leaving core deleted before its index.js ran, hence `waw.wait is not a
+// function`.) The dot-prefixed dir lives alongside npm's own .bin / .cache and
+// is left untouched by npm reconciliation at the project root.
+const ensureNpmModuleIsolated = (name, pkgName, installRoot) => {
+	const home = path.join(installRoot, "node_modules", ".waw", name);
+	const dir = path.join(home, "node_modules", pkgName);
 	if (fs.existsSync(dir) && fs.lstatSync(dir).isDirectory()) return dir;
+
+	fs.mkdirSync(home, { recursive: true });
 	console.log(`Installing waw module ${orange(pkgName)} at ${orange(path.basename(installRoot))}`);
 	const cmd =
-		`npm i --prefix ${JSON.stringify(installRoot)} ` +
+		`npm i --prefix ${JSON.stringify(home)} ` +
 		`--no-save --no-package-lock --no-fund --no-audit --loglevel=error ${pkgName}`;
-	execSync(cmd, { cwd: installRoot, stdio: 'inherit' });
+	execSync(cmd, { cwd: home, stdio: "inherit" });
 	return dir;
 };
 
@@ -240,7 +251,7 @@ const processModules = (modulesConfig, installRoot, collected) => {
 		} else {
 			// "npm" = shorthand for @wawjs/waw-{name}, anything else = literal package name
 			const pkgName = value === 'npm' ? `@wawjs/waw-${name}` : value;
-			dir = ensureNpmModule(pkgName, installRoot);
+			dir = ensureNpmModuleIsolated(name, pkgName, installRoot);
 		}
 
 		if (!dir || !fs.existsSync(dir) || !fs.lstatSync(dir).isDirectory()) continue;
